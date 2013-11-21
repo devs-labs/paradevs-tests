@@ -43,7 +43,8 @@ public:
       const paradevs::common::NoParameters& parameters) :
         paradevs::dtss::Dynamics < common::DoubleTime, SchedulerHandle,
                                    paradevs::common::NoParameters >(name,
-                                                                    parameters)
+                                                                    parameters),
+        _value(0)
     { }
     virtual ~A()
     { }
@@ -95,8 +96,9 @@ public:
 
         common::Bag < common::DoubleTime, SchedulerHandle > msgs;
 
-        msgs.push_back(common::ExternalEvent < common::DoubleTime,
-                                               SchedulerHandle >("out", 0.));
+        msgs.push_back(common::ExternalEvent <
+                           common::DoubleTime, SchedulerHandle >(
+                               "out", (void*)&_value));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -109,6 +111,9 @@ public:
 
         return msgs;
     }
+
+private:
+    double _value;
 };
 
 template < class SchedulerHandle>
@@ -121,7 +126,8 @@ public:
       const paradevs::common::NoParameters& parameters) :
         paradevs::dtss::Dynamics < common::DoubleTime, SchedulerHandle,
                                    paradevs::common::NoParameters >(name,
-                                                                    parameters)
+                                                                    parameters),
+        _value(0)
     { }
     virtual ~B()
     { }
@@ -174,8 +180,9 @@ public:
 
         common::Bag < common::DoubleTime, SchedulerHandle > msgs;
 
-        msgs.push_back(common::ExternalEvent < common::DoubleTime,
-                                               SchedulerHandle >("out", 0.));
+        msgs.push_back(common::ExternalEvent <
+                           common::DoubleTime, SchedulerHandle >(
+                               "out", (void*)&_value));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -188,6 +195,9 @@ public:
 
         return msgs;
     }
+
+private:
+    double _value;
 };
 
 } } } // namespace paradevs tests dtss

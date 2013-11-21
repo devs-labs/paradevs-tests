@@ -57,7 +57,8 @@ class A :
 public:
     A(const std::string& name, const common::NoParameters& parameters) :
         paradevs::pdevs::Dynamics < common::DoubleTime,
-                                    SchedulerHandle >(name, parameters)
+                                    SchedulerHandle >(name, parameters),
+        _value(0)
     { }
     virtual ~A()
     { }
@@ -179,7 +180,7 @@ public:
 
         msgs.push_back(
             common::ExternalEvent < common::DoubleTime, SchedulerHandle >(
-                "out", 0.));
+                "out", (void*)&_value));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -200,6 +201,7 @@ private:
     enum Phase { WAIT, SEND };
 
     Phase _phase;
+    double _value;
 };
 
 template < class SchedulerHandle >
@@ -209,7 +211,8 @@ class B :
 public:
     B(const std::string& name, const common::NoParameters& parameters) :
         paradevs::pdevs::Dynamics < common::DoubleTime,
-                                    SchedulerHandle >(name, parameters)
+                                    SchedulerHandle >(name, parameters),
+        _value(0)
     { }
     virtual ~B()
     { }
@@ -328,8 +331,9 @@ public:
 #endif
         common::Bag < common::DoubleTime, SchedulerHandle > msgs;
 
-        msgs.push_back(common::ExternalEvent < common::DoubleTime,
-                                               SchedulerHandle >("out", 0.));
+        msgs.push_back(common::ExternalEvent <
+                           common::DoubleTime, SchedulerHandle >(
+                               "out", (void*)&_value));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -350,6 +354,7 @@ private:
     enum Phase { WAIT, SEND };
 
     Phase _phase;
+    double _value;
 };
 
 } } } // namespace paradevs tests pdevs

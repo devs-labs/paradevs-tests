@@ -46,7 +46,7 @@ public:
        const paradevs::common::NoParameters& parameters) :
         paradevs::pdevs::Dynamics < common::DoubleTime, SchedulerHandle,
                                     paradevs::common::NoParameters >(
-                                        name, parameters)
+                                        name, parameters), _value(0)
     { }
     virtual ~A1()
     { }
@@ -157,8 +157,9 @@ public:
 
         common::Bag < common::DoubleTime, SchedulerHandle > msgs;
 
-        msgs.push_back(common::ExternalEvent < common::DoubleTime,
-                                               SchedulerHandle >("out", 0.));
+        msgs.push_back(common::ExternalEvent <
+                           common::DoubleTime, SchedulerHandle >(
+                               "out", (void*)&_value));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -175,6 +176,7 @@ private:
     enum Phase { WAIT, SEND };
 
     Phase _phase;
+    double _value;
 };
 
 template < class SchedulerHandle>
@@ -301,8 +303,9 @@ public:
 #endif
         common::Bag < common::DoubleTime, SchedulerHandle > msgs;
 
-        msgs.push_back(common::ExternalEvent < common::DoubleTime,
-                                               SchedulerHandle >("out", t));
+        msgs.push_back(common::ExternalEvent <
+                           common::DoubleTime, SchedulerHandle >(
+                               "out", (void*)&t));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -330,7 +333,7 @@ public:
        const paradevs::common::NoParameters& parameters) :
         paradevs::dtss::Dynamics < common::DoubleTime, SchedulerHandle,
                                    paradevs::common::NoParameters >(
-                                       name, parameters)
+                                       name, parameters), _value(0)
     { }
     virtual ~A2()
     { }
@@ -383,7 +386,7 @@ public:
 
         msgs.push_back(
             common::ExternalEvent < common::DoubleTime,
-                                    SchedulerHandle >( "out", 0.));
+                                    SchedulerHandle >( "out", (void*)&_value));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -395,6 +398,9 @@ public:
 
         return msgs;
     }
+
+private:
+    double _value;
 };
 
 template < class SchedulerHandle >
@@ -406,7 +412,7 @@ public:
        const paradevs::common::NoParameters& parameters) :
         paradevs::dtss::Dynamics < common::DoubleTime, SchedulerHandle,
                                    paradevs::common::NoParameters >(
-                                       name, parameters)
+                                       name, parameters), _value(0)
     { }
     virtual ~B2()
     { }
@@ -459,7 +465,7 @@ public:
 
         msgs.push_back(
             common::ExternalEvent < common::DoubleTime,
-                                    SchedulerHandle >("out", 0.));
+                                    SchedulerHandle >("out", (void*)&_value));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -471,6 +477,9 @@ public:
 
         return msgs;
     }
+
+private:
+    double _value;
 };
 
 template < class SchedulerHandle>
@@ -481,9 +490,10 @@ class Beep :
 public:
     Beep(const std::string& name,
          const paradevs::common::NoParameters& parameters) :
-        paradevs::pdevs::Dynamics < common::DoubleTime, SchedulerHandle,
-                                    paradevs::common::NoParameters >(name,
-                                                                     parameters)
+        paradevs::pdevs::Dynamics < common::DoubleTime,
+                                    SchedulerHandle,
+                                    paradevs::common::NoParameters >(
+                                        name, parameters), _value(0)
     { }
     virtual ~Beep()
     { }
@@ -597,8 +607,9 @@ public:
 #endif
         common::Bag < common::DoubleTime, SchedulerHandle > msgs;
 
-        msgs.push_back(common::ExternalEvent < common::DoubleTime,
-                                               SchedulerHandle >("out", 0.));
+        msgs.push_back(common::ExternalEvent <
+                           common::DoubleTime, SchedulerHandle >(
+                               "out", (void*)&_value));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -615,6 +626,7 @@ private:
     enum Phase { WAIT, SEND };
 
     Phase _phase;
+    double _value;
 };
 
 } } } // namespace paradevs tests mixed

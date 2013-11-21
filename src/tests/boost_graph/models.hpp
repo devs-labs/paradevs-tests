@@ -44,7 +44,8 @@ public:
     TopPixel(const std::string& name,
              const TopPixelParameters& parameters) :
         paradevs::pdevs::Dynamics < common::DoubleTime, SchedulerHandle,
-                                    TopPixelParameters >(name, parameters)
+                                    TopPixelParameters >(name, parameters),
+        _value(0)
     { }
 
     virtual ~TopPixel()
@@ -60,7 +61,9 @@ public:
 
     virtual typename common::DoubleTime::type start(
         typename common::DoubleTime::type /* t */)
-    { return 0; }
+    {
+        return 0;
+    }
 
     virtual typename common::DoubleTime::type ta(
         typename common::DoubleTime::type /* t */) const
@@ -75,10 +78,14 @@ public:
 
         common::Bag < common::DoubleTime, SchedulerHandle > bag;
 
-        bag.push_back(common::ExternalEvent < common::DoubleTime,
-                                              SchedulerHandle >("out", 0.));
+        bag.push_back(common::ExternalEvent <
+                          common::DoubleTime, SchedulerHandle >(
+                              "out", (void*)&_value));
         return bag;
     }
+
+private:
+    double _value;
 };
 
 struct NormalPixelParameters
@@ -99,7 +106,7 @@ public:
              const NormalPixelParameters& parameters) :
         paradevs::pdevs::Dynamics < common::DoubleTime, SchedulerHandle,
                                     NormalPixelParameters >(name, parameters),
-        _neighbour_number(parameters._neighbour_number)
+        _neighbour_number(parameters._neighbour_number), _value(0)
     { }
 
     virtual ~NormalPixel()
@@ -186,8 +193,9 @@ public:
         common::Bag < common::DoubleTime, SchedulerHandle > bag;
 
         if (_phase == SEND) {
-            bag.push_back(common::ExternalEvent < common::DoubleTime,
-                                                  SchedulerHandle >("out", 0.));
+            bag.push_back(common::ExternalEvent <
+                              common::DoubleTime, SchedulerHandle >(
+                                  "out", (void*)&_value));
         }
         return bag;
     }
@@ -196,6 +204,7 @@ private:
     enum Phase { WAIT, SEND };
 
     unsigned int _neighbour_number;
+    double       _value;
 
     Phase                             _phase;
     unsigned int                      _received;
