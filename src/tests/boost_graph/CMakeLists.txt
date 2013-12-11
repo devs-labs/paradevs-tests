@@ -10,7 +10,7 @@ LINK_DIRECTORIES(
   ${LIBXML_LIBRARY_DIR})
 
 # graph tests
-ADD_EXECUTABLE(graph-tests graph_builder.hpp graph_defs.hpp graph_manager.hpp
+ADD_EXECUTABLE(graph-tests graph_builder.hpp graph_generator.hpp graph_defs.hpp graph_manager.hpp
   graph_partitioning.hpp tests.cpp models.hpp)
 
 TARGET_LINK_LIBRARIES(graph-tests partitioning

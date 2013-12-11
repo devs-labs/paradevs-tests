@@ -28,23 +28,21 @@
 #define TESTS_BOOST_GRAPH_PARTITIONING_GGGP_H 1
 
 #include <tests/boost_graph/partitioning/utils.hpp>
+#include <boost/graph/copy.hpp>
 
 namespace paradevs { namespace tests { namespace boost_graph {
 
 void ggp(UnorientedGraph *g, Entiers *sommetsSource,
-         Entiers *sommetsDestination, EntiersEntiers &Partition);
-
-void gggp(UnorientedGraph *g, Entiers *sommetsSource,
-          Entiers *sommetsDestination, EntiersEntiers &Partition);
+         Entiers *sommetsDestination, EntiersEntiers &Partition,int rand);
 
 void gggp_pond(UnorientedGraph *g, Entiers *sommetsSource,
-               Entiers *sommetsDestination, EntiersEntiers &Partition);
+               Entiers *sommetsDestination, EntiersEntiers &Partition, int rand);
 
 void Iter_2l(EntiersEntiers &part, int nbr_parties, UnorientedGraph *g,
-             const std::string &nom);
+             const std::string &nom_cut, int nbr_tirage, const std::string &nom_strat);
 
 void bissectionRec(UnorientedGraph *g, EntiersEntiers &Partition,
-                   int nbr_parties, const std::string &nom);
+                   int nbr_parties, const std::string &nom_cut, int nbr_tirage, const std::string &nom_strat);
 
 void Pseudo_random_partitioning(UnorientedGraph *g, EntiersEntiers &Partition,
                                 uint nbr_parties);
@@ -53,7 +51,7 @@ EntiersEntiers Random_partitioning(UnorientedGraph *g,
                                 uint nbr_parties);
 
 OrientedGraphs Multiniveau(uint niveau_contraction, UnorientedGraph *g, UnorientedGraph *graph_origin,
-                           OrientedGraph *go, int nbr_parties,
+                           OrientedGraph *go, int nbr_parties, int nbr_tirage,
                            std::string contraction,
                            std::string type_methode,
                            std::string choix_affinage,
@@ -62,6 +60,8 @@ OrientedGraphs Multiniveau(uint niveau_contraction, UnorientedGraph *g, Unorient
                            OutputEdgeList &outputedgeslist,
                            InputEdgeList &inputedgelist,
                            Connections &connections);
+void Optimisation_method_neighbour(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition, int nbr_tirage, const std::string &name_cut, const std::string &name_strat);
+
 
 } } } // namespace paradevs tests boost_graph
 

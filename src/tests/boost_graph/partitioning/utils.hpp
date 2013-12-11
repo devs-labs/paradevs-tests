@@ -108,6 +108,8 @@ void make_unoriented_graph(const OrientedGraph& og, UnorientedGraph& uog);
 void adjacence_ggp(int vertex, Entiers &sommets_adj, UnorientedGraph *g);
 
 float modif_Cout_coupe(const Entiers &P, int val, float cut, UnorientedGraph *g);
+double Cluster_Weight(UnorientedGraph &g , const Entiers &cluster);
+double Best_Cut_cluster(EntiersEntiers &tab_cluster,Entiers *cluster1, Entiers *cluster2, int index_cluster1, UnorientedGraph &g,std::string name);
 
 } } } // namespace paradevs tests boost_graph
 

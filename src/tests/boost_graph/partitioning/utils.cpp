@@ -1152,7 +1152,7 @@ double Cut_one_cluster(const Entiers &cluster, UnorientedGraph &g, std::string n
 		bool found;
 		double cpt=0.;
 		for(uint i=0;i<cluster.size();i++){
-			tie(neighbourIt, neighbourEnd) = adjacent_vertices(cluster[i], g);
+			tie(neighbourIt, neighbourEnd) = adjacent_vertices(cluster.at(i), g);
 			for (; neighbourIt != neighbourEnd; ++neighbourIt){
 				tie(e1,found)=edge(vertex(cluster[i],g),vertex(*neighbourIt,g),g);
 				if(In_tab(cluster,*neighbourIt)!=1){
@@ -1160,10 +1160,10 @@ double Cut_one_cluster(const Entiers &cluster, UnorientedGraph &g, std::string n
 				}
 			}
 		}
-		double vol = Cluster_Degree(g,cluster);
-		return (cpt/2.)/vol;
+		double deg = Cluster_Degree(g,cluster);
+		return cpt/deg;
 	}
-	else{
+	else if(name == "cut"){
 		edge_t e1;
 		bool found;
 		double cpt=0.;
@@ -1178,6 +1178,24 @@ double Cut_one_cluster(const Entiers &cluster, UnorientedGraph &g, std::string n
 		}
 		return cpt/2.;
 	}
+	else if(name == "ratio"){
+		edge_t e1;
+		bool found;
+		double cpt=0.;
+		for(uint i=0;i<cluster.size();i++){
+			tie(neighbourIt, neighbourEnd) = adjacent_vertices(cluster.at(i), g);
+			for (; neighbourIt != neighbourEnd; ++neighbourIt){
+				tie(e1,found)=edge(vertex(cluster.at(i),g),vertex(*neighbourIt,g),g);
+				if(In_tab(cluster,*neighbourIt)!=1){
+					cpt+=g[e1]._weight;
+				}
+			}
+		}
+		double vol = Cluster_Weight(g,cluster);
+		return cpt/vol;
+	}
+	
+	/*Vérification de la formule : doute sur le /2.*/
 }
 
 double Cut_cluster(const EntiersEntiers &tab_cluster,UnorientedGraph &g,std::string name)
@@ -1370,6 +1388,33 @@ OrientedGraphs Graph_Partition(const EntiersEntiers& Partition,
     }
 
     return graph_partie;
+}
+
+
+
+double Cluster_Weight(UnorientedGraph &g , const Entiers &cluster)
+{
+    double val = 0.;
+
+    for(uint i = 0; i < cluster.size(); i++){
+        val += g[cluster.at(i)]._weight;;
+    }
+    return val;
+}
+
+double Best_Cut_cluster(EntiersEntiers &tab_cluster,Entiers *cluster1, Entiers *cluster2, int index_cluster1, UnorientedGraph &g,std::string name)
+{
+	tab_cluster.push_back(cluster2);
+	
+	double cpt=0.;
+	for(int i=0;i<tab_cluster.size();i++){
+		if(i!=index_cluster1){
+		cpt+=Cut_one_cluster(*tab_cluster[i],g,name);
+		}
+	}
+	cpt+=Cut_one_cluster(*cluster1,g,name);
+	tab_cluster.pop_back();
+	return cpt;
 }
 
 /*double In_modularity(UnorientedGraph &g , const Entiers &cluster){

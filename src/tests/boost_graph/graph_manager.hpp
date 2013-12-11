@@ -405,12 +405,13 @@ struct PartitioningParameters
     std::string partitioning_method_name;
     int         contraction_coef;
     bool        contraction_coef_flag;
-
+	GraphGenerator* generator;
+	
     PartitioningParameters(int cn,
                            const std::string& pmn,
-                           int cc, bool ccf) :
+                           int cc, bool ccf, GraphGenerator* generator) :
         cluster_number(cn), partitioning_method_name(pmn),
-        contraction_coef(cc), contraction_coef_flag(ccf)
+        contraction_coef(cc), contraction_coef_flag(ccf), generator(generator)
     { }
 };
 
@@ -432,7 +433,8 @@ public:
         GraphBuilder graph_builder(parameters.cluster_number,
                                    parameters.partitioning_method_name,
                                    parameters.contraction_coef,
-                                   parameters.contraction_coef_flag);
+                                   parameters.contraction_coef_flag,
+								   parameters.generator);
         OrientedGraphs graphs;
         InputEdgeList  input_edges;
         OutputEdgeList output_edges;
@@ -534,7 +536,8 @@ public:
         GraphBuilder   graph_builder(parameters.cluster_number,
                                      parameters.partitioning_method_name,
                                      parameters.contraction_coef,
-                                     parameters.contraction_coef_flag);
+                                     parameters.contraction_coef_flag,
+                                     parameters.generator);
         OrientedGraphs graphs;
         InputEdgeList  input_edges;
         OutputEdgeList output_edges;
@@ -626,7 +629,8 @@ public:
         GraphBuilder   graph_builder(parameters.cluster_number,
                                      parameters.partitioning_method_name,
                                      parameters.contraction_coef,
-                                     parameters.contraction_coef_flag);
+                                     parameters.contraction_coef_flag,
+                                     parameters.generator);
         OrientedGraphs graphs;
         InputEdgeList  input_edges;
         OutputEdgeList output_edges;

@@ -28,12 +28,13 @@
 #define TESTS_BOOST_GRAPH_PARTITIONING_GRAPH_BUILD_H
 
 #include <tests/boost_graph/partitioning/defs.hpp>
-
+#include <tests/boost_graph/partitioning/utils.hpp>
 namespace paradevs { namespace tests { namespace boost_graph {
 
-void build_graph(UnorientedGraph& g, OrientedGraph& graph);
-void build_corsen_graph(OrientedGraph& graph);
+void build_graph(OrientedGraph& og, unsigned int edge_number);
+void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source, int nbr_v_min, int nbr_v_max,const std::vector<int> &niveau);
+//void build_corsen_graph(OrientedGraph& graph);
 
-} } } // namespace paradevs tests boost_graph
+} } } // namespace paradevs tests boost_graph;
 
 #endif
