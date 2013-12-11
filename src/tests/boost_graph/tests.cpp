@@ -103,7 +103,7 @@ void hierarchical_test()
                                       bool contraction_coef_flag)
 {
 	RandomGraphGenerator g(2000);
-	
+
     RootCoordinator <
         DoubleTime,
         paradevs::pdevs::multithreading::Coordinator <
@@ -128,14 +128,14 @@ void partitionning_heap_test(double duration,
                              int contraction_coef,
                              bool contraction_coef_flag)
 {
-	std::vector<int> niveau;
-	niveau.push_back(4);
-	niveau.push_back(3);
-	niveau.push_back(2);
-	RandomGraphGenerator g(2000, niveau, 5, 2, 4);
-	//ArtificialGraphGenerator g(38);
-	//CorsenGraphGenerator g;
-	
+    std::vector<int> niveau;
+    niveau.push_back(4);
+    niveau.push_back(3);
+    niveau.push_back(2);
+    RandomGraphGenerator g(2000, niveau, 5, 2, 4);
+    //ArtificialGraphGenerator g(38);
+    //CorsenGraphGenerator g;
+
     RootCoordinator <
         DoubleTime,
         paradevs::pdevs::Coordinator <
@@ -149,7 +149,8 @@ void partitionning_heap_test(double duration,
             PartitioningParameters >
         > rc(0, duration, "root", NoParameters(),
              PartitioningParameters(cluster_number, partitioning_method_name,
-                                    contraction_coef, contraction_coef_flag, &g));
+                                    contraction_coef, contraction_coef_flag,
+                                    &g));
 
     rc.run();
 }
@@ -339,7 +340,7 @@ void test_flat_random()
 
 void test_partiotining_random()
 {
-	test(duration_random, "gggp_pond", 2, 32, 2, false, true, 5, true);
+    test(duration_random, "gggp_pond", 2, 32, 2, false, true, 5, true);
     test(duration_random, "gggp_pond", 2, 32, 2, false, true, 10, true);
     test(duration_random, "gggp_pond", 2, 32, 2, false, true, 20, true);
     test(duration_random, "gggp_pond", 2, 32, 2, false, true, 40, true);
@@ -451,7 +452,7 @@ int main()
 
     //test_flat_corsen();
     //test_partitioning_corsen();
-    
+
     /*
      * *** Problème inconnu affiche oups lors de l'exécution (problème hors compétence) ***
      */
