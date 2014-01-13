@@ -46,7 +46,7 @@ int main()
 
     srand((unsigned)time(NULL));
 
-	UnorientedGraph* g = new UnorientedGraph();
+	
     OrientedGraph* go = new OrientedGraph();
     UnorientedGraph graph_origin;
     std::vector<std::string> color;
@@ -69,22 +69,19 @@ int main()
     int nbr_parties = 4;
     
 
-    Edges edge_partie;
-    OutputEdgeList outputedgeslist(nbr_parties);
-    InputEdgeList inputedgelist;
-    Connections connections;
-    
-    build_graph(*go, 38);
+
+    //build_graph(*go, 38);
     Entiers niveau;
-    niveau.push_back(3);
     niveau.push_back(2);
-    niveau.push_back(3);
+    niveau.push_back(3);   
+    niveau.push_back(2);
+	//niveau.push_back(2);
+    //niveau.push_back(2);
     
-    //build_generator_graph(go, 2000, 10 , 2 , 5 ,niveau);
-    make_unoriented_graph(*go, *g);
-    boost::copy_graph(*g, graph_origin);
+    build_generator_graph(go, 2000, 5 , 2 , 5 ,niveau);
+    //make_unoriented_graph(*go, *g);
     
-    /*std::ofstream fichier ("../../sortie_graphe/graph_38_4.txt", std::ios::out);
+    std::ofstream fichier ("../../sortie_graphe/graph_38.txt", std::ios::out);
     fichier<<"digraph G {"<<std::endl;
     tie(vertexIto, vertexEndo) = vertices(*go);
     for (; vertexIto != vertexEndo; ++vertexIto) {
@@ -97,19 +94,60 @@ int main()
     	fichier<<"}"<<std::endl;
     }
 	fichier<<"}";
-	fichier.close();*/
+	fichier.close();
+	
+	std::vector<double> Cut;
+	int niveau_contraction = num_vertices(*go)/10;
+	
+	for(uint i =0; i<100; i++){
+		Edges edge_partie;
+		OutputEdgeList outputedgeslist(nbr_parties);
+		InputEdgeList inputedgelist;
+		Connections connections;
+		UnorientedGraph* g = new UnorientedGraph();
+		make_unoriented_graph(*go, *g);
+		boost::copy_graph(*g, graph_origin);
     
-    int niveau_contraction = num_vertices(*g)/1;
-    
-    OrientedGraphs graphs = Multiniveau(niveau_contraction, g, &graph_origin, go, nbr_parties, niveau_contraction/4,"HEM", "gggp",
+		OrientedGraphs graphs = Multiniveau(niveau_contraction, g, &graph_origin, go, nbr_parties, 8,"HEM", "gggp",
                                         "cut", "ratio", edge_partie ,
                                         outputedgeslist, inputedgelist,
-                                        connections);
+                                        connections,Cut,3);  
+                                        
+	}
+	
+	std::ofstream fichier_cut ("../../sortie_graphe/graphe_cut.txt", std::ios::out);
+	fichier_cut<<"x<-c(";
+	double moy = 0.;
+	
+	for(int cpt = 0; cpt <Cut.size(); cpt ++){
+		if(cpt!=Cut.size()-1)
+			fichier_cut<<Cut.at(cpt)<<",";
+		else
+			fichier_cut<<Cut.at(cpt);
+		moy += Cut.at(cpt);
+		std::cout<<Cut.at(cpt)<<std::endl;
+	}
+	fichier_cut<<")"<<std::endl;
+	fichier_cut.close();
+	
+	moy/= Cut.size();
 
-
-                
+	
+	double etendu = *max_element(Cut.begin(),Cut.end()) - *min_element(Cut.begin(),Cut.end());
+	
+	std::cout<<std::endl;
+	std::cout<<" *** Partitionnement en "<<nbr_parties<<" parties d'un graphe de taille "<<2000<<" *** "<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<" === 1 tirage === "<<std::endl;
+	std::cout<<"Cout de coupe min : "<<*min_element(Cut.begin(),Cut.end())<<" "<<"Cout de coupe max : "<<*max_element(Cut.begin(),Cut.end())<<std::endl;
+	std::cout<<"Cout de coupe normalisé moyen : "<<moy<<std::endl;
+	std::cout<<"Étendu du coût de coupe : "<<etendu<<std::endl;
+    std::cout << "Duration : " << t.elapsed() << " seconds" << std::endl;
+	std::cout << std::endl;
+	
+	     
    /*for(int i =0; i<graphs.size(); i++){
-	    fichier2<<color.at(i)<<std::endl; 
+	    fichier2<<color.at(i)<<std::endl; C
 		tie(vertexIto, vertexEndo) = vertices(graphs.at(i));
 		for (; vertexIto != vertexEndo; ++vertexIto) {
 			fichier2<<(graphs.at(i))[*vertexIto]._index<<"-> {";
@@ -133,5 +171,5 @@ int main()
 
 	delete go;
 	
-	std::cout << "Duration : " << t.elapsed() << " seconds" << std::endl;
+	std::cout << "Duration : " << t.elapsed()/100 << " seconds" << std::endl;
 }
