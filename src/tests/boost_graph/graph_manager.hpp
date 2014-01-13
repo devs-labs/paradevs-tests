@@ -401,17 +401,19 @@ public:
 
 struct PartitioningParameters
 {
-    int         cluster_number;
-    std::string partitioning_method_name;
-    int         contraction_coef;
-    bool        contraction_coef_flag;
-	GraphGenerator* generator;
-	
+    int             cluster_number;
+    std::string     partitioning_method_name;
+    int             contraction_coef;
+    bool            contraction_coef_flag;
+    GraphGenerator& generator;
+
     PartitioningParameters(int cn,
                            const std::string& pmn,
-                           int cc, bool ccf, GraphGenerator* generator) :
+                           int cc, bool ccf,
+                           GraphGenerator& generator) :
         cluster_number(cn), partitioning_method_name(pmn),
-        contraction_coef(cc), contraction_coef_flag(ccf), generator(generator)
+        contraction_coef(cc), contraction_coef_flag(ccf),
+        generator(generator)
     { }
 };
 

@@ -39,6 +39,12 @@ using namespace paradevs::common::scheduler;
 using namespace paradevs::pdevs;
 using namespace paradevs::tests::boost_graph;
 
+#include <fstream>
+
+std::ofstream log_file("log");
+
+/* flat models */
+
 template < class GraphBuilder >
 void flat_heap_test(double duration)
 {
@@ -50,15 +56,13 @@ void flat_heap_test(double duration)
             SchedulerHandle,
             InBuildFlatGraphManager <
                 SchedulerHandle,
-                GraphBuilder >,
-            paradevs::common::NoParameters,
-            paradevs::common::NoParameters >
-    > rc(0, duration, "root", NoParameters(), NoParameters());
+                GraphBuilder > >
+    > rc(0, duration, "root");
 
     rc.run();
 }
 
-/*template < class GraphBuilder >
+template < class GraphBuilder >
 void flat_vector_test(double duration)
 {
     RootCoordinator <
@@ -70,72 +74,22 @@ void flat_vector_test(double duration)
             paradevs::common::scheduler::NoSchedulerHandle,
             InBuildFlatGraphManager <
                 paradevs::common::scheduler::NoSchedulerHandle,
-                GraphBuilder >,
-            paradevs::common::NoParameters,
-            paradevs::common::NoParameters >
-    > rc(0, duration, "root", NoParameters(), NoParameters());
+                GraphBuilder > >
+    > rc(0, duration, "root");
 
     rc.run();
-}*/
-
-void hierarchical_test()
-{
-    // RootCoordinator <
-    //     DoubleTime,
-    //     paradevs::pdevs::Coordinator <
-    //         DoubleTime,
-    //         SchedulerType,
-    //         SchedulerHandle,
-    //         HierarchicalGraphManager <
-    //             SchedulerHandle,
-    //             HierarchicalGraphBuilder >,
-    //         paradevs::common::NoParameters,
-    //         paradevs::common::NoParameters >
-    //     > rc(0, 100, "root", NoParameters(), NoParameters());
-
-    // rc.run();
 }
 
-/*void parallel_partitionning_heap_test(double duration,
-                                      int cluster_number,
-                                      std::string partitioning_method_name,
-                                      int contraction_coef,
-                                      bool contraction_coef_flag)
-{
-	RandomGraphGenerator g(2000);
+/* partitionning models */
 
-    RootCoordinator <
-        DoubleTime,
-        paradevs::pdevs::multithreading::Coordinator <
-            DoubleTime,
-            SchedulerType,
-            SchedulerHandle,
-            ParallelHeapHierarchicalGraphManager <
-                SchedulerHandle,
-                PartitioningGraphBuilder >,
-            paradevs::common::NoParameters,
-            PartitioningParameters >
-        > rc(0, duration, "root", NoParameters(),
-             PartitioningParameters(cluster_number, partitioning_method_name,
-                                    contraction_coef, contraction_coef_flag, &g));
-
-    rc.run();
-}*/
-
+template < class GraphGenerator >
 void partitionning_heap_test(double duration,
                              int cluster_number,
                              std::string partitioning_method_name,
                              int contraction_coef,
-                             bool contraction_coef_flag)
+                             bool contraction_coef_flag,
+                             GraphGenerator& g)
 {
-    std::vector<int> niveau;
-    niveau.push_back(4);
-    niveau.push_back(3);
-    niveau.push_back(2);
-    RandomGraphGenerator g(2000, niveau, 5, 2, 4);
-    //ArtificialGraphGenerator g(38);
-    //CorsenGraphGenerator g;
-
     RootCoordinator <
         DoubleTime,
         paradevs::pdevs::Coordinator <
@@ -150,18 +104,19 @@ void partitionning_heap_test(double duration,
         > rc(0, duration, "root", NoParameters(),
              PartitioningParameters(cluster_number, partitioning_method_name,
                                     contraction_coef, contraction_coef_flag,
-                                    &g));
+                                    g));
 
     rc.run();
 }
 
-/*void partitionning_vector_test(double duration,
+template < class GraphGenerator >
+void partitionning_vector_test(double duration,
                                int cluster_number,
                                std::string partitioning_method_name,
                                int contraction_coef,
-                               bool contraction_coef_flag)
+                               bool contraction_coef_flag,
+                               GraphGenerator& g)
 {
-	RandomGraphGenerator g(2000);
     RootCoordinator <
         DoubleTime,
         paradevs::pdevs::Coordinator <
@@ -176,36 +131,40 @@ void partitionning_heap_test(double duration,
             PartitioningParameters >
         > rc(0, duration, "root", NoParameters(),
              PartitioningParameters(cluster_number, partitioning_method_name,
-                                    contraction_coef, contraction_coef_flag, &g));
+                                    contraction_coef, contraction_coef_flag, g));
 
     rc.run();
-}*/
+}
 
+/* iteration for partitionning methods */
+
+template < class GraphGenerator >
 void test(double duration, std::string partitioning_method_name,
           unsigned int min, unsigned int max, unsigned int step,
           bool vector, bool heap,
           int contraction_coef,
-          bool contraction_coef_flag)
+          bool contraction_coef_flag,
+          GraphGenerator& g)
 {
     boost::timer t;
 
-    std::cout << "==== " << partitioning_method_name << " with ";
+    log_file << "==== " << partitioning_method_name << " with ";
     if (contraction_coef_flag) {
-        std::cout << "/";
+        log_file << "/";
     }
-    std::cout << contraction_coef << " ===" << std::endl;
-    std::cout << "n";
+    log_file << contraction_coef << " ===" << std::endl;
+    log_file << "n";
     if (heap) {
-        std::cout << "\t heap";
+        log_file << "\t heap";
     }
     if (vector) {
-        std::cout << "\t vector";
+        log_file << "\t vector";
     }
-    std::cout << std::endl;
+    log_file << std::endl;
 
     if (contraction_coef_flag) {
         for (unsigned int n = min; n <= max; n += step) {
-            std::cout << n << "\t";
+            log_file << n << "\t";
             if (heap) {
                 double t1 = t.elapsed();
 
@@ -213,33 +172,33 @@ void test(double duration, std::string partitioning_method_name,
                     partitionning_heap_test(duration, n,
                                             partitioning_method_name,
                                             contraction_coef,
-                                            contraction_coef_flag);
+                                            contraction_coef_flag, g);
                 }
 
                 double t2 = t.elapsed();
 
-                std::cout << (t2 - t1) / 20 << "\t";
+                log_file << (t2 - t1) / 20 << "\t";
             }
             if (vector) {
                 double t1 = t.elapsed();
 
                 for (unsigned int i = 0; i < 20; ++i) {
-                    /*partitionning_vector_test(duration, n,
+                    partitionning_vector_test(duration, n,
                                               partitioning_method_name,
                                               contraction_coef,
-                                              contraction_coef_flag);*/
+                                              contraction_coef_flag, g);
                 }
 
                 double t2 = t.elapsed();
 
-                std::cout << (t2 - t1) / 20 << std::endl;
+                log_file << (t2 - t1) / 20 << std::endl;
             } else {
-                std::cout << std::endl;
+                log_file << std::endl;
             }
 
         }
     } else {
-        std::cout << contraction_coef << "\t";
+        log_file << contraction_coef << "\t";
         if (heap) {
             double t1 = t.elapsed();
 
@@ -247,31 +206,33 @@ void test(double duration, std::string partitioning_method_name,
                 partitionning_heap_test(duration, contraction_coef,
                                         partitioning_method_name,
                                         contraction_coef,
-                                        contraction_coef_flag);
+                                        contraction_coef_flag, g);
             }
 
             double t2 = t.elapsed();
 
-            std::cout << (t2 - t1) / 20 << "\t";
+            log_file << (t2 - t1) / 20 << "\t";
         }
         if (vector) {
             double t1 = t.elapsed();
 
             for (unsigned int i = 0; i < 20; ++i) {
-                /*partitionning_vector_test(duration, contraction_coef,
+                partitionning_vector_test(duration, contraction_coef,
                                           partitioning_method_name,
                                           contraction_coef,
-                                          contraction_coef_flag);*/
-                }
+                                          contraction_coef_flag, g);
+            }
 
             double t2 = t.elapsed();
 
-            std::cout << (t2 - t1) / 20 << std::endl;
+            log_file << (t2 - t1) / 20 << std::endl;
         } else {
-            std::cout << std::endl;
+            log_file << std::endl;
         }
     }
 }
+
+/* 38 nodes graph */
 
 const double duration_38 = 1000;
 
@@ -279,38 +240,46 @@ void test_flat_38()
 {
     boost::timer t;
 
-    std::cout << "== 38 nodes ==" << std::endl;
-    std::cout << "flat graph with heap = ";
+    log_file << "== 38 nodes ==" << std::endl;
+    log_file << "flat graph with heap = ";
     for (unsigned int i = 0; i < 20; ++i) {
         flat_heap_test< FlatGraphBuilder >(duration_38);
     }
 
     double t2 = t.elapsed();
 
-    std::cout << t2 / 20 << std::endl;
+    log_file << t2 / 20 << std::endl;
 
-    /*std::cout << "flat graph with vector = ";
+    log_file << "flat graph with vector = ";
     for (unsigned int i = 0; i < 20; ++i) {
         flat_vector_test< FlatGraphBuilder >(1000);
-    }*/
+    }
 
     double t3 = t.elapsed();
 
-    std::cout << (t3 - t2) / 20 << std::endl;
+    log_file << (t3 - t2) / 20 << std::endl;
 }
 
-void test_partiotining_38()
+void test_partitioning_38()
 {
+    ArtificialGraphGenerator g(38);
+
     for (int i = 1; i <= 2; ++i) {
-        test(duration_38, "ggp", 2, 16, 2, true, true, i, true);
-        test(duration_38, "gggp_pond", 2, 16, 2, true, true, i, true);
-        test(duration_38, "random", 2, 16, 2, true, true, i, true);
+        test < ArtificialGraphGenerator >(duration_38, "ggp", 2, 16, 2,
+                                          true, true, i, true, g);
+        test < ArtificialGraphGenerator >(duration_38, "gggp_pond", 2, 16, 2,
+                                          true, true, i, true, g);
+        test < ArtificialGraphGenerator >(duration_38, "random", 2, 16, 2,
+                                          true, true, i, true, g);
     }
 
     for (int i = 2; i <= 8; i += 2) {
-        test(duration_38, "gggp_pond", 0, 0, 0, true, true, i, false);
+        test < ArtificialGraphGenerator >(duration_38, "gggp_pond", 0, 0, 0,
+                                          true, true, i, false, g);
     }
 }
+
+/* random graph */
 
 const double duration_random = 20;
 
@@ -318,65 +287,101 @@ void test_flat_random()
 {
     boost::timer t;
 
-    std::cout << "== Random Graph ==" << std::endl;
-    std::cout << "flat graph with heap = ";
+    log_file << "== Random Graph ==" << std::endl;
+    log_file << "flat graph with heap = ";
     for (unsigned int i = 0; i < 20; ++i) {
         flat_heap_test< RandomFlatGraphBuilder >(duration_random);
     }
 
     double t2 = t.elapsed();
 
-    std::cout << t2 / 20 << std::endl;
+    log_file << t2 / 20 << std::endl;
 
-    /*std::cout << "flat graph with vector = ";
+    log_file << "flat graph with vector = ";
     for (unsigned int i = 0; i < 20; ++i) {
         flat_vector_test< FlatGraphBuilder >(1000);
-    }*/
+    }
 
     double t3 = t.elapsed();
 
-    std::cout << (t3 - t2) / 20 << std::endl;
+    log_file << (t3 - t2) / 20 << std::endl;
 }
 
-void test_partiotining_random()
+void test_partitioning_random()
 {
-    test(duration_random, "gggp_pond", 2, 32, 2, false, true, 5, true);
-    test(duration_random, "gggp_pond", 2, 32, 2, false, true, 10, true);
-    test(duration_random, "gggp_pond", 2, 32, 2, false, true, 20, true);
-    test(duration_random, "gggp_pond", 2, 32, 2, false, true, 40, true);
-    test(duration_random, "gggp_pond", 2, 22, 2, false, true, 100, true);
+    std::vector < int > levels = { 4, 3, 2  };
+    RandomGraphGenerator g(2000, levels, 5, 2, 4);
 
-    test(duration_random, "gggp_pond", 2, 32, 2, false, true, 15, false);
-    test(duration_random, "gggp_pond", 2, 32, 2, false, true, 20, false);
-    test(duration_random, "gggp_pond", 2, 32, 2, false, true, 25, false);
-    test(duration_random, "gggp_pond", 2, 32, 2, false, true, 30, false);
-    test(duration_random, "gggp_pond", 2, 32, 2, false, true, 35, false);
-    test(duration_random, "gggp_pond", 2, 32, 2, false, true, 40, false);
-    test(duration_random, "gggp_pond", 2, 32, 2, false, true, 45, false);
-    test(duration_random, "gggp_pond", 2, 32, 2, false, true, 50, false);
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 5, true, g);
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 10, true, g);
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 20, true, g);
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 40, true, g);
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 22, 2,
+                                  false, true, 100, true, g);
 
-    test(duration_random, "ggp", 2, 32, 2, false, true, 5, true);
-    test(duration_random, "ggp", 2, 32, 2, false, true, 10, true);
-    test(duration_random, "ggp", 2, 32, 2, false, true, 20, true);
-    test(duration_random, "ggp", 2, 32, 2, false, true, 40, true);
-    test(duration_random, "ggp", 2, 22, 2, false, true, 100, true);
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 15, false, g);
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 20, false, g);
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 25, false, g);
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 30, false, g);
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 35, false, g);
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 40, false, g);
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 45, false, g);
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 50, false, g);
 
-    test(duration_random, "ggp", 2, 32, 2, false, true, 15, false);
-    test(duration_random, "ggp", 2, 32, 2, false, true, 20, false);
-    test(duration_random, "ggp", 2, 32, 2, false, true, 25, false);
-    test(duration_random, "ggp", 2, 32, 2, false, true, 30, false);
-    test(duration_random, "ggp", 2, 32, 2, false, true, 35, false);
-    test(duration_random, "ggp", 2, 32, 2, false, true, 40, false);
-    test(duration_random, "ggp", 2, 32, 2, false, true, 45, false);
-    test(duration_random, "ggp", 2, 32, 2, false, true, 50, false);
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
+                                  false, true, 5, true, g);
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
+                                  false, true, 10, true, g);
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
+                                  false, true, 20, true, g);
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
+                                  false, true, 40, true, g);
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 22, 2,
+                                  false, true, 100, true, g);
 
-    test(duration_random, "random", 2, 32, 2, false, true, 5, true);
-    test(duration_random, "random", 2, 32, 2, false, true, 10, true);
-    test(duration_random, "random", 2, 32, 2, false, true, 20, true);
-    test(duration_random, "random", 2, 32, 2, false, true, 40, true);
-    test(duration_random, "random", 2, 22, 2, false, true, 100, true);
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
+                                  false, true, 15, false, g);
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
+                                  false, true, 20, false, g);
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
+                                  false, true, 25, false, g);
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
+                                  false, true, 30, false, g);
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
+                                  false, true, 35, false, g);
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
+                                  false, true, 40, false, g);
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
+                                  false, true, 45, false, g);
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
+                                  false, true, 50, false, g);
+
+    test < RandomGraphGenerator >(duration_random, "random", 2, 32, 2,
+                                  false, true, 5, true, g);
+    test < RandomGraphGenerator >(duration_random, "random", 2, 32, 2,
+                                  false, true, 10, true, g);
+    test < RandomGraphGenerator >(duration_random, "random", 2, 32, 2,
+                                  false, true, 20, true, g);
+    test < RandomGraphGenerator >(duration_random, "random", 2, 32, 2,
+                                  false, true, 40, true, g);
+    test < RandomGraphGenerator >(duration_random, "random", 2, 22, 2,
+                                  false, true, 100, true, g);
 
 }
+
+/* corsen graph */
 
 const double corsen_duration = 20;
 
@@ -384,80 +389,124 @@ void test_flat_corsen()
 {
     boost::timer t;
 
-    std::cout << "== CORSEN == " << std::endl;
-    std::cout << "flat graph with heap = ";
+    log_file << "== CORSEN == " << std::endl;
+    log_file << "flat graph with heap = ";
     for (unsigned int i = 0; i < 20; ++i) {
         flat_heap_test< CorsenFlatGraphBuilder >(corsen_duration);
     }
 
     double t2 = t.elapsed();
 
-    std::cout << t2 / 20 << std::endl;
+    log_file << t2 / 20 << std::endl;
 
-    // std::cout << "flat graph with vector = ";
-    // for (unsigned int i = 0; i < 20; ++i) {
-    //     flat_vector_test< CorsenFlatGraphBuilder >(corsen_duration);
-    // }
+    log_file << "flat graph with vector = ";
+    for (unsigned int i = 0; i < 20; ++i) {
+        flat_vector_test< CorsenFlatGraphBuilder >(corsen_duration);
+    }
 
-    // double t3 = t.elapsed();
+    double t3 = t.elapsed();
 
-    // std::cout << (t3 - t2) / 20 << std::endl;
+    log_file << (t3 - t2) / 20 << std::endl;
 }
 
 void test_partitioning_corsen()
 {
-    test(corsen_duration, "gggp_pond", 2, 32, 2, false, true, 10, true);
-    test(corsen_duration, "gggp_pond", 2, 32, 2, false, true, 20, true);
-    test(corsen_duration, "gggp_pond", 2, 32, 2, false, true, 40, true);
-    test(corsen_duration, "gggp_pond", 2, 32, 2, false, true, 80, true);
-    test(corsen_duration, "gggp_pond", 2, 22, 2, false, true, 200, true);
+    CorsenGraphGenerator g;
 
-    test(corsen_duration, "gggp_pond", 2, 32, 2, false, true, 30, false);
-    test(corsen_duration, "gggp_pond", 2, 32, 2, false, true, 40, false);
-    test(corsen_duration, "gggp_pond", 2, 32, 2, false, true, 50, false);
-    test(corsen_duration, "gggp_pond", 2, 32, 2, false, true, 60, false);
-    test(corsen_duration, "gggp_pond", 2, 32, 2, false, true, 70, false);
-    test(corsen_duration, "gggp_pond", 2, 32, 2, false, true, 80, false);
-    test(corsen_duration, "gggp_pond", 2, 32, 2, false, true, 90, false);
-    test(corsen_duration, "gggp_pond", 2, 32, 2, false, true, 100, false);
+    test < CorsenGraphGenerator >(corsen_duration, "gggp_pond", 2, 32, 2,
+                                  false, true, 10, true, g);
+    test < CorsenGraphGenerator >(corsen_duration, "gggp_pond", 2, 32, 2,
+                                  false, true, 20, true, g);
+    test < CorsenGraphGenerator >(corsen_duration, "gggp_pond", 2, 32, 2,
+                                  false, true, 40, true, g);
+    test < CorsenGraphGenerator >(corsen_duration, "gggp_pond", 2, 32, 2,
+                                  false, true, 80, true, g);
+    test < CorsenGraphGenerator >(corsen_duration, "gggp_pond", 2, 22, 2,
+                                  false, true, 200, true, g);
 
-    test(corsen_duration, "ggp", 2, 32, 2, false, true, 10, true);
-    test(corsen_duration, "ggp", 2, 32, 2, false, true, 20, true);
-    test(corsen_duration, "ggp", 2, 32, 2, false, true, 40, true);
-    test(corsen_duration, "ggp", 2, 32, 2, false, true, 80, true);
-    test(corsen_duration, "ggp", 2, 22, 2, false, true, 200, true);
+    test < CorsenGraphGenerator >(corsen_duration, "gggp_pond", 2, 32, 2,
+                                  false, true, 30, false, g);
+    test < CorsenGraphGenerator >(corsen_duration, "gggp_pond", 2, 32, 2,
+                                  false, true, 40, false, g);
+    test < CorsenGraphGenerator >(corsen_duration, "gggp_pond", 2, 32, 2,
+                                  false, true, 50, false, g);
+    test < CorsenGraphGenerator >(corsen_duration, "gggp_pond", 2, 32, 2,
+                                  false, true, 60, false, g);
+    test < CorsenGraphGenerator >(corsen_duration, "gggp_pond", 2, 32, 2,
+                                  false, true, 70, false, g);
+    test < CorsenGraphGenerator >(corsen_duration, "gggp_pond", 2, 32, 2,
+                                  false, true, 80, false, g);
+    test < CorsenGraphGenerator >(corsen_duration, "gggp_pond", 2, 32, 2,
+                                  false, true, 90, false, g);
+    test < CorsenGraphGenerator >(corsen_duration, "gggp_pond", 2, 32, 2,
+                                  false, true, 100, false, g);
 
-    test(corsen_duration, "ggp", 2, 32, 2, false, true, 30, false);
-    test(corsen_duration, "ggp", 2, 32, 2, false, true, 40, false);
-    test(corsen_duration, "ggp", 2, 32, 2, false, true, 50, false);
-    test(corsen_duration, "ggp", 2, 32, 2, false, true, 60, false);
-    test(corsen_duration, "ggp", 2, 32, 2, false, true, 70, false);
-    test(corsen_duration, "ggp", 2, 32, 2, false, true, 80, false);
-    test(corsen_duration, "ggp", 2, 32, 2, false, true, 90, false);
-    test(corsen_duration, "ggp", 2, 32, 2, false, true, 100, false);
+    test < CorsenGraphGenerator >(corsen_duration, "ggp", 2, 32, 2,
+                                  false, true, 10, true, g);
+    test < CorsenGraphGenerator >(corsen_duration, "ggp", 2, 32, 2,
+                                  false, true, 20, true, g);
+    test < CorsenGraphGenerator >(corsen_duration, "ggp", 2, 32, 2,
+                                  false, true, 40, true, g);
+    test < CorsenGraphGenerator >(corsen_duration, "ggp", 2, 32, 2,
+                                  false, true, 80, true, g);
+    test < CorsenGraphGenerator >(corsen_duration, "ggp", 2, 22, 2,
+                                  false, true, 200, true, g);
 
-    test(corsen_duration, "random", 2, 32, 2, false, true, 10, true);
-    test(corsen_duration, "random", 2, 32, 2, false, true, 20, true);
-    test(corsen_duration, "random", 2, 32, 2, false, true, 40, true);
-    test(corsen_duration, "random", 2, 32, 2, false, true, 80, true);
-    test(corsen_duration, "random", 2, 22, 2, false, true, 200, true);
+    test < CorsenGraphGenerator >(corsen_duration, "ggp", 2, 32, 2,
+                                  false, true, 30, false, g);
+    test < CorsenGraphGenerator >(corsen_duration, "ggp", 2, 32, 2,
+                                  false, true, 40, false, g);
+    test < CorsenGraphGenerator >(corsen_duration, "ggp", 2, 32, 2,
+                                  false, true, 50, false, g);
+    test < CorsenGraphGenerator >(corsen_duration, "ggp", 2, 32, 2,
+                                  false, true, 60, false, g);
+    test < CorsenGraphGenerator >(corsen_duration, "ggp", 2, 32, 2,
+                                  false, true, 70, false, g);
+    test < CorsenGraphGenerator >(corsen_duration, "ggp", 2, 32, 2,
+                                  false, true, 80, false, g);
+    test < CorsenGraphGenerator >(corsen_duration, "ggp", 2, 32, 2,
+                                  false, true, 90, false, g);
+    test < CorsenGraphGenerator >(corsen_duration, "ggp", 2, 32, 2,
+                                  false, true, 100, false, g);
+
+    test < CorsenGraphGenerator >(corsen_duration, "random", 2, 32, 2,
+                                  false, true, 10, true, g);
+    test < CorsenGraphGenerator >(corsen_duration, "random", 2, 32, 2,
+                                  false, true, 20, true, g);
+    test < CorsenGraphGenerator >(corsen_duration, "random", 2, 32, 2,
+                                  false, true, 40, true, g);
+    test < CorsenGraphGenerator >(corsen_duration, "random", 2, 32, 2,
+                                  false, true, 80, true, g);
+    test < CorsenGraphGenerator >(corsen_duration, "random", 2, 22, 2,
+                                  false, true, 200, true, g);
+}
+
+/* three graph types : 38 nodes, corsen and random */
+
+void test_38()
+{
+    test_flat_38();
+    test_partitioning_38();
+}
+
+void test_corsen()
+{
+    test_flat_corsen();
+    test_partitioning_corsen();
+}
+
+void test_random()
+{
+    test_flat_random();
+    test_partitioning_random();
 }
 
 int main()
 {
     srand(7262);
 
-    test_flat_38();
-    test_partiotining_38();
-
-    //test_flat_corsen();
-    //test_partitioning_corsen();
-
-    /*
-     * *** Problème inconnu affiche oups lors de l'exécution (problème hors compétence) ***
-     */
-    test_flat_random();
-    test_partiotining_random();
-
+    test_38();
+    test_corsen();
+    test_random();
     return 0;
 }

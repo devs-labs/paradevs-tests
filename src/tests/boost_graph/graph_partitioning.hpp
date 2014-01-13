@@ -36,11 +36,11 @@
 
 namespace paradevs { namespace tests { namespace boost_graph {
 
-//template < class GraphGenerator >
 class PartitioningGraphBuilder
 {
 public:
-    PartitioningGraphBuilder(int cn, std::string pmn, int cc, bool ccf, GraphGenerator* g) :
+    PartitioningGraphBuilder(int cn, std::string pmn, int cc, bool ccf,
+                             GraphGenerator& g) :
         cluster_number(cn),/*ajout d'un paramètre nbr_tirage,*/ partitioning_method_name(pmn),
         contraction_coef(cc), contraction_coef_flag(ccf), generator(g)
     { }
@@ -53,10 +53,10 @@ public:
         UnorientedGraph* g = new UnorientedGraph();
         OrientedGraph go;
         UnorientedGraph graph_origin;
-        
-        generator->generate(go);
+
+        generator.generate(go);
         make_unoriented_graph(go, *g);
-        boost::copy_graph(*g, graph_origin);        
+        boost::copy_graph(*g, graph_origin);
 
         Edges edge_partie;
         Connections connections;
@@ -136,11 +136,11 @@ public:
     }
 
 private:
-    int cluster_number;
-    std::string partitioning_method_name;
-    int contraction_coef;
-    bool contraction_coef_flag;
-    GraphGenerator* generator;
+    int             cluster_number;
+    std::string     partitioning_method_name;
+    int             contraction_coef;
+    bool            contraction_coef_flag;
+    GraphGenerator& generator;
 };
 
 } } } // namespace paradevs tests boost_graph

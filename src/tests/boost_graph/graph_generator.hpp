@@ -37,59 +37,62 @@ namespace paradevs { namespace tests { namespace boost_graph {
 class GraphGenerator
 {
 public:
-	GraphGenerator() 
-	{ }
-	
-	virtual void generate(OrientedGraph& go) = 0;
+    GraphGenerator()
+    { }
+
+    virtual void generate(OrientedGraph& go) = 0;
 };
 
 class RandomGraphGenerator : public GraphGenerator
 {
 public:
-	RandomGraphGenerator(unsigned int edge_number, std::vector<int> levels, unsigned int source_number, unsigned int min_neigh, unsigned int max_neigh) : edge_number(edge_number), levels(levels), source_number(source_number), min_neigh(min_neigh), max_neigh(max_neigh)
-	{ }
-	
-	virtual void generate(OrientedGraph& go)
-	{
-        build_generator_graph(&go,edge_number,source_number,min_neigh,max_neigh,levels);
-	}
-	
-private:
+    RandomGraphGenerator(unsigned int edge_number,
+                         std::vector<int> levels,
+                         unsigned int source_number,
+                         unsigned int min_neigh,
+                         unsigned int max_neigh) :
+        edge_number(edge_number), levels(levels), source_number(source_number),
+        min_neigh(min_neigh), max_neigh(max_neigh)
+    { }
 
-	unsigned int edge_number;
-	std::vector<int> levels;
-	unsigned int source_number;
-	unsigned int min_neigh;
-	unsigned int max_neigh;
+    virtual void generate(OrientedGraph& go)
+    {
+        build_generator_graph(&go, edge_number, source_number, min_neigh,
+                              max_neigh, levels);
+    }
+
+private:
+    unsigned int edge_number;
+    std::vector<int> levels;
+    unsigned int source_number;
+    unsigned int min_neigh;
+    unsigned int max_neigh;
 };
 
 class ArtificialGraphGenerator : public GraphGenerator
 {
 public:
-	ArtificialGraphGenerator(unsigned int edge_number) : edge_number(edge_number)
-	{ }
-	
-	virtual void generate(OrientedGraph& go)
-	{
-        build_graph(go, edge_number);
-	}
-	
+    ArtificialGraphGenerator(unsigned int edge_number) :
+    edge_number(edge_number)
+    { }
+
+    virtual void generate(OrientedGraph& go)
+    { build_graph(go, edge_number); }
+
 private:
-
-	unsigned int edge_number;
-
+    unsigned int edge_number;
 };
 
 class CorsenGraphGenerator : public GraphGenerator
 {
 public:
-	CorsenGraphGenerator()
-	{ }
-	
-	virtual void generate(OrientedGraph& go)
-	{
+    CorsenGraphGenerator()
+    { }
+
+    virtual void generate(OrientedGraph& go)
+    {
         //build_corsen_graph(go);
-	}
+    }
 };
 
 } } } // namespace paradevs tests boost_graph
