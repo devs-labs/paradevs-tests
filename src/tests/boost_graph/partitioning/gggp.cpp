@@ -55,7 +55,8 @@ void ggp(UnorientedGraph *g, Entiers *sommetsSource,
         for(uint i=0; i<Partition.size();i++){
             if(Partition.at(i)->size()==tmp)
             {
-                ggp(g,Partition[i],sommetsDestination,Partition,rand_fini(0,Partition.at(i)->size()), distance);
+                ggp(g, Partition[i], sommetsDestination, Partition, rand_fini(0,Partition.at(i)->size()),
+					distance);
                 return;
             }
         }
@@ -699,7 +700,7 @@ OrientedGraphs Multiniveau(uint niveau_contraction,
 		double best_cut = Cut_cluster(Partition,copy_graph,type_cut);
 		Cut.push_back(best_cut);
 		//std::cout<<"Meilleur coût de coupe : "<<best_cut<<std::endl;
-		std::cout<<std::endl;
+		//std::cout<<std::endl;
     }
     else
     	Partition = Random_partitioning(baseg.at(baseg.size()-1),nbr_parties);
@@ -723,9 +724,9 @@ OrientedGraphs Multiniveau(uint niveau_contraction,
     		projection(Partition,lit);
     		// std::cout<<std::endl;
     		double cut = Cut_cluster(Partition,*baseg.at(baseg.size()-2-y),type_cut);
-    		std::cout<<"Cout de coupe avant affinage : "<<cut<<std::endl;
-    		std::cout<<std::endl;
-    		std::cout<<"Affinage "<<std::endl;
+    		//std::cout<<"Cout de coupe avant affinage : "<<cut<<std::endl;
+    		//std::cout<<std::endl;
+    		//std::cout<<"Affinage "<<std::endl;
     		if(choix_affinage=="charge")
     			Affinage_equilibrage_charge(baseg.at(baseg.size()-2-y),Partition);
     		else
@@ -734,7 +735,7 @@ OrientedGraphs Multiniveau(uint niveau_contraction,
     		lit--;
     	}
     	else{
-    		std::cout<<"Pas de projection "<<std::endl;
+    		//std::cout<<"Pas de projection "<<std::endl;
     		// std::cout<<std::endl;
 
     		/*if(nbr_parties != num_vertices(*g)){
@@ -774,7 +775,7 @@ OrientedGraphs Multiniveau(uint niveau_contraction,
     color.push_back("[color=crimson, fontcolor=crimson];");
     color.push_back("[color=black, fontcolor=black];");
     
-   std::ofstream fichier2 ("../../sortie_graphe/graph_partition_38_4_1.txt", std::ios::out);
+   /*std::ofstream fichier2 ("../../sortie_graphe/graph_partition_38_4_1.txt", std::ios::out);
    fichier2<<"digraph G {"<<std::endl;   
    tie(vertexIto, vertexEndo) = vertices(*go);
    for (; vertexIto != vertexEndo; ++vertexIto) {
@@ -795,7 +796,7 @@ OrientedGraphs Multiniveau(uint niveau_contraction,
     }   
     
 	fichier2<<"}";	
-	fichier2.close();
+	fichier2.close();*/
 
 	//double cut = Cut_cluster(Partition,*graph_origin,"cut");
 	// std::cout<<"Cout de coupe engendré par le partitionnement: "<<cut<<std::endl;
@@ -960,7 +961,7 @@ void Optimisation_method_neighbour_distance(UnorientedGraph *g, EntiersEntiers &
 		tirage_distance(g, *Iter, vertex_list, distance);
 		}
 		else{	
-			std::cout<<"Tous les sommets sont verrouillés"<<std::endl;
+			//std::cout<<"Tous les sommets sont verrouillés"<<std::endl;
 			break;
 		}
 		
@@ -996,7 +997,7 @@ void Optimisation_method_neighbour_distance(UnorientedGraph *g, EntiersEntiers &
 		
 		new_cut = Best_Cut_cluster(Partition, tmp_part, part2, index_partition, *g,name_cut);
 
-		std::cout<<"Cout de coupe : "<<new_cut<<std::endl;
+		//std::cout<<"Cout de coupe : "<<new_cut<<std::endl;
 		
 		if(new_cut<cut){ //conservation de l'information en cas d'amélioration de la contrainte
 			cut = new_cut;
@@ -1021,9 +1022,9 @@ void Optimisation_method_neighbour_distance(UnorientedGraph *g, EntiersEntiers &
 	Partition.at(index_partition)=part_cour_cons;
 	Partition.push_back(part2_cons);
 	
-	std::cout<<std::endl;
+	/*std::cout<<std::endl;
 	std::cout<<"Bissection réalisé"<<std::endl;
-	std::cout<<std::endl;
+	std::cout<<std::endl;*/
 }
 
 void tirage_distance(UnorientedGraph *g, int tirage, std::list<int> &vertex_list, int distance){
@@ -1047,7 +1048,7 @@ void tirage_distance(UnorientedGraph *g, int tirage, std::list<int> &vertex_list
 		liste_tmp.unique();
 		vertex_delete.push_back(liste_tmp);
 	}
-	std::cout<<std::endl;
+	//std::cout<<std::endl;
 		
 	/*for(int i =0; i<vertex_delete.size(); i++){
 		std::list<int>::iterator Ite_tmp;

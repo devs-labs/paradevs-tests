@@ -234,7 +234,7 @@ void test(double duration, std::string partitioning_method_name,
 
 /* 38 nodes graph */
 
-const double duration_38 = 1000;
+const double duration_38 = 20;
 
 void test_flat_38()
 {
@@ -265,10 +265,13 @@ void test_partitioning_38()
     ArtificialGraphGenerator g(38);
 
     for (int i = 1; i <= 2; ++i) {
-        test < ArtificialGraphGenerator >(duration_38, "ggp", 2, 16, 2,
-                                          true, true, i, true, g);
+		std::cout<<"Méthode ggp"<<std::endl;
+        /*test < ArtificialGraphGenerator >(duration_38, "ggp", 2, 16, 2,
+                                          true, true, i, true, g);*/
+        std::cout<<"Méthode gggp"<<std::endl;
         test < ArtificialGraphGenerator >(duration_38, "gggp_pond", 2, 16, 2,
                                           true, true, i, true, g);
+        std::cout<<"Méthode random"<<std::endl;
         test < ArtificialGraphGenerator >(duration_38, "random", 2, 16, 2,
                                           true, true, i, true, g);
     }
@@ -281,7 +284,7 @@ void test_partitioning_38()
 
 /* random graph */
 
-const double duration_random = 20;
+const double duration_random = 10;
 
 void test_flat_random()
 {
@@ -310,7 +313,7 @@ void test_flat_random()
 void test_partitioning_random()
 {
     std::vector < int > levels = { 4, 3, 2  };
-    RandomGraphGenerator g(2000, levels, 5, 2, 4);
+    RandomGraphGenerator g(3000, levels, 5, 2, 4);
 
     test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
                                   false, true, 5, true, g);
@@ -505,8 +508,14 @@ int main()
 {
     srand(7262);
 
+	std::cout<<"Simulation pour graphe 38"<<std::endl;
     test_38();
-    test_corsen();
+    std::cout<<std::endl;
+    std::cout<<"Simulation pour graphe RANDOM 4000"<<std::endl;
     test_random();
+    std::cout<<std::endl;
+    std::cout<<"Simulation pour graphe CORSEN"<<std::endl;
+    test_corsen();
+
     return 0;
 }

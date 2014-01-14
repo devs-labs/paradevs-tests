@@ -68,18 +68,18 @@ public:
         if (contraction_coef_flag) {
             graphs = Multiniveau(num_vertices(*g) / contraction_coef,
                                  g, &graph_origin, &go,
-                                 cluster_number,25, "HEM",
+                                 cluster_number,10, "HEM",
                                  partitioning_method_name,
                                  "cut", "ratio", edge_partie ,
                                  output_edges, input_edges,
-                                 parent_connections, Cut);
+                                 parent_connections, Cut/*,3*/);
         } else {
             graphs = Multiniveau(contraction_coef, g, &graph_origin, &go,
-                                 cluster_number,25, "HEM",
+                                 cluster_number,10, "HEM",
                                  partitioning_method_name,
                                  "cut", "ratio", edge_partie ,
                                  output_edges, input_edges,
-                                 parent_connections, Cut);
+                                 parent_connections, Cut/*,3*/);
         }
 
         // std::cout << "*********************************" << std::endl;

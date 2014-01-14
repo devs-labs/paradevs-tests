@@ -371,7 +371,7 @@ void brhtg_source(OrientedGraph *go,int nbr_vertex, int nbr_source, int nbr_v_mi
 			}
 		}
 
-		for(int i =0; i<branche.size()-1; i++){
+		/*for(int i =0; i<branche.size()-1; i++){
 			for(int j = branche.at(i)+nbr_source; j<branche.at(i+1); j++){
 				(*go)[Vertexs.at(j)] = VertexProperties(j, 1, NORMAL_PIXEL);
 			}
@@ -381,7 +381,7 @@ void brhtg_source(OrientedGraph *go,int nbr_vertex, int nbr_source, int nbr_v_mi
 			for(int j = branche.at(i); j<branche.at(i)+nbr_source; j++){
 				(*go)[Vertexs.at(j)] = VertexProperties(j, 1, TOP_PIXEL);
 			}
-		}
+		}*/
 
 		Ram.push_back((niv_tot+b)*nbr_npb);
 		Exu.push_back(branche.at(branche.size()-1)-1);
@@ -502,11 +502,11 @@ void brhtg_ramification(OrientedGraph *go, int nbr_vertex, int nbr_v_min, int nb
 			Ram.push_back((niv_tot+b)*nbr_npb);
 			Exu.push_back(branche.at(b).at(branche.at(b).size()-1)-1);
 
-			for(int y =0; y<branche.at(b).size()-1; y++){
+			/*for(int y =0; y<branche.at(b).size()-1; y++){
 				for(int x = branche.at(b).at(y); x<branche.at(b).at(y+1); x++){
 					(*go)[Vertexs.at(x)] = VertexProperties(x, 1, NORMAL_PIXEL);
 				}
-			}
+			}*/
 		}
 
 		Ram.push_back(Ram.at(Ram.size()-1)+nbr_npb);
@@ -551,7 +551,7 @@ void brhtg_exutoire(OrientedGraph *go,int nbr_vertex,int nbr_v_min, int nbr_v_ma
 	for(int i =0; i<Ram.size()-1;i++){
 		for(int j = Ram.at(i); j<Ram.at(i+1); j++){
 			if(j==Ram.at(Ram.size()-1)-1){
-				(*go)[Vertexs.at(j)] = VertexProperties(j, 1, NORMAL_PIXEL);
+				//(*go)[Vertexs.at(j)] = VertexProperties(j, 1, NORMAL_PIXEL);
 				break;
 			}
 			else{
@@ -592,7 +592,7 @@ void brhtg_exutoire(OrientedGraph *go,int nbr_vertex,int nbr_v_min, int nbr_v_ma
 				}
 
 			}
-			(*go)[Vertexs.at(j)] = VertexProperties(j, 1, NORMAL_PIXEL);
+			//(*go)[Vertexs.at(j)] = VertexProperties(j, 1, NORMAL_PIXEL);
 		}
 	}
 }
@@ -647,6 +647,39 @@ void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source, in
 				
 	} else {
 			brhtg_source(go,nbr_vertex,nbr_source,nbr_v_min,nbr_v_max,niveau,Ram,Exu,Vertexs,nbr_passe,nbr_npb);
+	}
+	
+	std::vector < int > dg_in_vertex_list;
+	std::vector <vertex_to> dg_vertex_list;
+	OrientedGraph::vertex_iterator it_dg, end_dg;
+
+	tie(it_dg, end_dg) = vertices(*go);
+	for (uint i = 0; it_dg != end_dg; ++it_dg, ++i) {
+		dg_in_vertex_list.push_back(0);
+		dg_vertex_list.push_back(*it_dg);
+	}
+
+	tie(it_dg, end_dg) = vertices(*go);
+	for (uint i = 0; it_dg != end_dg; ++it_dg, ++i) {
+		OrientedGraph::adjacency_iterator neighbour_it, neighbour_end;
+
+		tie(neighbour_it, neighbour_end) = adjacent_vertices(*it_dg, *go);
+		for (; neighbour_it != neighbour_end; ++neighbour_it) {
+			uint index = 0;
+
+			while (dg_vertex_list[index] != *neighbour_it) {
+				++index;
+			}
+			++dg_in_vertex_list[index];
+		}
+	}
+	
+	for(uint i = 0; i<num_vertices(*go); i++){
+		if(dg_in_vertex_list.at(i) == 0){
+			(*go)[i] = VertexProperties(i, 1, TOP_PIXEL);
+		}else{
+			(*go)[i] = VertexProperties(i, 1, NORMAL_PIXEL);
+		}
 	}
 
 }
