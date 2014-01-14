@@ -338,7 +338,7 @@ public:
 		 */
 		 
         OrientedGraph graph;
-        unsigned int edge_number = 2000;
+        unsigned int edge_number = 3000;
         std::vector<int> levels;
         levels.push_back(4);
         levels.push_back(3);

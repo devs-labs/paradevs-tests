@@ -102,13 +102,13 @@ void ggp(UnorientedGraph *g, Entiers *sommetsSource,
         if(sommets_adj.size()==0)
         {
             //std::cout<<"Je suis sorti car pas de voisin !!!! "<<std::endl;
-            for (uint i=0; i<sommetsSource->size();i++)
+            /*for (uint i=0; i<sommetsSource->size();i++)
             {
                 for (uint j=0; j<sommetsDestination->size();j++)
                 {
                     remove_edge(sommetsSource->at(i),sommetsDestination->at(j),*g);
                 }
-            }
+            }*/
             sort(sommetsDestination->begin(), sommetsDestination->end());
             return;
         }
@@ -135,13 +135,13 @@ void ggp(UnorientedGraph *g, Entiers *sommetsSource,
             std::cout<<std::endl;*/
 
             if(poids>poids_max  || sommetsSource->size()==1){
-                for (uint i=0; i<sommetsSource->size();i++)
+                /*for (uint i=0; i<sommetsSource->size();i++)
                 {
                     for (uint j=0; j<sommetsDestination->size();j++)
                     {
                         remove_edge(sommetsSource->at(i),sommetsDestination->at(j),*g);
                     }
-                }
+                }*/
                 sort(sommetsDestination->begin(), sommetsDestination->end());
                 return;
             }

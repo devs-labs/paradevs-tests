@@ -50,6 +50,7 @@ public:
                OutputEdgeList& output_edges,
                Connections& parent_connections)
     {
+		std::cout<<"**"<<cluster_number<<"**"<<std::endl;
         UnorientedGraph* g = new UnorientedGraph();
         OrientedGraph go;
         UnorientedGraph graph_origin;
