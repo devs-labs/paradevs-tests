@@ -28,6 +28,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 
 namespace paradevs { namespace tests { namespace boost_graph {
 
@@ -48,6 +49,12 @@ struct myclass2
     bool operator() (Entiers *i, Entiers *j, UnorientedGraph *g)
     { return Calcul_poids(i,g) < Calcul_poids(j,g); }
 } mon_tri;
+
+struct myclass3
+{
+	bool operator() (Entiers *i, Entiers *j)
+	{ return i->size() > j->size(); }
+} myobject_taille;
 
 /**
  * Fonction de verification de la connexité d'un graphe
@@ -420,7 +427,6 @@ Entiers Neigh_community(UnorientedGraph *g, EntiersEntiers &Partition, int verte
 
 void Affinage_recherche_locale(UnorientedGraph *g, EntiersEntiers &Partition, double &cut, std::string name)
 {
-
     Entiers random_orders(num_vertices(*g)); //gestion d'un tableau contenant tout les sommets et ranger de façon aléatoire
 
     for (uint i=0 ; i<num_vertices(*g) ; i++)
@@ -443,7 +449,7 @@ void Affinage_recherche_locale(UnorientedGraph *g, EntiersEntiers &Partition, do
     for(uint k = 0; k < Partition.size();k++){
         std::vector<double> tmp;
         double vol = 0.;
-        double cut = Modif_Cut_one_cluster(*Partition.at(k), *g, vol);
+        double cut = Modif_Cut_one_cluster(*Partition.at(k), *g, vol, name);
         tmp.push_back(cut);
         tmp.push_back(vol);
         tabe_cut.push_back(tmp);
@@ -476,7 +482,7 @@ void Affinage_recherche_locale(UnorientedGraph *g, EntiersEntiers &Partition, do
                     for(uint k = 0; k < Partition.size();k++){
                         std::vector<double> tmp;
                         double vol = 0.;
-                        double cut = Modif_Cut_one_cluster(*Partition.at(k), *g, vol);
+                        double cut = Modif_Cut_one_cluster(*Partition.at(k), *g, vol, name);
                         tmp.push_back(cut);
                         tmp.push_back(vol);
                         tabe_cut.push_back(tmp);
@@ -485,7 +491,7 @@ void Affinage_recherche_locale(UnorientedGraph *g, EntiersEntiers &Partition, do
                 }
             }
 
-            //Modif_fonction_Gain_Cut(Partition,g,community,vertex,cut,name);
+            Modif_fonction_Gain_Cut(Partition,g,community,vertex,cut,name);
 
 
             /*if(Est_connexe(g,Partition,*Partition.at(comm))!=1)
@@ -500,22 +506,36 @@ void Affinage_recherche_locale(UnorientedGraph *g, EntiersEntiers &Partition, do
     }
 }
 
-double Modif_Cut_one_cluster(Entiers &cluster, UnorientedGraph &g, double &vol)
+double Modif_Cut_one_cluster(Entiers &cluster, UnorientedGraph &g, double &vol, std::string name)
 {
 	edge_t e1;
 	bool found;
-	double cpt=0.;
-	for(uint i=0;i<cluster.size();i++){
-		tie(neighbourIt, neighbourEnd) = adjacent_vertices(cluster.at(i), g);
-		for (; neighbourIt != neighbourEnd; ++neighbourIt){
-			tie(e1,found)=edge(vertex(cluster[i],g),vertex(*neighbourIt,g),g);
-			if(In_tab(cluster,*neighbourIt)!=1){
-				cpt+=g[e1]._weight;
+	double cpt= 0.;
+	
+	if(name == "norm"){
+		for(uint i=0;i<cluster.size();i++){
+			tie(neighbourIt, neighbourEnd) = adjacent_vertices(cluster.at(i), g);
+			for (; neighbourIt != neighbourEnd; ++neighbourIt){
+				tie(e1,found)=edge(vertex(cluster[i],g),vertex(*neighbourIt,g),g);
+				if(In_tab(cluster,*neighbourIt)!=1){
+					cpt+=g[e1]._weight;
+				}
 			}
 		}
+		vol = Cluster_Degree(g,cluster);
+	} else if(name == "ratio"){
+		for(uint i=0;i<cluster.size();i++){
+			tie(neighbourIt, neighbourEnd) = adjacent_vertices(cluster.at(i), g);
+			for (; neighbourIt != neighbourEnd; ++neighbourIt){
+				tie(e1,found)=edge(vertex(cluster[i],g),vertex(*neighbourIt,g),g);
+				if(In_tab(cluster,*neighbourIt)!=1){
+					cpt+=g[e1]._weight;
+				}
+			}
+		}
+		vol = Cluster_Weight(g,cluster);
 	}
-	vol = Cluster_Degree(g,cluster);
-	return cpt/2.;
+	return cpt;
 
 }
 
@@ -524,7 +544,7 @@ std::vector<double> modif_cut_tmp(UnorientedGraph *g, EntiersEntiers &Partition,
 	bool found;
 	//std::cout<<"le sommet tiré est : "<<vertexs<<std::endl;
 
-	if(name!="norm")
+	if(name == "cut")
 	{
 		std::vector<double> modif_cut(community.size());
 		double cpt_comm_in;
@@ -550,7 +570,7 @@ std::vector<double> modif_cut_tmp(UnorientedGraph *g, EntiersEntiers &Partition,
 		}
 		return modif_cut;
 	}
-	else{
+	else if(name == "norm"){
 		std::vector<double> modif_cut(community.size());
 		double cpt_comm_in;
 		double cpt_comm_out;
@@ -582,6 +602,45 @@ std::vector<double> modif_cut_tmp(UnorientedGraph *g, EntiersEntiers &Partition,
 			tab_cut.at(community.at(i)).at(0)+=cpt_comm_in;
 			tab_cut.at(community.at(i)).at(0)-=cpt_comm_out;
 			tab_cut.at(community.at(i)).at(1)+= Degree(*g ,vertexs);
+
+			for(uint j = 0; j < tab_cut.size();j++){
+				tmp_cut+=((tab_cut.at(j).at(0))/(tab_cut.at(j).at(1)));
+			}
+
+			modif_cut.at(i)=tmp_cut;
+		}
+	}else if(name == "ratio"){
+		std::vector<double> modif_cut(community.size());
+		double cpt_comm_in;
+		double cpt_comm_out;
+		double tmp_cut;
+
+		for(uint i =0; i<community.size(); i++){
+			std::vector<std::vector<double> > tab_cut = tabe_cut;
+
+			tmp_cut =0.;
+			cpt_comm_in=0.;
+			cpt_comm_out=0.;
+
+			tie(neighbourIt, neighbourEnd) = adjacent_vertices(vertexs,*g);
+			for (; neighbourIt != neighbourEnd; ++neighbourIt){
+				tie(e1,found)=edge(vertex(vertexs,*g),vertex(*neighbourIt,*g),*g);
+				if(In_tab(*Partition.at(comm_in),*neighbourIt)==1)
+					cpt_comm_in+=(*g)[e1]._weight;
+				else if(In_tab(*Partition.at(community.at(i)),*neighbourIt)==1)
+					cpt_comm_out+=(*g)[e1]._weight;
+			}
+
+			/*cpt_comm_in/=2.;
+			cpt_comm_out/=2.;*/
+
+			tab_cut.at(comm_in).at(0)+=cpt_comm_in;
+			tab_cut.at(comm_in).at(0)-=cpt_comm_out;
+			tab_cut.at(comm_in).at(1)-= (*g)[vertexs]._weight;
+
+			tab_cut.at(community.at(i)).at(0)+=cpt_comm_in;
+			tab_cut.at(community.at(i)).at(0)-=cpt_comm_out;
+			tab_cut.at(community.at(i)).at(1)+= (*g)[vertexs]._weight;
 
 			for(uint j = 0; j < tab_cut.size();j++){
 				tmp_cut+=((tab_cut.at(j).at(0))/(tab_cut.at(j).at(1)));
@@ -661,8 +720,7 @@ void Modif_fonction_Gain_Cut(EntiersEntiers &Partition,UnorientedGraph *g, Entie
 }
 
 bool contraction_HEM(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &liste_corr, int val_reduc, int &val_cpt){
-	UnorientedGraph *gtmp = new UnorientedGraph();
-	*gtmp=*g;
+	UnorientedGraph *gtmp = new UnorientedGraph(*g);
 	Entiers Random_list_vertices; // Initialisation du tableau de sommets rangés aléatoirements
 	EntiersEntiers *tableau_de_correspondance = new EntiersEntiers();
 	edge_t e1,e2; // Iterateurs sur les arcs
@@ -694,7 +752,7 @@ bool contraction_HEM(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &
 				/*
 				 * S'il en existe au mois un sommet adjacent au sommet tiré qui n'est pas verrouillé, on
 				 * choisi celui dont l'arc les reliants est le plus fort. Dans le cas où les arcs ont tous
-				 * le même poids, on selectionne le sommet d'identifiant le plus petit
+				 * le même poids, on selectionne le sommet d'index le plus petit
 				 */
 				double poids_a = 0.;
 				int best_vertexs = -1;
@@ -708,7 +766,7 @@ bool contraction_HEM(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &
 
 
 				Entiers * couple = new Entiers(); // Initialisation du vecteur contenant le couple de sommet fusionné
-				int vertex_delete = std::max(vertexs, best_vertexs); // Sommet d'indentifiant le plus grand (qui sera détruit)
+				int vertex_delete = std::max(vertexs, best_vertexs); // Sommet d'index le plus grand (qui sera détruit)
 				//std::cout<<"sommet détruit : "<<vertex_delete<<std::endl;
 				int vertex_save = std::min(vertexs,best_vertexs); // Sommet d'identifiant le plus petit (qui sera conservé)
 				//std::cout<<"sommet sauvé : "<<vertex_save<<std::endl;
@@ -1192,7 +1250,7 @@ double Cut_one_cluster(const Entiers &cluster, UnorientedGraph &g, std::string n
 			}
 		}
 		double vol = Cluster_Weight(g,cluster);
-		return cpt/vol;
+		return (cpt/2.)/vol;
 	}
 	
 	/*Vérification de la formule : doute sur le /2.*/
@@ -1257,6 +1315,16 @@ double Cluster_Degree(UnorientedGraph &g , const Entiers &cluster)
 
     for(uint i = 0; i < cluster.size(); i++){
         val += Degree(g, cluster.at(i));
+    }
+    return val;
+}
+
+double Cluster_Weight(UnorientedGraph &g , const Entiers &cluster)
+{
+    double val = 0.;
+
+    for(uint i = 0; i < cluster.size(); i++){
+        val += g[cluster.at(i)]._weight;;
     }
     return val;
 }
@@ -1388,18 +1456,6 @@ OrientedGraphs Graph_Partition(const EntiersEntiers& Partition,
     }
 
     return graph_partie;
-}
-
-
-
-double Cluster_Weight(UnorientedGraph &g , const Entiers &cluster)
-{
-    double val = 0.;
-
-    for(uint i = 0; i < cluster.size(); i++){
-        val += g[cluster.at(i)]._weight;;
-    }
-    return val;
 }
 
 double Best_Cut_cluster(EntiersEntiers &tab_cluster,Entiers *cluster1, Entiers *cluster2, int index_cluster1, UnorientedGraph &g,std::string name)
@@ -1613,21 +1669,628 @@ void adjacence_ggp(int vertex, Entiers &sommets_adj, UnorientedGraph *g)
 
 }
 
-float modif_Cout_coupe(const Entiers &P, int val, float cut, UnorientedGraph *g)
+double modif_Cout_coupe(const Entiers &P, int val, double cut, UnorientedGraph *g)
 {
     //std::cout<<"Cout de coupe initiale : "<<cut<<std::endl;
     //std::cout<<"degré du sommet tiré : "<<Degree(*g,val)<<std::endl;
-    double cpt=0;
-    float new_cut;
+    double cpt = 0.;
+    double new_cut;
+    bool found;
+	edge_t e1;
     tie(neighbourIt, neighbourEnd) = adjacent_vertices(val, *g);
     for (; neighbourIt != neighbourEnd; neighbourIt++){
         if(In_tab(P,*neighbourIt)==1){
-            cpt++;
+			tie(e1,found)=edge(vertex(val,*g),vertex(*neighbourIt,*g),*g);
+            cpt += (*g)[e1]._weight;
         }
     }
-    new_cut = cut + (Degree(*g,val) - (2 * cpt));
+    new_cut = cut + (Degree(*g,val) - 2*cpt);
     return new_cut;
 }
 
+int decimal(int valeur){
+	int res;
+	switch(valeur){
+		case 0 ... 9 : res = 0;
+		break;
+		case 10 ... 99 : res = 1;
+		break;
+		case 100 ... 999 : res = 2;
+		break;
+		case 1000 ... 9999 : res = 3;
+		break;
+		case 10000 ... 99999 : res = 4;
+		break;
+		case 100000 ... 999999 : res = 5;
+		break;
+		case 1000000 ... 9999999 : res = 6;
+		break;
+		case 10000000 ... 99999999 : res = 7;
+		break;
+		case 100000000 ... 999999999 : res = 8;
+		break;
+	default : 
+		std::cout<<"L'interval n'est pas de taille suffisante"<<std::endl;
+		break;
+	}
+	return res;
+}
+
+void Graph_constructor_txt(const char* text, OrientedGraph * Og){
+	
+	//Traitement initial
+	std::ifstream fichier (text, std::ios::in);
+	int lines = std::count(std::istreambuf_iterator<char>( fichier ),
+	std::istreambuf_iterator<char>(),'\n' );
+	//std::cout<<"Nombre de ligne : "<<lines<<std::endl;
+	
+	fichier.seekg(0, std::ios::beg);
+	std::string caractere;
+	getline(fichier, caractere);
+	int caractere_size = caractere.size()+1;
+	
+	fichier.seekg(0, std::ios::beg);
+	int nbr_vertices;
+	fichier >> nbr_vertices;
+	//std::cout << "Nombre de sommets : "<< nbr_vertices<< std::endl;
+	
+	//Création des sommets
+	
+	std::vector<vertex_to> vect_vertex;
+	for(int i =0; i<nbr_vertices; i++){
+		vertex_to v0 = boost::add_vertex(*Og);
+		vect_vertex.push_back(v0);
+	}
+	
+	//Création des arcs
+	int deplacement_sup = 0;
+	for(int i = 0; i <(lines-nbr_vertices-1); i++){
+	fichier.seekg((8)*i+caractere_size+deplacement_sup, std::ios::beg);
+	int vertex_in, vertex_out;
+	double weight;
+	fichier >> vertex_in >> vertex_out >> weight ; 
+	add_edge(vect_vertex.at(vertex_in), vect_vertex.at(vertex_out), EdgeProperties(weight), *Og); 
+	//std::cout << vertex_in << " " << vertex_out << " " << weight << std::endl; 
+	int tmp = decimal(vertex_in) + decimal(vertex_out) + decimal(floor(weight));
+	deplacement_sup += tmp;
+	}
+	
+	//Pondération des sommets
+	int cpt =0;
+	for(int i = lines-nbr_vertices-1; i <lines-1; i++){
+	fichier.seekg((8)*(lines-nbr_vertices-1)+caractere_size+deplacement_sup, std::ios::beg);
+	double poids;
+	std::string txt;
+	fichier >> poids >> txt ;
+	DynamicsType type;
+	if(txt == "NORMAL_PIXEL"){
+		type = NORMAL_PIXEL; 
+	}else{
+		type = TOP_PIXEL;
+	}
+	(*Og)[vect_vertex.at(cpt)] = VertexProperties(cpt, poids, type);
+	//std::cout << poids << std::endl; 
+	int tmp = decimal(floor(poids)) + 17;
+	deplacement_sup += tmp;
+	cpt++;
+	}
+
+	fichier.close();
+}
+
+void Text_generator_graph(const char *texte, OrientedGraph *go){
+	
+	bool found;
+	edge_to e1;
+	std::ofstream fichier (texte, std::ios::out);
+    fichier<<num_vertices(*go)<<std::endl;
+    tie(vertexIto, vertexEndo) = vertices(*go);
+    for (; vertexIto != vertexEndo; ++vertexIto) {
+    	tie(neighbourIto, neighbourEndo) = adjacent_vertices(*vertexIto,
+    			*go);
+    	for (; neighbourIto != neighbourEndo; ++neighbourIto){
+			tie(e1,found)=edge(vertex(*vertexIto,*go),vertex(*neighbourIto,*go),*go);
+			if(((*go)[e1]._weight - floor((*go)[e1]._weight)) == 0 ){
+				fichier<<(*go)[*vertexIto]._index<<" "<<(*go)[*neighbourIto]._index<<" "<<(*go)[e1]._weight<<".0"<<std::endl;
+			}else{
+				fichier<<(*go)[*vertexIto]._index<<" "<<(*go)[*neighbourIto]._index<<" "<<(*go)[e1]._weight<<std::endl;
+			}
+    	}
+    }
+    tie(vertexIto, vertexEndo) = vertices(*go);
+    for (; vertexIto != vertexEndo; ++vertexIto) {
+		if(((*go)[*vertexIto]._weight - floor((*go)[*vertexIto]._weight)) == 0 && (*go)[*vertexIto]._type == TOP_PIXEL){
+			fichier<<(*go)[*vertexIto]._weight<<".0"<<" "<<"TOP_PIXEL"<<"   "<<std::endl;
+		}else if(((*go)[*vertexIto]._weight - floor((*go)[*vertexIto]._weight)) == 0 && (*go)[*vertexIto]._type == NORMAL_PIXEL){
+			fichier<<(*go)[*vertexIto]._weight<<".0"<<" "<<"NORMAL_PIXEL"<<std::endl;
+		}else if(((*go)[*vertexIto]._weight - floor((*go)[*vertexIto]._weight)) != 0 && (*go)[*vertexIto]._type == TOP_PIXEL){
+			fichier<<(*go)[*vertexIto]._weight<<" "<<"TOP_PIXEL"<<std::endl;
+		}else{
+			fichier<<(*go)[*vertexIto]._weight<<" "<<"NORMAL_PIXEL"<<std::endl;
+		}
+    }
+    
+	fichier.close();
+}
+
+double Diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Partition, int partie, int node, std::string name){
+	double Dif;
+	double Int = 0.;
+	double Ext = 0.;
+	
+	edge_t e1;
+    bool found;
+
+    tie(neighbourIt, neighbourEnd) = adjacent_vertices(node, *g);
+    for (; neighbourIt != neighbourEnd; ++neighbourIt){
+		tie(e1, found) = edge(vertex(node, *g), vertex(*neighbourIt, *g), *g);
+		if(In_tab_dichotomie(*Partition.at(partie),*neighbourIt) == 1){
+			Int+= (*g)[e1]._weight;
+		}else{
+			Ext+= (*g)[e1]._weight;
+		}
+    }
+    
+	if(name == "ratio"){
+	    Int/=Cluster_Weight(*g,*Partition.at(partie));
+	    Ext/=Cluster_Weight(*g,*Partition.at(partie));
+	}
+	
+	Dif = Ext - Int;
+	return Dif;
+}
+
+double Diff_cut_ratio_bissection(UnorientedGraph *g, Entiers *part, int node, std::string name){
+	double Ext = 0.;
+	
+	edge_t e1;
+    bool found;
+
+    tie(neighbourIt, neighbourEnd) = adjacent_vertices(node, *g);
+    for (; neighbourIt != neighbourEnd; ++neighbourIt){
+		tie(e1, found) = edge(vertex(node, *g), vertex(*neighbourIt, *g), *g);
+		if(In_tab_dichotomie(*part,*neighbourIt) != 1){
+			Ext+= (*g)[e1]._weight;
+		}
+    }
+	
+	return Ext;
+}
+
+std::vector<std::vector<int>> Vector_diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Partition, std::string name){
+	std::vector<std::vector<int>> Diff_vector;
+	
+	for(uint i = 0; i < Partition.size(); i++){
+		std::vector<std::pair<double,int>> D_vector;
+		for(uint j = 0; j < Partition.at(i)->size(); j++){
+			double gain_d = Diff_cut_ratio(g, Partition, i, Partition.at(i)->at(j), name);
+			//std::cout<<gain_d<<std::endl;
+			if(gain_d > 0){
+				std::pair<double, int> D;
+				D.first =  gain_d;
+				D.second = Partition.at(i)->at(j);
+				D_vector.push_back(D);		
+			}	
+		}
+		sort(D_vector.begin(),D_vector.end());
+		std::reverse(D_vector.begin(),D_vector.end());
+		std::vector<int> index_vector;
+		for(uint id = 0; id < D_vector.size(); id++){
+			index_vector.push_back(D_vector.at(id).second);
+		}
+		Diff_vector.push_back(index_vector);
+	}
+	
+	/*std::cout<<"Tableau des différences "<<std::endl;
+	for(uint i = 0; i<Diff_vector.size(); i++){
+		std::cout<<"*"<<i<<"* ";
+		for(uint j = 0; j<Diff_vector.at(i).size(); j++){
+			std::cout<<Diff_vector.at(i).at(j)<<" ";
+		}
+		std::cout<<std::endl;
+	}*/
+	
+	return Diff_vector;
+
+}
+
+std::vector<int> Vector_diff_cut_ratio_2(UnorientedGraph *g, const EntiersEntiers &Partition, std::string name){
+	std::vector<int> Diff_vector;
+	std::vector<std::pair<double,int>> D_vector;
+	for(uint i = 0; i < Partition.size(); i++){
+		for(uint j = 0; j < Partition.at(i)->size(); j++){
+			double gain_d = Diff_cut_ratio(g, Partition, i, Partition.at(i)->at(j), name);
+			//std::cout<<gain_d<<std::endl;
+			if(gain_d > 0){
+				std::pair<double, int> D;
+				D.first =  gain_d;
+				D.second = Partition.at(i)->at(j);
+				D_vector.push_back(D);		
+			}	
+		}
+	}
+	sort(D_vector.begin(),D_vector.end());
+	for(uint id = 0; id < D_vector.size(); id++){
+		Diff_vector.push_back(D_vector.at(id).second);
+	}
+	
+	/*std::cout<<"Tableau des différences "<<std::endl;
+	for(uint i = 0; i<Diff_vector.size(); i++){
+		std::cout<<"*"<<i<<"* ";
+		for(uint j = 0; j<Diff_vector.at(i).size(); j++){
+			std::cout<<Diff_vector.at(i).at(j)<<" ";
+		}
+		std::cout<<std::endl;
+	}*/
+	/*for(uint j = 0; j<Diff_vector.size(); j++){
+		std::cout<<Diff_vector.at(j)<<" ";
+	}
+	std::cout<<std::endl;*/
+	
+	return Diff_vector;
+
+}
+
+void Modif_vector_diff_cut_ratio_2(UnorientedGraph *g, const EntiersEntiers &Partition, std::vector<int> &Diff_vector, int node, std::string name){
+	std::vector<std::pair<double,int>> D_vector;
+	
+	tie(neighbourIt, neighbourEnd) = adjacent_vertices(node, *g);
+	for (; neighbourIt != neighbourEnd; ++neighbourIt){
+		//std::cout<<"node : "<<node<<std::endl;
+		//std::cout<<"voisin : "<<*neighbourIt<<std::endl;
+		int neigh_ind = In_community_dichotomie(Partition, *neighbourIt);
+		//std::cout<<"dans  : "<<neigh_ind<<std::endl;
+		double gain_d = Diff_cut_ratio(g, Partition, neigh_ind, *neighbourIt, name);
+		//std::cout<<"gain_d : "<<gain_d<<std::endl;
+		if(gain_d > 0){
+			std::pair<double, int> D;
+			D.first =  gain_d;
+			D.second = *neighbourIt;
+			D_vector.push_back(D);		
+		}
+		//suprim_val(Diff_vector,*neighbourIt);
+	}
+	
+	if(D_vector.size() == 0){
+		Diff_vector.erase(Diff_vector.begin());
+		return;
+	}
+	
+	//std::cout<<"**"<<std::endl;
+	sort(D_vector.begin(),D_vector.end());
+	for(uint id = 0; id < D_vector.size(); id++){
+		if(In_tab(Diff_vector,D_vector.at(id).second) != 1)
+			Diff_vector.push_back(D_vector.at(id).second);
+	}
+	//std::cout<<"***"<<std::endl;
+	Diff_vector.erase(Diff_vector.begin());
+	//std::cout<<"**!**"<<std::endl;
+	
+	sort(Diff_vector.begin(),Diff_vector.end());
+	
+	for(uint j = 0; j<Diff_vector.size(); j++){
+		std::cout<<Diff_vector.at(j)<<" ";
+	}
+	//std::cout<<std::endl;
+}
+
+void Modif_vector_diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Partition, std::vector<std::vector<int>> &Diff_vector, int recalcul1, int recalcul2, std::string name){
+	
+	std::vector<std::pair<double,int>> D_vector;
+	for(uint j = 0; j < Partition.at(recalcul1)->size(); j++){
+		double gain_d = Diff_cut_ratio(g, Partition, recalcul1, Partition.at(recalcul1)->at(j), name);
+		//std::cout<<gain_d<<std::endl;
+		if(gain_d > 0){
+			std::pair<double, int> D;
+			D.first =  gain_d;
+			D.second = Partition.at(recalcul1)->at(j);
+			D_vector.push_back(D);		
+		}	
+	}
+	sort(D_vector.begin(),D_vector.end());
+	std::reverse(D_vector.begin(),D_vector.end());
+	std::vector<int> index_vector;
+	for(uint id = 0; id < D_vector.size(); id++){
+		index_vector.push_back(D_vector.at(id).second);
+	}
+	Diff_vector.at(recalcul1) = index_vector;
+	
+	std::vector<std::pair<double,int>> D_vector2;
+	for(uint j = 0; j < Partition.at(recalcul2)->size(); j++){
+		double gain_d = Diff_cut_ratio(g, Partition, recalcul2, Partition.at(recalcul2)->at(j), name);
+		//std::cout<<gain_d<<std::endl;
+		if(gain_d > 0){
+			std::pair<double, int> D;
+			D.first =  gain_d;
+			D.second = Partition.at(recalcul2)->at(j);
+			D_vector2.push_back(D);		
+		}	
+	}
+	sort(D_vector2.begin(),D_vector2.end());
+	std::reverse(D_vector2.begin(),D_vector2.end());
+	std::vector<int> index_vector2;
+	for(uint id = 0; id < D_vector2.size(); id++){
+		index_vector2.push_back(D_vector2.at(id).second);
+	}
+	Diff_vector.at(recalcul2) = index_vector2;
+	
+	/*std::cout<<"Tableau des différences modifié "<<std::endl;
+	for(uint i = 0; i<Diff_vector.size(); i++){
+		std::cout<<"*"<<i<<"* ";
+		for(uint j = 0; j<Diff_vector.at(i).size(); j++){
+			std::cout<<Diff_vector.at(i).at(j)<<" ";
+		}
+		std::cout<<std::endl;
+	}*/
+		
+}
+
+void Affinache_gain_diff(UnorientedGraph *g, EntiersEntiers &Partition, double &cut, std::string name, double poids_moy){
+	double old_cut = -1.;
+	
+	while(old_cut != cut){
+		//std::cout<<"Boucle d'ammélioration "<<std::endl;
+		old_cut = cut;
+		sort(Partition.begin(), Partition.end(), myobject_taille);
+		std::vector<std::vector<int>> diff_vector;
+		diff_vector = Vector_diff_cut_ratio(g, Partition, name);
+		
+		for(uint indice = 0; indice < diff_vector.size(); indice ++){
+			if(diff_vector.at(indice).size() != 0 && Partition.at(indice)->size() >1){
+				//for(uint i = 0; i < diff_vector.at(indice).size(); i++){
+				int i =0;
+				while(diff_vector.at(indice).size() != 0 && Partition.at(indice)->size() >1 && i < diff_vector.at(indice).size() && 
+				Cluster_Weight(*g,*Partition.at(indice)) > (poids_moy-poids_moy/Partition.size())){
+					//std::cout<<"Sommet de départ : "<< diff_vector.at(indice).at(i) <<" dans "<<indice<<std::endl;
+					Entiers neigh_part;
+					neigh_part = Neigh_community(g, Partition, diff_vector.at(indice).at(i), indice);
+					int best_neigh_part = neigh_part.at(0);
+					double gain = -10000000.;
+					for(uint ind_neigh = 0; ind_neigh < neigh_part.size(); ind_neigh++){
+						double tmp_gain;
+						if(name == "ratio"){
+							tmp_gain = Gain_ratio(g,Partition,indice,neigh_part.at(ind_neigh),diff_vector.at(indice).at(i),cut);
+						}else{
+							double Int = 0.;
+							double Ext = 0.;
+							edge_t e1;
+						    bool found;
+						
+						    tie(neighbourIt, neighbourEnd) = adjacent_vertices(diff_vector.at(indice).at(i), *g);
+						    for (; neighbourIt != neighbourEnd; ++neighbourIt){
+								tie(e1, found) = edge(vertex(diff_vector.at(indice).at(i), *g), vertex(*neighbourIt, *g), *g);
+								if(In_tab_dichotomie(*Partition.at(neigh_part.at(ind_neigh)),*neighbourIt) == 1){
+									Ext+= (*g)[e1]._weight;
+								}else if(In_tab_dichotomie(*Partition.at(indice),*neighbourIt) == 1){
+									Int+= (*g)[e1]._weight;
+								}
+						    }
+								tmp_gain = Ext - Int;
+						}
+						
+					    if(tmp_gain > gain & tmp_gain > 0){
+							gain = tmp_gain;
+							best_neigh_part = neigh_part.at(ind_neigh);
+						}
+					}
+					
+					//std::cout<<" Ensemble de déstination "<<best_neigh_part<<" gain de  : "<<gain<<std::endl;
+					if(gain > 0){
+						//std::cout<<"Modification"<<std::endl;
+						cut -= gain; /*Grosse modification a apporté de ce coté la*/
+						//std::cout<<"Ratio de coupe : "<<cut<<std::endl;
+						suprim_val(*Partition.at(indice),diff_vector.at(indice).at(i));
+						Partition.at(best_neigh_part)->push_back(diff_vector.at(indice).at(i));
+						sort(Partition.at(best_neigh_part)->begin(),Partition.at(best_neigh_part)->end());
+						//double cut2 = Cut_cluster(Partition,*g,"ratio");
+						//std::cout<<"Vrai ratio de coupe : "<<cut2<<std::endl;
+						Modif_vector_diff_cut_ratio(g,Partition,diff_vector,best_neigh_part,indice,name);
+						i = 0;
+					}else{
+						i++;
+					}			
+				}
+			}
+		}
+		//std::cout<<cut<<std::endl;
+	}
+}
+
+void Affinache_gain_diff_2(UnorientedGraph *g, EntiersEntiers &Partition, double &cut, std::string name, double poids_moy){
+	double old_cut = -1.;
+	
+	//while(old_cut != cut){
+		//std::cout<<"Boucle d'ammélioration "<<std::endl;
+		//old_cut = cut;
+		sort(Partition.begin(), Partition.end(), myobject_taille);
+		std::vector<int> diff_vector;
+		diff_vector = Vector_diff_cut_ratio_2(g, Partition, name);
+		
+		//for(uint indice = 0; indice < diff_vector.size(); indice ++){
+		int indice = 0;
+		while(/*indice < diff_vector.size() &&*/ diff_vector.size() != 0){
+			int com = In_community_dichotomie(Partition,diff_vector.at(indice));
+			std::cout<<" Ensemble de départ "<<com<<" sommet  : "<<diff_vector.at(indice)<<std::endl;
+			if(Partition.at(com)->size() >1 && Cluster_Weight(*g,*Partition.at(com)) > (poids_moy-poids_moy/Partition.size())){
+				Entiers neigh_part;
+				neigh_part = Neigh_community(g, Partition, diff_vector.at(indice), com);
+				int best_neigh_part = neigh_part.at(0);
+				double gain = -10000000.;
+				for(uint ind_neigh = 0; ind_neigh < neigh_part.size(); ind_neigh++){
+					double tmp_gain;
+					if(name == "ratio"){
+						tmp_gain = Gain_ratio(g,Partition,com,neigh_part.at(ind_neigh),diff_vector.at(indice),cut);
+					}else{
+						double Int = 0.;
+						double Ext = 0.;
+						edge_t e1;
+					    bool found;
+					
+					    tie(neighbourIt, neighbourEnd) = adjacent_vertices(diff_vector.at(indice), *g);
+					    for (; neighbourIt != neighbourEnd; ++neighbourIt){
+							tie(e1, found) = edge(vertex(diff_vector.at(indice), *g), vertex(*neighbourIt, *g), *g);
+							if(In_tab_dichotomie(*Partition.at(neigh_part.at(ind_neigh)),*neighbourIt) == 1){
+								Ext+= (*g)[e1]._weight;
+							}else if(In_tab_dichotomie(*Partition.at(com),*neighbourIt) == 1){
+								Int+= (*g)[e1]._weight;
+							}
+					    }
+							tmp_gain = Ext - Int;
+					}
+					
+				    if(tmp_gain > gain & tmp_gain > 0){
+						gain = tmp_gain;
+						best_neigh_part = neigh_part.at(ind_neigh);
+					}
+				}
+				
+				std::cout<<" Ensemble de déstination "<<best_neigh_part<<" gain de  : "<<gain<<std::endl;
+				if(gain > 0){
+					std::cout<<"Modification"<<std::endl;
+					cut -= gain; /*Grosse modification a apporté de ce coté la*/
+					std::cout<<"Ratio de coupe : "<<cut<<std::endl;
+					suprim_val(*Partition.at(com),diff_vector.at(indice));
+					Partition.at(best_neigh_part)->push_back(diff_vector.at(indice));
+					sort(Partition.at(best_neigh_part)->begin(),Partition.at(best_neigh_part)->end());
+					double cut2 = Cut_cluster(Partition,*g,"ratio");
+					std::cout<<"Vrai ratio de coupe : "<<cut2<<std::endl;
+					//Modif_vector_diff_cut_ratio_2(g,Partition,diff_vector,diff_vector.at(indice),name);
+					//indice = 0;
+					diff_vector.erase(diff_vector.begin());
+				}else{
+					diff_vector.erase(diff_vector.begin());
+				}
+			}
+		}
+		//std::cout<<cut<<std::endl;
+//	}
+}
+
+double Gain_ratio(UnorientedGraph *g,const EntiersEntiers &Partition, int in, int out, int node, double ratio){
+	double new_ratio = ratio;
+	double poids_in = Cluster_Weight(*g,*Partition.at(in));
+	double poids_out = Cluster_Weight(*g,*Partition.at(out));
+	double tmp_poids_in = poids_in - (*g)[node]._weight;
+	double tmp_poids_out = poids_out + (*g)[node]._weight;
+	//std::cout<<"tmp_poids_in "<< tmp_poids_in <<std::endl;
+	//std::cout<<"tmp_poids_out "<< tmp_poids_out <<std::endl;
+	
+	double cut_in = 0.;
+	double cut_out = 0.;
+	double tmp_cut_in = 0.;
+	double tmp_cut_out = 0.;
+	
+	edge_t e1;
+	bool found;
+	
+	for(uint i = 0; i < Partition.at(in)->size(); i++){
+		tie(neighbourIt, neighbourEnd) = adjacent_vertices(Partition.at(in)->at(i), *g);
+		for (; neighbourIt != neighbourEnd; ++neighbourIt){
+			tie(e1,found)=edge(vertex(Partition.at(in)->at(i),*g),vertex(*neighbourIt,*g),*g);
+			if(In_tab_dichotomie(*Partition.at(in),*neighbourIt) != 1){
+				if(Partition.at(in)->at(i) != node){
+					tmp_cut_in += (*g)[e1]._weight;
+				}
+				cut_in += (*g)[e1]._weight;
+			}else if(*neighbourIt == node){
+				tmp_cut_in += (*g)[e1]._weight;
+			}
+		}
+	}
+	
+	for(uint i = 0; i < Partition.at(out)->size(); i++){
+		tie(neighbourIt, neighbourEnd) = adjacent_vertices(Partition.at(out)->at(i), *g);
+		for (; neighbourIt != neighbourEnd; ++neighbourIt){
+			tie(e1,found)=edge(vertex(Partition.at(out)->at(i),*g),vertex(*neighbourIt,*g),*g);
+			if(In_tab_dichotomie(*Partition.at(out),*neighbourIt) != 1){
+				if(*neighbourIt != node){
+					tmp_cut_out += (*g)[e1]._weight;
+				}
+				cut_out += (*g)[e1]._weight;
+			}
+		}
+	}
+	tie(neighbourIt, neighbourEnd) = adjacent_vertices(node, *g);
+	for (; neighbourIt != neighbourEnd; ++neighbourIt){
+		tie(e1,found)=edge(vertex(node,*g),vertex(*neighbourIt,*g),*g);
+		if(In_tab_dichotomie(*Partition.at(out),*neighbourIt) != 1){
+			tmp_cut_out += (*g)[e1]._weight;
+		}
+	}
+	
+	//std::cout<<"tmp_cut_in "<< tmp_cut_in/2. <<std::endl;
+	//std::cout<<"tmp_cut_out "<< tmp_cut_out/2. <<std::endl;
+	new_ratio -= cut_in/2./poids_in;
+	new_ratio -= cut_out/2./poids_out;
+	new_ratio += tmp_cut_in/2./tmp_poids_in;
+	new_ratio += tmp_cut_out/2./tmp_poids_out;
+	
+	//std::cout<<"Nouveau ratio : " <<new_ratio<<std::endl;
+	return ratio - new_ratio;
+	
+}
+
+double Modif_ratio_cut(UnorientedGraph *g,Entiers *Ss, Entiers *Sd, int node, double ratio){/*Revoir cette fonction, modification psa forcement nécéssaire, plus simple !!!*/
+	double new_ratio;
+	double poids_in = Cluster_Weight(*g,*Ss);
+	double poids_out = Cluster_Weight(*g,*Sd);
+	double tmp_poids_in = poids_in - (*g)[node]._weight;
+	double tmp_poids_out = poids_out + (*g)[node]._weight;
+	//std::cout<<"tmp_poids_in "<< tmp_poids_in <<std::endl;
+	//std::cout<<"tmp_poids_out "<< tmp_poids_out <<std::endl;
+	
+	double new_cut = 0.;
+	//double new_cut_out = 0.;
+	//double tmp_cut_in = 0.;
+	//double tmp_cut_out = 0.;
+	
+	edge_t e1;
+	bool found;
+	
+	for(uint i = 0; i < Ss->size(); i++){
+		if(Ss->at(i) != node){
+			tie(neighbourIt, neighbourEnd) = adjacent_vertices(Ss->at(i), *g);
+			for (; neighbourIt != neighbourEnd; ++neighbourIt){
+				tie(e1,found)=edge(vertex(Ss->at(i),*g),vertex(*neighbourIt,*g),*g);
+				if(In_tab_dichotomie(*Ss,*neighbourIt) != 1){
+					new_cut += (*g)[e1]._weight;
+				}else if(*neighbourIt == node){
+					new_cut += (*g)[e1]._weight;
+				}
+			}
+		}
+	}
+	
+	/*for(uint i = 0; i < Sd->size(); i++){
+		tie(neighbourIt, neighbourEnd) = adjacent_vertices(Sd->at(i), *g);
+		for (; neighbourIt != neighbourEnd; ++neighbourIt){
+			tie(e1,found)=edge(vertex(Sd->at(i),*g),vertex(*neighbourIt,*g),*g);
+			if(In_tab(*Sd,*neighbourIt) != 1){
+				if(*neighbourIt != node){
+					tmp_cut_out += (*g)[e1]._weight;
+				}
+				cut_out += (*g)[e1]._weight;
+			}
+		}
+	}
+	tie(neighbourIt, neighbourEnd) = adjacent_vertices(node, *g);
+	for (; neighbourIt != neighbourEnd; ++neighbourIt){
+		tie(e1,found)=edge(vertex(node,*g),vertex(*neighbourIt,*g),*g);
+		if(In_tab(*Sd,*neighbourIt) != 1){
+			tmp_cut_out += (*g)[e1]._weight;
+		}
+	}*/
+	
+	//std::cout<<"tmp_cut_in "<< tmp_cut_in/2. <<std::endl;
+	//std::cout<<"tmp_cut_out "<< tmp_cut_out/2. <<std::endl;
+	new_ratio = new_cut/2./tmp_poids_in + new_cut/2./tmp_poids_out;
+	/*new_ratio -= cut_out/2./poids_out;
+	new_ratio += tmp_cut_in/2./tmp_poids_in;
+	new_ratio += tmp_cut_out/2./tmp_poids_out;*/
+	
+	//std::cout<<"Nouveau ratio : " <<new_ratio<<std::endl;
+	return new_ratio;
+	
+}
 
 } } } // namespace paradevs tests boost_graph

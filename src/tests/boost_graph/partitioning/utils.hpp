@@ -47,7 +47,7 @@ void List_edge_partie(Entiers *Partie, OrientedGraph *go, Edges &edge_partie,
 
 void construire_graph(UnorientedGraph *g, OrientedGraph *graph);
 
-double Modif_Cut_one_cluster(Entiers &cluster, UnorientedGraph &g, double &vol);
+double Modif_Cut_one_cluster(Entiers &cluster, UnorientedGraph &g, double &vol, std::string name);
 
 std::vector<double> modif_cut_tmp(UnorientedGraph *g, EntiersEntiers &Partition,
                              std::vector<std::vector<double> > tabe_cut,
@@ -107,10 +107,23 @@ void make_unoriented_graph(const OrientedGraph& og, UnorientedGraph& uog);
 
 void adjacence_ggp(int vertex, Entiers &sommets_adj, UnorientedGraph *g);
 
-float modif_Cout_coupe(const Entiers &P, int val, float cut, UnorientedGraph *g);
+double modif_Cout_coupe(const Entiers &P, int val, double cut, UnorientedGraph *g);
 double Cluster_Weight(UnorientedGraph &g , const Entiers &cluster);
 double Best_Cut_cluster(EntiersEntiers &tab_cluster,Entiers *cluster1, Entiers *cluster2, int index_cluster1, UnorientedGraph &g,std::string name);
 
+void Text_generator_graph(const char *texte, OrientedGraph *go);
+void Graph_constructor_txt(const char* text, OrientedGraph * Og);
+int decimal(int valeur);
+double Diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Partition, int partie, int node, std::string name);
+std::vector<std::vector<int>> Vector_diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Partition, std::string name);
+void Affinache_gain_diff(UnorientedGraph *g, EntiersEntiers &Partition, double &cut, std::string name, double poids_moy);
+void Modif_vector_diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Partition, std::vector<std::vector<int>> &Diff_vector, int recalcul1, int recalcul2, std::string name);
+double Gain_ratio(UnorientedGraph *g,const EntiersEntiers &Partition, int in, int out, int node, double ratio);
+std::vector<int> Vector_diff_cut_ratio_2(UnorientedGraph *g, const EntiersEntiers &Partition, std::string name);
+void Modif_vector_diff_cut_ratio_2(UnorientedGraph *g, const EntiersEntiers &Partition, std::vector<int> &Diff_vector, int node, std::string name);
+void Affinache_gain_diff_2(UnorientedGraph *g, EntiersEntiers &Partition, double &cut, std::string name, double poids_moy);
+double Modif_ratio_cut(UnorientedGraph *g,Entiers *Ss, Entiers *Sd, int node, double ratio);
+double Diff_cut_ratio_bissection(UnorientedGraph *g, Entiers *part, int node, std::string name);
 } } } // namespace paradevs tests boost_graph
 
 #endif

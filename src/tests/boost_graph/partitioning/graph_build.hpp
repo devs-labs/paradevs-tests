@@ -33,6 +33,8 @@ namespace paradevs { namespace tests { namespace boost_graph {
 
 void build_graph(OrientedGraph& og, unsigned int edge_number);
 void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source, int nbr_v_min, int nbr_v_max,const std::vector<int> &niveau);
+void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_couche, int nbr_v_min, int nbr_v_max);
+void build_graph_cyclique(OrientedGraph& og);
 //void build_corsen_graph(OrientedGraph& graph);
 
 } } } // namespace paradevs tests boost_graph;

@@ -57,7 +57,10 @@ public:
 
     virtual void generate(OrientedGraph& go)
     {
-        build_generator_graph(&go, edge_number, source_number, min_neigh,
+        /*const char *texte = new const char();
+        texte = "enregistrement.txt";
+        Graph_constructor_txt(texte,&go);*/
+       build_generator_graph(&go, edge_number, source_number, min_neigh,
                               max_neigh, levels);
     }
 
@@ -65,6 +68,30 @@ private:
     unsigned int edge_number;
     std::vector<int> levels;
     unsigned int source_number;
+    unsigned int min_neigh;
+    unsigned int max_neigh;
+};
+
+class RandomLinkedGraphGenerator : public GraphGenerator
+{
+public:
+    RandomLinkedGraphGenerator(unsigned int edge_number,
+                         unsigned int levels,
+                         unsigned int min_neigh,
+                         unsigned int max_neigh) :
+        edge_number(edge_number), levels(levels),
+        min_neigh(min_neigh), max_neigh(max_neigh)
+    { }
+
+    virtual void generate(OrientedGraph& go)
+    {
+       build_generator_graph_linked(&go, edge_number, levels , min_neigh,
+                              max_neigh);
+    }
+
+private:
+    unsigned int edge_number;
+    unsigned int levels;
     unsigned int min_neigh;
     unsigned int max_neigh;
 };
@@ -92,6 +119,7 @@ public:
     virtual void generate(OrientedGraph& go)
     {
         //build_corsen_graph(go);
+        
     }
 };
 

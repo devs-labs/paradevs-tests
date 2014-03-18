@@ -147,7 +147,8 @@ void test(double duration, std::string partitioning_method_name,
           GraphGenerator& g)
 {
     boost::timer t;
-
+	int nbr_ite = 20;
+	
     log_file << "==== " << partitioning_method_name << " with ";
     if (contraction_coef_flag) {
         log_file << "/";
@@ -168,7 +169,7 @@ void test(double duration, std::string partitioning_method_name,
             if (heap) {
                 double t1 = t.elapsed();
 
-                for (unsigned int i = 0; i < 10; ++i) {
+                for (unsigned int i = 0; i < nbr_ite; ++i) {
                     partitionning_heap_test(duration, n,
                                             partitioning_method_name,
                                             contraction_coef,
@@ -177,12 +178,12 @@ void test(double duration, std::string partitioning_method_name,
 
                 double t2 = t.elapsed();
 
-                log_file << (t2 - t1) / 10 << "\t";
+                log_file << (t2 - t1) / nbr_ite << "\t";
             }
             if (vector) {
                 double t1 = t.elapsed();
 
-                for (unsigned int i = 0; i < 10; ++i) {
+                for (unsigned int i = 0; i < nbr_ite; ++i) {
                     partitionning_vector_test(duration, n,
                                               partitioning_method_name,
                                               contraction_coef,
@@ -191,7 +192,7 @@ void test(double duration, std::string partitioning_method_name,
 
                 double t2 = t.elapsed();
 
-                log_file << (t2 - t1) / 10 << std::endl;
+                log_file << (t2 - t1) / nbr_ite << std::endl;
             } else {
                 log_file << std::endl;
             }
@@ -202,7 +203,7 @@ void test(double duration, std::string partitioning_method_name,
         if (heap) {
             double t1 = t.elapsed();
 
-            for (unsigned int i = 0; i < 10; ++i) {
+            for (unsigned int i = 0; i < nbr_ite; ++i) {
                 partitionning_heap_test(duration, contraction_coef,
                                         partitioning_method_name,
                                         contraction_coef,
@@ -211,12 +212,12 @@ void test(double duration, std::string partitioning_method_name,
 
             double t2 = t.elapsed();
 
-            log_file << (t2 - t1) / 10 << "\t";
+            log_file << (t2 - t1) / nbr_ite << "\t";
         }
         if (vector) {
             double t1 = t.elapsed();
 
-            for (unsigned int i = 0; i < 10; ++i) {
+            for (unsigned int i = 0; i < nbr_ite; ++i) {
                 partitionning_vector_test(duration, contraction_coef,
                                           partitioning_method_name,
                                           contraction_coef,
@@ -225,7 +226,7 @@ void test(double duration, std::string partitioning_method_name,
 
             double t2 = t.elapsed();
 
-            log_file << (t2 - t1) / 10 << std::endl;
+            log_file << (t2 - t1) / nbr_ite << std::endl;
         } else {
             log_file << std::endl;
         }
@@ -284,47 +285,57 @@ void test_partitioning_38()
 
 /* random graph */
 
-const double duration_random = 20;
+const double duration_random = 0;
 
 void test_flat_random()
 {
     boost::timer t;
+    int nbr_ite = 20;
 
     log_file << "== Random Graph ==" << std::endl;
     log_file << "flat graph with heap = ";
-    for (unsigned int i = 0; i < 10; ++i) {
+    for (unsigned int i = 0; i < nbr_ite; ++i) {
         flat_heap_test< RandomFlatGraphBuilder >(duration_random);
     }
 
     double t2 = t.elapsed();
 
-    log_file << t2 / 10 << std::endl;
+    /*log_file << t2 / 10 << std::endl;
 
     log_file << "flat graph with vector = ";
     for (unsigned int i = 0; i < 10; ++i) {
         flat_vector_test< FlatGraphBuilder >(duration_random);
     }
 
-    double t3 = t.elapsed();
+    double t3 = t.elapsed();*/
 
-    log_file << (t3 - t2) / 10 << std::endl;
+    //log_file << (t3 - t2) / 10 << std::endl;
+    log_file << t2 / nbr_ite << std::endl;
 }
 
 void test_partitioning_random()
 {
-    std::vector < int > levels = { 4, 3, 2  };
-    RandomGraphGenerator g(3000, levels, 5, 2, 4);
+    std::vector < int > levels = { 5, 4, 3, 2  };
+    int nbr_sommets = 6000;
+    int sources = nbr_sommets/100*1;
+    RandomGraphGenerator g(nbr_sommets, levels, sources, 2, 3);
 
-    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
-                                  false, true, 5, true, g);
-    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+    /*test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 5, true, g);*/
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 50, 2,
                                   false, true, 10, true, g);
-    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 50, 2,
                                   false, true, 20, true, g);
-    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 50, 2,
                                   false, true, 40, true, g);
-    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 22, 2,
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 50, 2,
+                                  false, true, 60, true, g);
+    /*test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 80, true, g);   
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
                                   false, true, 100, true, g);
+    /*test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 30, 2,
+                                  false, true, 200, true, g);*/
 
     /*test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
                                   false, true, 15, false, g);
@@ -351,10 +362,14 @@ void test_partitioning_random()
                                   false, true, 20, true, g);
     test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
                                   false, true, 40, true, g);
-    test < RandomGraphGenerator >(duration_random, "ggp", 2, 22, 2,
-                                  false, true, 100, true, g);
-
     test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
+                                  false, true, 60, true, g);
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
+                                  false, true, 80, true, g);   
+    test < RandomGraphGenerator >(duration_random, "ggp", 2, 30, 2,
+                                  false, true, 100, true, g);*/
+
+    /*test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
                                   false, true, 15, false, g);
     test < RandomGraphGenerator >(duration_random, "ggp", 2, 32, 2,
                                   false, true, 20, false, g);
@@ -380,6 +395,76 @@ void test_partitioning_random()
     test < RandomGraphGenerator >(duration_random, "random", 2, 32, 2,
                                   false, true, 40, true, g);
     test < RandomGraphGenerator >(duration_random, "random", 2, 22, 2,
+                                  false, true, 100, true, g);*/
+
+}
+
+const double duration_random_linked = 0;
+
+void test_flat_random_linked()
+{
+    boost::timer t;
+    int nbr_ite = 20;
+
+    log_file << "== Random Linked Graph ==" << std::endl;
+    log_file << "flat graph with heap = ";
+    for (unsigned int i = 0; i < nbr_ite; ++i) {
+        flat_heap_test< RandomLinkedFlatGraphBuilder >(duration_random_linked);
+    }
+
+    double t2 = t.elapsed();
+
+    /*log_file << t2 / 10 << std::endl;
+
+    log_file << "flat graph with vector = ";
+    for (unsigned int i = 0; i < 10; ++i) {
+        flat_vector_test< FlatGraphBuilder >(duration_random);
+    }
+
+    double t3 = t.elapsed();*/
+
+    //log_file << (t3 - t2) / 10 << std::endl;
+    log_file << t2 / nbr_ite << std::endl;
+}
+
+void test_partitioning_random_linked()
+{
+    unsigned int levels = 60;
+    int nbr_sommets = 6000;
+    RandomLinkedGraphGenerator g(nbr_sommets, levels, 2, 3);
+
+	// gggp
+    /*test < RandomLinkedGraphGenerator >(duration_random_linked, "gggp_pond", 2, 50, 2,
+                                  false, true, 5, true, g);*/
+    test < RandomLinkedGraphGenerator >(duration_random_linked, "gggp_pond", 2, 50, 2,
+                                  false, true, 10, true, g);
+    test < RandomLinkedGraphGenerator >(duration_random_linked, "gggp_pond", 2, 50, 2,
+                                  false, true, 20, true, g);
+    test < RandomLinkedGraphGenerator >(duration_random_linked, "gggp_pond", 2, 50, 2,
+                                  false, true, 40, true, g);
+    test < RandomLinkedGraphGenerator >(duration_random_linked, "gggp_pond", 2, 50, 2,
+                                  false, true, 60, true, g);
+    /*test < RandomLinkedGraphGenerator >(duration_random_linked, "gggp_pond", 2, 50, 2,
+                                  false, true, 80, true, g);   
+    test < RandomLinkedGraphGenerator >(duration_random_linked, "gggp_pond", 2, 50, 2,
+                                  false, true, 100, true, g);
+    test < RandomLinkedGraphGenerator >(duration_random_linked, "gggp_pond", 2, 50, 2,
+                                  false, true, 200, true, g);*/
+                                  
+    // ggp 
+    /*test < RandomLinkedGraphGenerator >(duration_random_linked, "ggp", 2, 50, 2,
+                                  false, true, 5, true, g);
+    test < RandomLinkedGraphGenerator >(duration_random_linked, "ggp", 2, 50, 2,
+                                  false, true, 10, true, g);
+    test < RandomLinkedGraphGenerator >(duration_random_linked, "ggp", 2, 50, 2,
+                                  false, true, 20, true, g);
+    test < RandomLinkedGraphGenerator >(duration_random_linked, "ggp", 2, 50, 2,
+                                  false, true, 40, true, g);
+    test < RandomLinkedGraphGenerator >(duration_random_linked, "ggp", 2, 50, 2,
+                                  false, true, 60, true, g);
+    test < RandomLinkedGraphGenerator >(duration_random_linked, "ggp", 2, 50, 2,
+                                  false, true, 80, true, g);   
+    test < RandomLinkedGraphGenerator >(duration_random_linked, "ggp", 2, 50, 2,
                                   false, true, 100, true, g);*/
 
 }
@@ -504,6 +589,12 @@ void test_random()
     test_partitioning_random();
 }
 
+void test_random_linked()
+{
+    test_flat_random_linked();
+    test_partitioning_random_linked();
+}
+
 int main()
 {
     srand(7262);
@@ -511,8 +602,12 @@ int main()
 	//std::cout<<"Simulation pour graphe 38"<<std::endl;
     //test_38();
     //std::cout<<std::endl;
-    std::cout<<"Simulation pour graphe RANDOM 4000"<<std::endl;
+    //std::cout<<"Simulation pour graphe RANDOM 4000"<<std::endl;
+    //test_random();
+    std::cout<<"Simulation pour graphe RANDOM_TREE 6000"<<std::endl;
     test_random();
+    std::cout<<"Simulation pour graphe RANDOM_LINKED 6000"<<std::endl;
+    test_random_linked();
     //std::cout<<std::endl;
     //std::cout<<"Simulation pour graphe CORSEN"<<std::endl;
     //test_corsen();

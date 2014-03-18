@@ -71,16 +71,16 @@ public:
                                  g, &graph_origin, &go,
                                  cluster_number,10, "HEM",
                                  partitioning_method_name,
-                                 "cut", "ratio", edge_partie ,
+                                 "diff", "ratio", edge_partie ,
                                  output_edges, input_edges,
-                                 parent_connections, Cut/*,3*/);
+                                 parent_connections,false, Cut, 2);
         } else {
             graphs = Multiniveau(contraction_coef, g, &graph_origin, &go,
                                  cluster_number,10, "HEM",
                                  partitioning_method_name,
-                                 "cut", "ratio", edge_partie ,
+                                 "diff", "ratio", edge_partie ,
                                  output_edges, input_edges,
-                                 parent_connections, Cut/*,3*/);
+                                 parent_connections,false, Cut, 2);
         }
 
         // std::cout << "*********************************" << std::endl;

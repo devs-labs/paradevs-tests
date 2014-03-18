@@ -47,23 +47,23 @@ void build_graph(OrientedGraph& og, unsigned int edge_number)
 		vertex_to v9 = boost::add_vertex(og);
 		vertex_to v10 = boost::add_vertex(og);
 
-		add_edge(v1, v0, EdgeProperties(1.), og);
-		add_edge(v2, v0, EdgeProperties(1.), og);
-		add_edge(v3, v0, EdgeProperties(1.), og);
-		add_edge(v1, v2, EdgeProperties(1.), og);
-		add_edge(v4, v1, EdgeProperties(1.), og);
-		add_edge(v5, v1, EdgeProperties(1.), og);
-		add_edge(v6, v1, EdgeProperties(1.), og);
-		add_edge(v6, v2, EdgeProperties(1.), og);
+		add_edge(v1, v0, EdgeProperties(2.), og);
+		add_edge(v2, v0, EdgeProperties(1.5), og);
+		add_edge(v3, v0, EdgeProperties(1.5), og);
+		add_edge(v1, v2, EdgeProperties(3.), og);
+		add_edge(v4, v1, EdgeProperties(3.), og);
+		add_edge(v5, v1, EdgeProperties(3.), og);
+		add_edge(v6, v1, EdgeProperties(3.), og);
+		add_edge(v6, v2, EdgeProperties(2.), og);
 		add_edge(v2, v3, EdgeProperties(1.), og);
 		add_edge(v9, v3, EdgeProperties(1.), og);
 		add_edge(v10, v3, EdgeProperties(1.), og);
-		add_edge(v4, v5, EdgeProperties(1.), og);
-		add_edge(v5, v6, EdgeProperties(1.), og);
+		add_edge(v4, v5, EdgeProperties(1.5), og);
+		add_edge(v5, v6, EdgeProperties(1.5), og);
 		add_edge(v7, v4, EdgeProperties(1.), og);
 		add_edge(v8, v4, EdgeProperties(1.), og);
-		add_edge(v7, v8, EdgeProperties(1.), og);
-		add_edge(v9, v10, EdgeProperties(1.), og);
+		add_edge(v7, v8, EdgeProperties(1.5), og);
+		add_edge(v9, v10, EdgeProperties(2.), og);
 
 		og[v6] = VertexProperties(6, 1.5, NORMAL_PIXEL);
 		og[v8] = VertexProperties(8, 1., NORMAL_PIXEL);
@@ -236,6 +236,57 @@ void modify_file_paths(std::string& absolutePath,
     }
 }
 
+void build_graph_cyclique(OrientedGraph& og)
+{
+		vertex_to v0 = boost::add_vertex(og);
+		vertex_to v1 = boost::add_vertex(og);
+		vertex_to v2 = boost::add_vertex(og);
+		vertex_to v3 = boost::add_vertex(og);
+		vertex_to v4 = boost::add_vertex(og);
+		vertex_to v5 = boost::add_vertex(og);
+		vertex_to v6 = boost::add_vertex(og);
+		vertex_to v7 = boost::add_vertex(og);
+		vertex_to v8 = boost::add_vertex(og);
+		vertex_to v9 = boost::add_vertex(og);
+		vertex_to v10 = boost::add_vertex(og);
+
+		add_edge(v0, v1, EdgeProperties(1.), og);
+		add_edge(v0, v2, EdgeProperties(1.), og);
+		add_edge(v0, v3, EdgeProperties(1.), og);
+		add_edge(v1, v3, EdgeProperties(1.), og);
+		add_edge(v2, v1, EdgeProperties(1.), og);
+		add_edge(v2, v3, EdgeProperties(1.), og);
+		add_edge(v2, v4, EdgeProperties(1.), og);
+		add_edge(v2, v5, EdgeProperties(1.), og);
+		add_edge(v2, v7, EdgeProperties(1.), og);
+		add_edge(v2, v9, EdgeProperties(1.), og);
+		add_edge(v3, v4, EdgeProperties(1.), og);
+		add_edge(v3, v5, EdgeProperties(1.), og);
+		add_edge(v3, v7, EdgeProperties(1.), og);
+		add_edge(v3, v9, EdgeProperties(1.), og);
+		add_edge(v4, v6, EdgeProperties(1.), og);
+		add_edge(v5, v4, EdgeProperties(1.), og);
+		add_edge(v5, v6, EdgeProperties(1.), og);
+		add_edge(v6, v7, EdgeProperties(1.), og);
+		add_edge(v7, v8, EdgeProperties(1.), og);
+		add_edge(v7, v10, EdgeProperties(1.), og);
+		add_edge(v8, v9, EdgeProperties(1.), og);
+		add_edge(v8, v10, EdgeProperties(1.), og);
+		add_edge(v9, v10, EdgeProperties(1.), og);
+		add_edge(v10, v0, EdgeProperties(1.), og);
+
+		og[v6] = VertexProperties(6, 1, NORMAL_PIXEL);
+		og[v8] = VertexProperties(8, 1, NORMAL_PIXEL);
+		og[v10] = VertexProperties(10, 1, NORMAL_PIXEL);
+		og[v0] = VertexProperties(0, 1, NORMAL_PIXEL);
+		og[v1] = VertexProperties(1, 1, NORMAL_PIXEL);
+		og[v2] = VertexProperties(2, 1, NORMAL_PIXEL);
+		og[v3] = VertexProperties(3, 1, NORMAL_PIXEL);
+		og[v4] = VertexProperties(4, 1, NORMAL_PIXEL);
+		og[v5] = VertexProperties(5, 1, NORMAL_PIXEL);
+		og[v7] = VertexProperties(7, 1, NORMAL_PIXEL);
+		og[v9] = VertexProperties(9, 1, NORMAL_PIXEL);
+}
 /*void build_corsen_graph(OrientedGraph& graph)
 {
     std::string absolutePath(
@@ -339,7 +390,7 @@ void brhtg_source(OrientedGraph *go,int nbr_vertex, int nbr_source, int nbr_v_mi
 					while(cpt!=nbr_voisin){
 						int val;
 						if(j<branche.at(i)+nbr_source){ // Les sommets sont des sources donc imossible de recevoir des données
-							val = rand_fini(j + nbr_source, j + nbr_v_max + nbr_passe);
+							val = rand_fini(j + 4, j + nbr_v_max + nbr_passe);
 						}
 						else if(j>=branche.at(i)+nbr_npb-nbr_passe && i!= (branche.size()-2)){ // Les sommets sont en fin de branche, nécessité de raccordement avec les autres branches
 							val = rand_fini(branche.at(branche.size()-1)-4, branche.at(branche.size()-1));
@@ -682,6 +733,193 @@ void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source, in
 		}
 	}
 
+}
+
+void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_couche, int nbr_v_min, int nbr_v_max){
+	std::vector<vertex_to> Vertexs;
+	for(int i =0; i<nbr_vertex; i++){
+		vertex_to vo = boost::add_vertex(*go);
+		Vertexs.push_back(vo);
+	}
+	
+	/*Création du vecteur contenant le nombre de sommets par couche*/
+	int midel_couche = nbr_couche-2;
+	int top_couche;
+	if(nbr_couche>5){
+		top_couche = floor(nbr_vertex/floor(midel_couche/2));
+	}else{
+		top_couche = floor(nbr_vertex/2);
+	}
+	int nbr_vertex_midel_couche = nbr_vertex - top_couche -1;
+	int tmp = 0;
+	std::vector<int> nbr_som_couche;
+	nbr_som_couche.push_back(1);
+	
+	for(int i = 1; i <= midel_couche; i++){
+		tmp += i;
+	}
+	
+	for(int i = 0; i < midel_couche; i++){
+		nbr_som_couche.push_back(floor((i+1)*nbr_vertex_midel_couche/tmp));
+	}
+	
+	nbr_som_couche.push_back(top_couche);
+	
+	int sum = 0;
+	for(int i = 0; i < nbr_som_couche.size(); i++){
+		sum += nbr_som_couche.at(i);
+	}
+	int reste = nbr_vertex - sum;
+	
+	/*std::cout<<"sum : "<<sum<<std::endl;
+	std::cout<<"midel_couche : "<<midel_couche<<std::endl;
+	std::cout<<"top_couche : "<<top_couche<<std::endl;
+	std::cout<<"nbr_vertex_midel_couche : "<<nbr_vertex_midel_couche<<std::endl;
+	std::cout<<"tmp : "<<tmp<<std::endl;
+	std::cout<<"reste : "<<reste<<std::endl;
+	
+	for(int i =0; i < nbr_som_couche.size(); i++){
+		std::cout<<nbr_som_couche.at(i)<<" ";
+	}
+	std::cout<<std::endl;*/
+	
+	while(reste != 0){
+		for(int i = 1; i <nbr_som_couche.size(); i++){
+			nbr_som_couche.at(i) += 1;
+			reste --;
+			if(reste == 0){
+				break;
+			}
+		}
+	}
+	
+	/*for(int i =0; i < nbr_som_couche.size(); i++){
+		std::cout<<nbr_som_couche.at(i)<<" ";
+	}
+	std::cout<<std::endl;*/
+	
+	/*Génération du graphe*/
+	std::vector<int> tab_couche_som;
+	tab_couche_som.push_back(0);
+	
+	for(int i =1; i<nbr_som_couche.size(); i++){
+		tab_couche_som.push_back(tab_couche_som.at(i-1)+nbr_som_couche.at(i));
+	}
+	
+	/*for(int i =0; i < tab_couche_som.size(); i++){
+		std::cout<<tab_couche_som.at(i)<<" ";
+	}
+	std::cout<<std::endl;*/
+	int nbr_vois = nbr_v_max+2;
+	
+	int cpt = 0;
+	for(int i = tab_couche_som.at(tab_couche_som.size()-2)+1; i <= tab_couche_som.at(tab_couche_som.size()-1); i++){
+		std::vector<int> vertex_tmp;
+		int rand = rand_fini(nbr_v_min,nbr_v_max+1);
+		int neigh_cpt = 0;
+		while(neigh_cpt != rand){
+			int val;
+			if(cpt<nbr_vois){
+				val = rand_fini(tab_couche_som.at(tab_couche_som.size()-3)+cpt+1,tab_couche_som.at(tab_couche_som.size()-3)+cpt+1+nbr_vois);
+				//std::cout<<"val1 : "<<val<<std::endl;
+			}else if(cpt>nbr_vois && cpt<(tab_couche_som.at(tab_couche_som.size()-2)-tab_couche_som.at(tab_couche_som.size()-3)+1-nbr_vois)){
+				val = rand_fini(tab_couche_som.at(tab_couche_som.size()-3)+cpt+1-nbr_vois,tab_couche_som.at(tab_couche_som.size()-3)+cpt+1+nbr_vois);
+				//std::cout<<"val2 : "<<val<<std::endl;
+			}else{
+				val = rand_fini(tab_couche_som.at(tab_couche_som.size()-2)+1-2*nbr_vois,tab_couche_som.at(tab_couche_som.size()-2)+1);
+				//std::cout<<"val3 : "<<val<<std::endl;
+			}
+			if(In_tab(vertex_tmp,val) != 1){
+				boost::add_edge(Vertexs.at(i), Vertexs.at(val), EdgeProperties(1.), *go);
+				vertex_tmp.push_back(val);
+				neigh_cpt ++;
+			}
+		}
+		cpt ++;
+	}
+	//std::cout<<"Passage !"<<std::endl;
+	
+	for(int j = 2; j < tab_couche_som.size()-1; j++){
+		cpt = 0;
+		for(int i = tab_couche_som.at(tab_couche_som.size()-1-j)+1; i <= tab_couche_som.at(tab_couche_som.size()-1-(j-1)); i++){
+			std::vector<int> vertex_tmp;
+			int rand = rand_fini(nbr_v_min,nbr_v_max+1);
+			//std::cout<<"rand : "<<rand<<std::endl;
+			int neigh_cpt = 0;
+			while(neigh_cpt != rand){
+				int val;
+				if((tab_couche_som.at(tab_couche_som.size()-2-(j-1))-tab_couche_som.at(tab_couche_som.size()-2-j))>2*nbr_vois){
+					if(cpt<nbr_vois){
+						val = rand_fini(tab_couche_som.at(tab_couche_som.size()-2-j)+cpt+1,tab_couche_som.at(tab_couche_som.size()-2-j)+cpt+1+nbr_vois);
+						//std::cout<<"val1 : "<<val<<std::endl;
+					}else if(cpt>nbr_vois && cpt<(tab_couche_som.at(tab_couche_som.size()-2-(j-1))-tab_couche_som.at(tab_couche_som.size()-2-j)+1-nbr_vois)){
+						val = rand_fini(tab_couche_som.at(tab_couche_som.size()-2-j)+cpt+1-nbr_vois,tab_couche_som.at(tab_couche_som.size()-2-j)+cpt+1+nbr_vois);
+						//std::cout<<"val2 : "<<val<<std::endl;
+					}else{
+						if(2*nbr_vois<(tab_couche_som.at(tab_couche_som.size()-2-(j-1))-tab_couche_som.at(tab_couche_som.size()-2-j)+1)){
+							val = rand_fini(tab_couche_som.at(tab_couche_som.size()-2-(j-1))+1-2*nbr_vois,tab_couche_som.at(tab_couche_som.size()-2-(j-1))+1);
+						}else{
+							val = rand_fini(tab_couche_som.at(tab_couche_som.size()-2-(j-1))+1-nbr_vois,tab_couche_som.at(tab_couche_som.size()-2-(j-1))+1);
+						}
+						//std::cout<<"val3 : "<<val<<std::endl;
+					}
+				}else{
+					val = rand_fini(tab_couche_som.at(tab_couche_som.size()-2-j)+1,tab_couche_som.at(tab_couche_som.size()-2-(j-1))+1);
+				}
+				//int val = rand_fini(tab_couche_som.at(tab_couche_som.size()-2-j)+1,tab_couche_som.at(tab_couche_som.size()-2-(j-1))+1);
+				if(In_tab(vertex_tmp,val) != 1){
+					boost::add_edge(Vertexs.at(i), Vertexs.at(val), EdgeProperties(1.), *go);
+					vertex_tmp.push_back(val);
+					neigh_cpt ++;	
+				}
+			}
+			cpt ++;
+		}
+	}
+	//std::cout<<"Passage2 !"<<std::endl;
+	
+	for(int i = tab_couche_som.at(0)+1; i <= tab_couche_som.at(1); i++){
+		//int val = rand_fini(0,2);
+		//if(val == 0){
+			boost::add_edge(Vertexs.at(i), Vertexs.at(0), EdgeProperties(1.), *go);
+		//}
+	}
+	//std::cout<<"Passage3 !"<<std::endl;
+	
+	std::vector < int > dg_in_vertex_list;
+	std::vector <vertex_to> dg_vertex_list;
+	OrientedGraph::vertex_iterator it_dg, end_dg;
+
+	tie(it_dg, end_dg) = vertices(*go);
+	for (uint i = 0; it_dg != end_dg; ++it_dg, ++i) {
+		dg_in_vertex_list.push_back(0);
+		dg_vertex_list.push_back(*it_dg);
+	}
+
+	tie(it_dg, end_dg) = vertices(*go);
+	for (uint i = 0; it_dg != end_dg; ++it_dg, ++i) {
+		OrientedGraph::adjacency_iterator neighbour_it, neighbour_end;
+
+		tie(neighbour_it, neighbour_end) = adjacent_vertices(*it_dg, *go);
+		for (; neighbour_it != neighbour_end; ++neighbour_it) {
+			uint index = 0;
+
+			while (dg_vertex_list[index] != *neighbour_it) {
+				++index;
+			}
+			++dg_in_vertex_list[index];
+		}
+	}
+	
+	for(uint i = 0; i<num_vertices(*go); i++){
+		if(dg_in_vertex_list.at(i) == 0){
+			(*go)[i] = VertexProperties(i, 1, TOP_PIXEL);
+		}else{
+			(*go)[i] = VertexProperties(i, 1, NORMAL_PIXEL);
+		}
+	}
+	
+	
 }
 
 

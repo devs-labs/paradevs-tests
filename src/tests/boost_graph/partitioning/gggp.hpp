@@ -33,10 +33,10 @@
 namespace paradevs { namespace tests { namespace boost_graph {
 
 void ggp(UnorientedGraph *g, Entiers *sommetsSource,
-         Entiers *sommetsDestination, EntiersEntiers &Partition,int rand);
+         Entiers *sommetsDestination, EntiersEntiers &Partition, int rand , int &index_partition, int distance);
 
 void gggp_pond(UnorientedGraph *g, Entiers *sommetsSource,
-               Entiers *sommetsDestination, EntiersEntiers &Partition, int rand, int distance);
+               Entiers *sommetsDestination, EntiersEntiers &Partition, int rand, int &index_partition, const std::string &name , int distance);
 
 void Iter_2l(EntiersEntiers &part, int nbr_parties, UnorientedGraph *g,
              const std::string &nom_cut, int nbr_tirage, const std::string &nom_strat, int distance = -1);
@@ -59,10 +59,15 @@ OrientedGraphs Multiniveau(uint niveau_contraction, UnorientedGraph *g, Unorient
                            Edges &edge_partie,
                            OutputEdgeList &outputedgeslist,
                            InputEdgeList &inputedgelist,
-                           Connections &connections, std::vector<double> &Cut, int distance = -1);
+                           Connections &connections,
+                           bool rec, std::vector<double> &Cut,
+                           int distance = -1);
 void Optimisation_method_neighbour(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition, int nbr_tirage, const std::string &name_cut, const std::string &name_strat);
 void Optimisation_method_neighbour_distance(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition, int nbr_tirage, int distance, const std::string &name_cut, 
 	const std::string &name_strat);
+void Optimisation_method_neighbour_degree(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition,const std::string &name_cut, const std::string &name_strat);
+void Optimisation_method_neighbour_minweight(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition,
+	const std::string &name_cut, const std::string &name_strat);
 void tirage_distance(UnorientedGraph *g, int tirage, std::list<int> &vertex_list, int distance);
 
 } } } // namespace paradevs tests boost_graph

@@ -336,18 +336,51 @@ public:
 		/*
 		 * *** Graphe créé différent du graphe obtenu dans graph_partitioning ! Solution ? *** 
 		 */
-		 
+		
+        /*
+        const char *texte = new const char();
+        texte = "enregistrement.txt";
+        Graph_constructor_txt(texte, &graph);*/
         OrientedGraph graph;
-        unsigned int edge_number = 3000;
-        std::vector<int> levels;
-        levels.push_back(4);
-        levels.push_back(3);
-        levels.push_back(2);
-        unsigned int source_number = 5;
+        unsigned int edge_number = 6000;
+        std::vector<int> levels = {5, 4, 3, 2 };
+        
+        unsigned int source_number = edge_number/100*1;
         unsigned int min_neigh = 2;
-        unsigned int max_neigh = 4;
+        unsigned int max_neigh = 3;
 
         build_generator_graph(&graph,edge_number,source_number,min_neigh,max_neigh,levels);
+        graphs.push_back(graph);
+    }
+
+};
+
+class RandomLinkedFlatGraphBuilder
+{
+public:
+    RandomLinkedFlatGraphBuilder()
+    { }
+
+    void build(OrientedGraphs& graphs, InputEdgeList& ,
+               OutputEdgeList& ,
+               Connections& )
+    {
+		/*
+		 * *** Graphe créé différent du graphe obtenu dans graph_partitioning ! Solution ? *** 
+		 */
+		
+        /*
+        const char *texte = new const char();
+        texte = "enregistrement.txt";
+        Graph_constructor_txt(texte, &graph);*/
+        OrientedGraph graph;
+        unsigned int edge_number = 6000;
+        unsigned int levels = 60;
+        
+        unsigned int min_neigh = 2;
+        unsigned int max_neigh = 3;
+
+        build_generator_graph_linked(&graph,edge_number,levels,min_neigh,max_neigh);
         graphs.push_back(graph);
     }
 
