@@ -60,8 +60,12 @@ public:
         /*const char *texte = new const char();
         texte = "enregistrement.txt";
         Graph_constructor_txt(texte,&go);*/
+       //boost::timer t; 
+	   
        build_generator_graph(&go, edge_number, source_number, min_neigh,
                               max_neigh, levels);
+       //double t3 = t.elapsed();
+	   //std::cout << "tmp_gen = " << t3 << std::endl;
     }
 
 private:
@@ -71,6 +75,36 @@ private:
     unsigned int min_neigh;
     unsigned int max_neigh;
 };
+
+class RandomGridGraphGenerator : public GraphGenerator
+{
+public:
+    RandomGridGraphGenerator( int side,std::vector<std::pair<int,int>> vertex_selection,
+							  Entiers weight_vertex,const char *edge_weight, bool rec) :
+        side(side), vertex_selection(vertex_selection), weight_vertex(weight_vertex),
+        edge_weight(edge_weight), rec(rec)
+    { }
+
+    virtual void generate(OrientedGraph& go)
+    {
+        /*const char *texte = new const char();
+        texte = "enregistrement.txt";
+        Graph_constructor_txt(texte,&go);*/
+       //boost::timer t; 
+	   
+       build_graph_grid(&go, side, vertex_selection,  weight_vertex, edge_weight, rec);
+       //double t3 = t.elapsed();
+	   //std::cout << "tmp_gen = " << t3 << std::endl;
+    }
+
+private:
+		int side;
+		std::vector<std::pair<int,int>> vertex_selection;
+		Entiers weight_vertex;
+		const char *edge_weight;
+		bool rec;
+};
+
 
 class RandomLinkedGraphGenerator : public GraphGenerator
 {

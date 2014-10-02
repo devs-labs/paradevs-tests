@@ -50,7 +50,7 @@ void Pseudo_random_partitioning(UnorientedGraph *g, EntiersEntiers &Partition,
 EntiersEntiers Random_partitioning(UnorientedGraph *g,
                                 uint nbr_parties);
 
-OrientedGraphs Multiniveau(uint niveau_contraction, UnorientedGraph *g, UnorientedGraph *graph_origin,
+OrientedGraphs Multiniveau(uint niveau_contraction, UnorientedGraph *g,
                            OrientedGraph *go, int nbr_parties, int nbr_tirage,
                            std::string contraction,
                            std::string type_methode,

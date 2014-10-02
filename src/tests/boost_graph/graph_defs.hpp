@@ -32,7 +32,7 @@
 namespace paradevs { namespace tests { namespace boost_graph {
 
 enum DynamicsType {
-    TOP_PIXEL = 0, NORMAL_PIXEL
+	TOP_PIXEL = 0, NORMAL_PIXEL
 };
 
 struct VertexProperties
@@ -58,7 +58,7 @@ struct EdgeProperties
     { }
 };
 
-typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::directedS,
+typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::bidirectionalS,//boost::directedS,
                                 VertexProperties, EdgeProperties> OrientedGraph;
 typedef std::vector < OrientedGraph > OrientedGraphs;
 

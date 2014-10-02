@@ -53,13 +53,11 @@ public:
 		std::cout<<"**"<<cluster_number<<"**"<<std::endl;
         UnorientedGraph* g = new UnorientedGraph();
         OrientedGraph go;
-        UnorientedGraph graph_origin;
         std::vector<double> Cut;
 
         generator.generate(go);
 
         make_unoriented_graph(go, *g);
-        boost::copy_graph(*g, graph_origin);
 
         Edges edge_partie;
         Connections connections;
@@ -68,14 +66,14 @@ public:
 
         if (contraction_coef_flag) {
             graphs = Multiniveau(num_vertices(*g) / contraction_coef,
-                                 g, &graph_origin, &go,
+                                 g, &go,
                                  cluster_number,10, "HEM",
                                  partitioning_method_name,
                                  "diff", "ratio", edge_partie ,
                                  output_edges, input_edges,
                                  parent_connections,false, Cut, 2);
         } else {
-            graphs = Multiniveau(contraction_coef, g, &graph_origin, &go,
+            graphs = Multiniveau(contraction_coef, g, &go,
                                  cluster_number,10, "HEM",
                                  partitioning_method_name,
                                  "diff", "ratio", edge_partie ,

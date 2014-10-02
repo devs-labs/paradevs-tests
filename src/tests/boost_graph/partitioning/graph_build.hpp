@@ -29,12 +29,14 @@
 
 #include <tests/boost_graph/partitioning/defs.hpp>
 #include <tests/boost_graph/partitioning/utils.hpp>
+#include <fstream>
 namespace paradevs { namespace tests { namespace boost_graph {
 
 void build_graph(OrientedGraph& og, unsigned int edge_number);
 void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source, int nbr_v_min, int nbr_v_max,const std::vector<int> &niveau);
 void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_couche, int nbr_v_min, int nbr_v_max);
 void build_graph_cyclique(OrientedGraph& og);
+void build_graph_grid(OrientedGraph *go, int side,std::vector<std::pair<int,int>> vertex_selection, Entiers weight_vertex,const char *edge_weight, bool rec);
 //void build_corsen_graph(OrientedGraph& graph);
 
 } } } // namespace paradevs tests boost_graph;

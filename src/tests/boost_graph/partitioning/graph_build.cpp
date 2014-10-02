@@ -918,9 +918,91 @@ void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_cou
 			(*go)[i] = VertexProperties(i, 1, NORMAL_PIXEL);
 		}
 	}
+}
+
+void build_graph_grid(OrientedGraph *go, int side, std::vector<std::pair<int,int>> vertex_selection, Entiers weight_vertex,const char *edge_weight, bool rec){
+	int nbr_vertex = side*side;
+	std::vector<vertex_to> Vertexs;
+	for(int i =0; i<nbr_vertex; i++){
+		vertex_to vo = boost::add_vertex(*go);
+		Vertexs.push_back(vo);
+	}
 	
+	if(rec == true){
+		std::ofstream fichier (edge_weight, std::ios::out);
+		for(int i = 0; i<side; i++){
+			for(int j = 0; j<side-1; j++){
+				boost::add_edge(i*side+j, i*side+j+1,EdgeProperties(1), *go);
+				fichier<<i*side+j<<" "<<i*side+j+1<<" "<<1<<" "<<std::endl;
+			}
+		}
+		
+		for(int i = 0; i<side-1; i++){
+			for(int j = 0; j<side; j++){
+				boost::add_edge(i*side+j, (i+1)*side+j,EdgeProperties(1), *go);
+				fichier<<i*side+j<<" "<<(i+1)*side+j<<" "<<1<<" "<<std::endl;
+			}
+		}
+		fichier.close();
+	}else{
+		for(int i = 0; i<side; i++){
+			for(int j = 0; j<side-1; j++){
+				boost::add_edge(i*side+j, i*side+j+1,EdgeProperties(1), *go);
+			}
+		}
+		
+		for(int i = 0; i<side-1; i++){
+			for(int j = 0; j<side; j++){
+				boost::add_edge(i*side+j, (i+1)*side+j,EdgeProperties(1), *go);
+			}
+		}
+	}
+		
+	(*go)[0] = VertexProperties(0, 1, TOP_PIXEL);
+	for(uint i = 1; i<num_vertices(*go); i++){
+			(*go)[i] = VertexProperties(i, 1, NORMAL_PIXEL);
+	}
+	
+	for(int ind=0; ind<vertex_selection.size(); ind++){
+		for(int ind_i = vertex_selection.at(ind).first; ind_i<vertex_selection.at(ind).second+1; ind_i++){
+			if(ind_i != 0)
+				(*go)[ind_i] = VertexProperties(ind_i, weight_vertex.at(ind), NORMAL_PIXEL);
+			else
+				(*go)[ind_i] = VertexProperties(ind_i, weight_vertex.at(ind), TOP_PIXEL);
+		}
+	}
+	
+	if(rec == false){
+		std::ifstream fichier (edge_weight, std::ios::in);
+		
+		if(fichier){
+			bool found;
+			edge_to e1;
+			int edge1, edge2;
+			double edge_weight;
+			int lines = std::count(std::istreambuf_iterator<char>( fichier ),std::istreambuf_iterator<char>(),'\n' );
+			//std::cout<<lines<<std::endl;
+			int cpt =0;
+			int length;
+			fichier.seekg(0, std::ios::beg);
+			while(cpt < lines){
+			fichier >> edge1 >> edge2 >> edge_weight;
+			tie(e1,found)=edge(vertex(edge1,*go),vertex(edge2,*go),*go);
+			(*go)[e1] = EdgeProperties(edge_weight);
+			//std::cout<<edge1<<" "<<edge2<<" "<<edge_weight<<std::endl;
+			length = fichier.tellg();
+			fichier.seekg(length+1, std::ios::beg);
+			cpt++;
+			}
+			
+		}else{
+			std::cerr<<"Bugggggg du fichier txt !!!! "<<std::endl;
+		}
+		fichier.close();
+	}
 	
 }
 
+/*Vérification de la pondération + vérification des poids de la contraction + vérification de la structure de contraction*/
 
 } } } // namespace paradevs tests boost_graph

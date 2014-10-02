@@ -147,7 +147,7 @@ void test(double duration, std::string partitioning_method_name,
           GraphGenerator& g)
 {
     boost::timer t;
-	int nbr_ite = 20;
+	int nbr_ite = 10;
 	
     log_file << "==== " << partitioning_method_name << " with ";
     if (contraction_coef_flag) {
@@ -315,26 +315,27 @@ void test_flat_random()
 
 void test_partitioning_random()
 {
-    std::vector < int > levels = { 5, 4, 3, 2  };
-    int nbr_sommets = 6000;
+    std::vector < int > levels = {/*5,4,*/ 3, 2  };
+    int nbr_sommets = 200;
     int sources = nbr_sommets/100*1;
+    
     RandomGraphGenerator g(nbr_sommets, levels, sources, 2, 3);
 
-    /*test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
-                                  false, true, 5, true, g);*/
-    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 50, 2,
+    /*test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 200, 2,
+                                  false, true, 5, true, g);
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 200, 2,
                                   false, true, 10, true, g);
-    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 50, 2,
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 200, 2,
                                   false, true, 20, true, g);
-    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 50, 2,
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 42, 42, 2,
                                   false, true, 40, true, g);
     test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 50, 2,
-                                  false, true, 60, true, g);
-    /*test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
-                                  false, true, 80, true, g);   
-    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
+                                  false, true, 60, true, g);*/
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 200, 2,
+                                  false, true, 1 , true, g);   
+   /* test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
                                   false, true, 100, true, g);
-    /*test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 30, 2,
+    test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 30, 2,
                                   false, true, 200, true, g);*/
 
     /*test < RandomGraphGenerator >(duration_random, "gggp_pond", 2, 32, 2,
@@ -399,7 +400,60 @@ void test_partitioning_random()
 
 }
 
-const double duration_random_linked = 0;
+const double duration_random_grid = 40;
+
+void test_flat_random_grid()
+{
+    boost::timer t;
+    int nbr_ite = 10;
+
+    log_file << "== Random Graph ==" << std::endl;
+    log_file << "flat graph with heap = ";
+    for (unsigned int i = 0; i < nbr_ite; ++i) {
+        flat_heap_test< RandomGridFlatGraphBuilder >(duration_random_grid);
+    }
+
+    double t2 = t.elapsed();
+
+    /*log_file << t2 / 10 << std::endl;
+
+    log_file << "flat graph with vector = ";
+    for (unsigned int i = 0; i < 10; ++i) {
+        flat_vector_test< FlatGraphBuilder >(duration_random);
+    }
+
+    double t3 = t.elapsed();*/
+
+    //log_file << (t3 - t2) / 10 << std::endl;
+    log_file << t2 / nbr_ite << std::endl;
+}
+
+void test_partitioning_random_grid()
+{
+	unsigned int side = 90;
+	std::vector<std::pair<int,int>> vertex_selection;
+	std::pair<int,int> tmp;
+	tmp.first = 0;
+	tmp.second = 3;
+	vertex_selection.push_back(tmp);
+	Entiers weight_vertex;
+	weight_vertex.push_back(1);
+	const char *edge_weight;
+	edge_weight = "../../sortie_graphe/tests_grid.txt";
+	bool rec = false;
+        
+    RandomGridGraphGenerator g(side, vertex_selection,  weight_vertex, edge_weight, rec);
+
+    test < RandomGridGraphGenerator >(duration_random_grid, "gggp_pond", 2, 100, 2,
+                                  false, true, 80 , true, g); 
+                                  
+    test < RandomGridGraphGenerator >(duration_random_grid, "gggp_pond", 2, 100, 2,
+                                  false, true, 40 , true, g);   
+
+
+}
+
+const double duration_random_linked = 30;
 
 void test_flat_random_linked()
 {
@@ -430,7 +484,7 @@ void test_flat_random_linked()
 void test_partitioning_random_linked()
 {
     unsigned int levels = 60;
-    int nbr_sommets = 6000;
+    int nbr_sommets = 5000;
     RandomLinkedGraphGenerator g(nbr_sommets, levels, 2, 3);
 
 	// gggp
@@ -595,6 +649,12 @@ void test_random_linked()
     test_partitioning_random_linked();
 }
 
+void test_random_grid()
+{
+    test_flat_random_grid();
+    test_partitioning_random_grid();
+}
+
 int main()
 {
     srand(7262);
@@ -604,10 +664,10 @@ int main()
     //std::cout<<std::endl;
     //std::cout<<"Simulation pour graphe RANDOM 4000"<<std::endl;
     //test_random();
-    std::cout<<"Simulation pour graphe RANDOM_TREE 6000"<<std::endl;
-    test_random();
-    std::cout<<"Simulation pour graphe RANDOM_LINKED 6000"<<std::endl;
-    test_random_linked();
+    std::cout<<"Simulation pour graphe RANDOM_TREE 200"<<std::endl;
+    test_random_grid();
+    //std::cout<<"Simulation pour graphe RANDOM_LINKED 6000"<<std::endl;
+    //test_random_linked();
     //std::cout<<std::endl;
     //std::cout<<"Simulation pour graphe CORSEN"<<std::endl;
     //test_corsen();

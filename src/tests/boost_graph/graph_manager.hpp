@@ -446,6 +446,8 @@ public:
                             parent_connections);
 
         // build coordinators (graphs)
+        //boost::timer t; 
+
         for (unsigned int i = 0; i < graphs.size(); ++i) {
             Coordinator* coordinator = 0;
             std::ostringstream ss;
@@ -497,6 +499,8 @@ public:
                         ss_in.str());
             }
         }
+        //double t3 = t.elapsed();
+        //std::cout << "tmp_constr = " << t3 << std::endl;
     }
 
     virtual ~HeapHierarchicalGraphManager()
