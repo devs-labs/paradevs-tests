@@ -13,7 +13,16 @@ LINK_DIRECTORIES(
 ADD_EXECUTABLE(graph-tests graph_builder.hpp graph_generator.hpp graph_defs.hpp graph_manager.hpp
   graph_partitioning.hpp tests.cpp models.hpp)
 
+# file generator
+ADD_EXECUTABLE(file-generator graph_generator.hpp graph_defs.hpp graph_partitioning.hpp file_generator.cpp)
+
 TARGET_LINK_LIBRARIES(graph-tests partitioning
+  ${Boost_LIBRARIES}
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${GTHREAD_LIBRARIES})
+
+TARGET_LINK_LIBRARIES(file-generator partitioning
   ${Boost_LIBRARIES}
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}

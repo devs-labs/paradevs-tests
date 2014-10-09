@@ -34,6 +34,8 @@
 
 #include <boost/graph/copy.hpp>
 
+#include <iostream>
+
 namespace paradevs { namespace tests { namespace boost_graph {
 
 class PartitioningGraphBuilder
