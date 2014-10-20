@@ -576,11 +576,11 @@ void Pseudo_random_partitioning(UnorientedGraph *g, EntiersEntiers &Partition,
 
 
 EntiersEntiers Random_partitioning(UnorientedGraph *g,
-                                uint nbr_parties)
+                                uint parts_number)
 {
 	EntiersEntiers Partition;
 	Entiers random_order; //gestion d'un tableau contenant tout les sommets et ranger de façon aléatoire
-
+	uint cpt = 0;
 	for (uint i=0 ; i<num_vertices(*g) ; i++)
 		random_order.push_back(i);
 	for (uint j=0 ; j<num_vertices(*g)-1 ; j++) {
@@ -589,21 +589,18 @@ EntiersEntiers Random_partitioning(UnorientedGraph *g,
 		random_order.at(j) = random_order.at(rand_pos);
 		random_order.at(rand_pos) = tmp;
 	}
-
-	uint size = num_vertices(*g)/nbr_parties;
-	for(uint j = 0 ; j < nbr_parties-1 ; j++){
+	
+	for(uint j = 0 ; j < parts_number ; j++){
 		Entiers *part = new Entiers();
-		for(uint i = j*size; i<(j+1)*size; i++){
-			part->push_back(random_order.at(i));
-		}
 		Partition.push_back(part);
 	}
-
-	Entiers *part = new Entiers();
-	for(uint i = (nbr_parties-1)*size; i < random_order.size(); i++){
-		part->push_back(random_order.at(i));
+	
+	for(uint id = 0; id < random_order.size(); id++){
+		Partition.at(cpt)->push_back(random_order.at(id));
+		cpt++;
+		if(cpt == parts_number)
+			cpt = 0;
 	}
-	Partition.push_back(part);
 
 	for(uint i = 0 ; i < Partition.size() ; i++){
 		sort(Partition.at(i)->begin(),Partition.at(i)->end());
@@ -613,21 +610,24 @@ EntiersEntiers Random_partitioning(UnorientedGraph *g,
 }
 
 OrientedGraphs Multiniveau(uint niveau_contraction,
-                           UnorientedGraph *g,
                            OrientedGraph *go,
                            int nbr_parties,
                            int nbr_tirage,
-                           std::string contraction,
-                           std::string type_methode,
-                           std::string choix_affinage,
-                           std::string type_cut,
+                           const std::vector<std::string> &parameters,
                            Edges& /* edge_partie */,
                            OutputEdgeList& outputedgelist,
                            InputEdgeList& inputedgelist,
-                           Connections& connections, bool rec,
-                           std::vector<double> &Cut /*Paramètre à vérifier*/, int distance)
+                           Connections& connections, bool rec, int distance)
 {   
-    boost::timer t;    
+	/* std::vector<std::string> parameters :
+	 * 0 -> std::string contraction    : nom de la méthode de contraction
+	 * 1 -> std::string type_methode   : nom de la méthode de partitionnement
+	 * 2 -> std::string choix_affinage : nom de la méthode d'affinage
+	 * 3 -> std::string type_cut       : nom de la fonction objectif étudiée
+	 */
+    boost::timer t;
+    UnorientedGraph *g = new UnorientedGraph();
+	make_unoriented_graph(*go, *g); 
     EntiersEntiers Partition;
     Entiers *part = new Entiers();
     Base_Graph baseg;
@@ -643,7 +643,7 @@ OrientedGraphs Multiniveau(uint niveau_contraction,
 	
 	    while(stop != true)
 	    {
-	    	if(contraction == "HEM")
+	    	if(parameters.at(0) == "HEM")
 				stop = contraction_HEM_degree(baseg.at(cpt),baseg,liste_corr,niveau_contraction,val_cpt);
 	    		//stop = contraction_HEM(baseg.at(cpt),baseg,liste_corr,niveau_contraction,val_cpt);
 	    	else
@@ -691,8 +691,8 @@ OrientedGraphs Multiniveau(uint niveau_contraction,
 			Plot_UnorientedGraph_All(baseg.at(baseg.size()-1),Partition,"../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/contraction_final.txt", false);
 		}
 	    
-	    if(type_methode == "gggp" || type_methode == "ggp"){
-			bissectionRec(baseg.at(baseg.size()-1),Partition,nbr_parties,type_cut,nbr_tirage,type_methode, distance);
+	    if(parameters.at(1) == "gggp" || parameters.at(1) == "ggp"){
+			bissectionRec(baseg.at(baseg.size()-1),Partition,nbr_parties, parameters.at(3), nbr_tirage, parameters.at(1), distance);
 	    }
 	    else
 	    	Partition = Random_partitioning(baseg.at(baseg.size()-1),nbr_parties);
@@ -834,14 +834,14 @@ OrientedGraphs Multiniveau(uint niveau_contraction,
 					Plot_UnorientedGraph_All(baseg.at(baseg.size()-2-y),Partition,nom.at(y), true);
 				}
 	
-	    		double cut = Cut_cluster(Partition,*baseg.at(baseg.size()-2-y),type_cut);
+	    		double cut = Cut_cluster(Partition,*baseg.at(baseg.size()-2-y),parameters.at(3));
 	    		//std::cout<<"Cout de coupe avant affinage : "<<cut<<std::endl;
-	    		if(choix_affinage == "charge")
+	    		if(parameters.at(2) == "charge")
 	    			Affinage_equilibrage_charge(baseg.at(baseg.size()-2-y),Partition);
-	    		else if(choix_affinage == "locale"){
-	    			Affinage_recherche_locale(baseg.at(baseg.size()-2-y),Partition,cut,type_cut);}
+	    		else if(parameters.at(2) == "locale"){
+	    			Affinage_recherche_locale(baseg.at(baseg.size()-2-y),Partition,cut,parameters.at(3));}
 	    		else	
-	    			Affinache_gain_diff(baseg.at(baseg.size()-2-y), Partition, cut, type_cut, poids_moy);
+	    			Affinache_gain_diff(baseg.at(baseg.size()-2-y), Partition, cut, parameters.at(3), poids_moy);
 				//std::cout<<"Cout de coupe après affinage : "<<cut<<std::endl;
 				
 				if(rec == true){
@@ -870,10 +870,6 @@ OrientedGraphs Multiniveau(uint niveau_contraction,
 		for(uint i =0; i < Partition.size(); i++){
 			std::cout<<"Poids partie "<<i<<" : "<<Cluster_Weight(*g,*Partition.at(i))<<std::endl;
 		}*/
-				
-		double best_cut = Cut_cluster(Partition,*g,type_cut);
-		//std::cout<<"Fct Obj : "<<best_cut<<std::endl;
-		Cut.push_back(best_cut);
 		
 		Graphes = Graph_Partition(Partition, go, g, outputedgelist,
 	                                             inputedgelist, connections);
@@ -886,16 +882,12 @@ OrientedGraphs Multiniveau(uint niveau_contraction,
 	
 		UnorientedGraph *copie_g = new UnorientedGraph();
 		boost::copy_graph(*g,*copie_g);
-	    if(type_methode == "gggp" || type_methode == "ggp"){
-			bissectionRec(copie_g,Partition,nbr_parties,type_cut,nbr_tirage,type_methode, distance);
+	    if(parameters.at(1) == "gggp" || parameters.at(1) == "ggp"){
+			bissectionRec(copie_g,Partition,nbr_parties,parameters.at(3),nbr_tirage,parameters.at(1), distance);
 		}
 		else
 			Partition = Random_partitioning(copie_g,nbr_parties);
 			
-		double best_cut = Cut_cluster(Partition,*g,type_cut);
-		//std::cout<<"Fct Obj : "<<best_cut<<std::endl;
-		Cut.push_back(best_cut);
-		
 		Graphes = Graph_Partition(Partition, go, copie_g, outputedgelist,
                                              inputedgelist, connections);
 	}

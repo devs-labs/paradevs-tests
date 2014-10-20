@@ -51,13 +51,15 @@ public:
                Connections& parent_connections)
     {
 		std::cout<<"**"<<cluster_number<<"**"<<std::endl;
-        UnorientedGraph* g = new UnorientedGraph();
         OrientedGraph go;
-        std::vector<double> Cut;
+        
+        std::vector<std::string> parameters;
+		parameters.push_back("HEM");
+		parameters.push_back(partitioning_method_name);
+		parameters.push_back("diff");
+		parameters.push_back("ratio");
 
         generator.generate(go);
-
-        make_unoriented_graph(go, *g);
 
         Edges edge_partie;
         Connections connections;
@@ -65,20 +67,17 @@ public:
         output_edges = OutputEdgeList(cluster_number);
 
         if (contraction_coef_flag) {
-            graphs = Multiniveau(num_vertices(*g) / contraction_coef,
-                                 g, &go,
-                                 cluster_number,10, "HEM",
-                                 partitioning_method_name,
-                                 "diff", "ratio", edge_partie ,
+            graphs = Multiniveau(num_vertices(go) / contraction_coef,
+                                 &go,cluster_number,10, 
+                                 parameters, edge_partie ,
                                  output_edges, input_edges,
-                                 parent_connections,false, Cut, 2);
+                                 parent_connections,false, 2);
         } else {
-            graphs = Multiniveau(contraction_coef, g, &go,
-                                 cluster_number,10, "HEM",
-                                 partitioning_method_name,
-                                 "diff", "ratio", edge_partie ,
+            graphs = Multiniveau(contraction_coef, &go,
+                                 cluster_number,10,
+                                 parameters, edge_partie ,
                                  output_edges, input_edges,
-                                 parent_connections,false, Cut, 2);
+                                 parent_connections,false, 2);
         }
 
         // std::cout << "*********************************" << std::endl;

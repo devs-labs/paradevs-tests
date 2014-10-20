@@ -30,6 +30,7 @@
 #include <tests/boost_graph/partitioning/defs.hpp>
 #include <tests/boost_graph/partitioning/utils.hpp>
 #include <fstream>
+
 namespace paradevs { namespace tests { namespace boost_graph {
 
 void build_graph(OrientedGraph& og, unsigned int edge_number);

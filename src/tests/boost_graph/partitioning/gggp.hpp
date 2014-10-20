@@ -48,19 +48,20 @@ void Pseudo_random_partitioning(UnorientedGraph *g, EntiersEntiers &Partition,
                                 uint nbr_parties);
 
 EntiersEntiers Random_partitioning(UnorientedGraph *g,
-                                uint nbr_parties);
+                                uint parts_number);
 
-OrientedGraphs Multiniveau(uint niveau_contraction, UnorientedGraph *g,
+OrientedGraphs Multiniveau(uint niveau_contraction,
                            OrientedGraph *go, int nbr_parties, int nbr_tirage,
-                           std::string contraction,
+                           const std::vector<std::string> &parameters, 
+                           /*std::string contraction,
                            std::string type_methode,
                            std::string choix_affinage,
-                           std::string type_cut,
+                           std::string type_cut,*/
                            Edges &edge_partie,
                            OutputEdgeList &outputedgeslist,
                            InputEdgeList &inputedgelist,
                            Connections &connections,
-                           bool rec, std::vector<double> &Cut,
+                           bool rec,
                            int distance = -1);
 void Optimisation_method_neighbour(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition, int nbr_tirage, const std::string &name_cut, const std::string &name_strat);
 void Optimisation_method_neighbour_distance(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition, int nbr_tirage, int distance, const std::string &name_cut, 

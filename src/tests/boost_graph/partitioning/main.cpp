@@ -53,8 +53,8 @@ int main()
     Entiers niveau = {4,3,2};
     //int nbr_couches = 150;//nbr_sommets*3/100;
     
-    build_graph(*go, 38);
-    //build_generator_graph(go, nbr_sommets, nbr_sources , 2 , 5 ,niveau);
+    //build_graph(*go, 38);
+    build_generator_graph(go, nbr_sommets, nbr_sources , 2 , 4 ,niveau);
     /*std::vector<std::pair<int,int>> vertex_selection;
     std::pair<int,int> tmp;
     tmp.first = 0;
@@ -247,9 +247,14 @@ int main()
 	/*** ***/
 
 	int nbr_parties = 4;
-	int niveau_contraction = num_vertices(*go)/2;
-	std::vector<double> Cut;
+	int niveau_contraction = num_vertices(*go)/10;
 	int nbr_tirage = 2;
+	
+	std::vector<std::string> parameters;
+	parameters.push_back("HEM");
+	parameters.push_back("rand");
+	parameters.push_back("diff");
+	parameters.push_back(type_cut);
 	
 	for(uint i =1; i<nbr_tirage; i++){
 		Edges edge_partie;
@@ -261,36 +266,19 @@ int main()
 			make_unoriented_graph(*go, *g);
 			Adjacent_Matrix_Txt(g,"../../Classif_R/Graphe/txt/Madj.txt");
 			Weight_Matrix_Txt(g,"../../Classif_R/Graphe/txt/Mwei.txt");
-			OrientedGraphs graphs = Multiniveau(niveau_contraction, g, go, nbr_parties, 10 ,"HEM", "gggp",
-										"diff", type_cut, edge_partie ,
+			delete g;
+			OrientedGraphs graphs = Multiniveau(niveau_contraction, go, nbr_parties,
+										10 , parameters, edge_partie ,
 										outputedgeslist, inputedgelist,
-										connections,true,Cut,2);  	
+										connections,true,2);  	
 										std::cout<<std::endl;
-		}else{
-			UnorientedGraph *g = new UnorientedGraph();
-			make_unoriented_graph(*go, *g);
-			OrientedGraphs graphs = Multiniveau(niveau_contraction, g, go, nbr_parties, num_vertices(*go)*2/100,"HEM", "gggp",
-										"diff", type_cut, edge_partie ,
+		}else
+			OrientedGraphs graphs = Multiniveau(niveau_contraction, go, nbr_parties, 
+										num_vertices(*go)*2/100, 
+										parameters, edge_partie ,
 										outputedgeslist, inputedgelist,
-										connections,true,Cut,2);  	
-										std::cout<<std::endl;
-		}
+										connections,true,2); 
 	}
-	//std::ofstream fichier_cut ("../../sortie_graphe/Tests/Cut/cut_s200_nc10_d0_c1_t10_p8_gggp.txt", std::ios::out);
-	double moy = 0.;
-	
-	for(int cpt = 0; cpt <Cut.size(); cpt ++){
-		//if(cpt!=Cut.size()-1)
-			//fichier_cut<<Cut.at(cpt)<<";";
-		//else
-			//fichier_cut<<Cut.at(cpt);
-		moy += Cut.at(cpt);
-		//std::cout<<Cut.at(cpt)<<std::endl;
-	}
-	//fichier_cut.close();
-	
-	moy/= Cut.size();
-	std::cout<<"Critère : "<<moy<<std::endl;
 	
 	delete go;
 	
