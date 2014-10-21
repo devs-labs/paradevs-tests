@@ -48,11 +48,11 @@ int main()
 	/*** Génération du graphe ***/
 	
     OrientedGraph *go = new OrientedGraph();
-    std::string type_graph = "grid";
+    std::string type_graph = "tree";
     std::pair<bool,bool> Spectrale = {false,false};
     
     if(type_graph == "grid"){
-		int side = floor(sqrt(200));
+		int side = floor(sqrt(5000));
 		std::vector<std::pair<int,int>> vertex_selection;
 	    std::pair<int,int> tmp;
 	    tmp.first = 0;
@@ -64,9 +64,9 @@ int main()
 	    build_graph_grid(go, side, vertex_selection, weight_vertex,texte,true);
 	    Plot_OrientedGraph(go,"../../sortie_graphe/Tests/Graphes/Multiniveau/txt/grid_500.txt");
 	}else if (type_graph == "tree"){
-		int nbr_sommets = 1000;
+		int nbr_sommets = 5000;
 		int nbr_sources = nbr_sommets/100*1; 
-		Entiers niveau = {4,3,2};
+		Entiers niveau = {5,4,3,2};
 		build_generator_graph(go, nbr_sommets, nbr_sources , 2 , 4 ,niveau);
 	}else if (type_graph == "linked"){
 		int nbr_sommets = 1000;
@@ -93,8 +93,8 @@ int main()
 	}
 
 	/*** Paramétrage du Multiniveau ***/
-	std::vector<uint> numeric_parameters = {num_vertices(*go), 8, 5};
-	std::vector<std::string> parameters = {"HEM", "gggp", "diff", "ratio"};
+	std::vector<uint> numeric_parameters = {num_vertices(*go)/20, 8, 10};
+	std::vector<std::string> parameters = {"HEM", "rand", "diff", "cut"};
 	
 	uint nbr_tirage = 1;
 	
@@ -104,23 +104,23 @@ int main()
 		InputEdgeList inputedgelist;
 		Connections connections;
 		if(!Spectrale.first){
-			UnorientedGraph *g = new UnorientedGraph();
-			make_unoriented_graph(*go, *g);
 			if(Spectrale.second){
+				UnorientedGraph *g = new UnorientedGraph();
+				make_unoriented_graph(*go, *g);
 				Adjacent_Matrix_Txt(g,"../../Classif_R/Graphe/txt/Madj.txt");
 				Weight_Matrix_Txt(g,"../../Classif_R/Graphe/txt/Mwei.txt");
+				delete g;
 			}
-			delete g;
 			OrientedGraphs graphs = Multiniveau(go, numeric_parameters,
 												parameters, edge_partie ,
 												outputedgeslist, inputedgelist,
-												connections,true, 2);  	
+												connections,true, i);  	
 												std::cout<<std::endl;
 		}else{
 			OrientedGraphs graphs = Multiniveau(go, numeric_parameters,
 												parameters, edge_partie ,
 												outputedgeslist, inputedgelist,
-												connections,true, 2); 
+												connections,true, i); 
 												std::cout<<std::endl;
 		}
 	}

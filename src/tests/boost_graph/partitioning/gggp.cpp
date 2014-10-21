@@ -593,20 +593,6 @@ EntiersEntiers Random_partitioning(UnorientedGraph *g,
 	return Partition;
 }
 
-/* std::vector<std::string> parameters :
- * 0 -> contraction    : nom de la méthode de contraction
- * 1 -> type_methode   : nom de la méthode de partitionnement
- * 2 -> choix_affinage : nom de la méthode d'affinage
- * 3 -> type_cut       : nom de la fonction objectif étudiée
- * 
- * std::vector<uint> numeric_parameters :
- * 0 -> niveau_contraction : niveau de contraction à atteindre
- * 1 -> nbr_parties        : nombre de parties de la partition
- * 2 -> nbr_tirage         : nombre de tirage de sommet de depart
- * 3 -> distance           : distance minimum de selection de sommet 
- * 							 de depart par default -1
- */
-
 void Coarsening_Phase(Base_Graph &baseg, ListEntiersEntiers &liste_corr, 
 					  uint niveau, int nbr_vertex, 
 					  std::string parameter){
@@ -629,16 +615,13 @@ EntiersEntiers Partitioning_Phase(const Base_Graph &baseg,
 					const std::vector<uint> &numeric_parameters, 
 					const std::vector<std::string> &parameters, 
 					int distance){
-	
-	EntiersEntiers Partition;
-    Entiers *part = new Entiers();
-    
-	for(uint i = 0; i<num_vertices(*baseg.at(baseg.size() - 1)); i++)
-		part->push_back(i);
-			
-	Partition.push_back(part);
-    
+						
+    EntiersEntiers Partition;
     if(parameters.at(1) == "gggp" || parameters.at(1) == "ggp"){
+		Entiers *part = new Entiers();
+		for(uint i = 0; i<num_vertices(*baseg.at(baseg.size() - 1)); i++)
+			part->push_back(i);
+		Partition.push_back(part);
 		bissectionRec(baseg.at(baseg.size()-1), Partition,
 					  numeric_parameters.at(1), parameters.at(3), 
 					  numeric_parameters.at(2), parameters.at(1), 
@@ -769,6 +752,20 @@ void Uncoarsening_Phase(const Base_Graph &baseg,
 
     }
 }
+
+/* std::vector<std::string> parameters :
+ * 0 -> contraction    : nom de la méthode de contraction
+ * 1 -> type_methode   : nom de la méthode de partitionnement
+ * 2 -> choix_affinage : nom de la méthode d'affinage
+ * 3 -> type_cut       : nom de la fonction objectif étudiée
+ * 
+ * std::vector<uint> numeric_parameters :
+ * 0 -> niveau_contraction : niveau de contraction à atteindre
+ * 1 -> nbr_parties        : nombre de parties de la partition
+ * 2 -> nbr_tirage         : nombre de tirage de sommet de depart
+ * 3 -> distance           : distance minimum de selection de sommet 
+ * 							 de depart par default -1
+ */
 	 
 OrientedGraphs Multiniveau(OrientedGraph *go,
                            const std::vector<uint> &numeric_parameters,
@@ -787,8 +784,10 @@ OrientedGraphs Multiniveau(OrientedGraph *go,
     ListEntiersEntiers liste_corr;
     OrientedGraphs Graphes;
     int val_cpt = num_vertices(*g);
+    bool time = true;
+    double t1, t2, t3, t4;
     
-    if(numeric_parameters.at(0) != val_cpt){
+    if(numeric_parameters.at(0) != val_cpt && parameters.at(1) != "rand"){
 			
 		Coarsening_Phase(baseg, liste_corr, numeric_parameters.at(0), val_cpt, parameters.at(0));
 	    
@@ -803,8 +802,10 @@ OrientedGraphs Multiniveau(OrientedGraph *go,
 			GRAPHp.close();
 		}
 	
-	    //double t2 = t.elapsed();
-	    //std::cout << "C : " << t2 << " ; ";
+		if(time){
+			t2 = t.elapsed();
+			std::cout << "C : " << t2 << " ; ";
+		}
 	    
 	    if(rec)
 			Plot_UnorientedGraph(baseg.at(baseg.size()-1),"../../sortie_graphe/Tests/Graphes/Multiniveau/txt/contraction_final.txt");
@@ -815,8 +816,10 @@ OrientedGraphs Multiniveau(OrientedGraph *go,
 		EntiersEntiers Partition = Partitioning_Phase(baseg, 
 							numeric_parameters, parameters, distance);
 	    
-	    //double t3 = t.elapsed();
-	    //std::cout << "P : " << (t3 - t2) << " ; ";
+	    if(time){
+			t3 = t.elapsed();
+			std::cout << "P : " << (t3 - t2) << " ; ";
+	    }
 	    
 	    if(rec)
 			Plot_UnorientedGraph_All(&copy_graph,Partition,"../../sortie_graphe/Tests/Graphes/Multiniveau/txt/contraction_final_partition.txt", true);
@@ -829,6 +832,14 @@ OrientedGraphs Multiniveau(OrientedGraph *go,
 		
 		Uncoarsening_Phase(baseg, Partition, parameters, 
 								  liste_corr, poids_moy, rec);
+								  
+		if(time){
+			t4 = t.elapsed();
+			std::cout << "A : " << (t4 - t3) << " ; "<<std::endl;
+	    }
+	    
+	    double ratio_cut = Cut_cluster(Partition, *g, parameters.at(3));
+	    std::cout<<"Coût de la fonction objectif : "<<ratio_cut<<std::endl;
 		
 		Graphes = Graph_Partition(Partition, go, g, outputedgelist,
 	                              inputedgelist, connections);
@@ -846,6 +857,14 @@ OrientedGraphs Multiniveau(OrientedGraph *go,
 		EntiersEntiers Partition = Partitioning_Phase(baseg, 
 								   numeric_parameters, parameters, 
 								   distance);
+								   
+		if(time){
+		    t1 = t.elapsed();
+			std::cout << "P : " << t1 << " ; "<<std::endl;
+	    }
+	    
+	    double ratio_cut = Cut_cluster(Partition, *g, parameters.at(3));
+	    std::cout<<"Coût de la fonction objectif : "<<ratio_cut<<std::endl;
 			
 		Graphes = Graph_Partition(Partition, go, copie_g, 
 								  outputedgelist, inputedgelist,
