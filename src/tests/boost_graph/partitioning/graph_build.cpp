@@ -357,37 +357,37 @@ void brhtg_source(OrientedGraph *go,int nbr_vertex, int nbr_source, int nbr_v_mi
 					std::vector<int> &Ram, std::vector<int> &Exu, const std::vector<vertex_to> &Vertexs,
 					int nbr_passe, int nbr_npb){
 
-	int nbr_voisin;
+	uint nbr_voisin;
 
 	int niv=1;
-	for(int j =0; j<niveau.size()-1; j++){
+	for(uint j =0; j<niveau.size()-1; j++){
 		niv *= niveau.at(j);
 	}
 
 	int niv_tot=1;
-	for(int j =0; j<niveau.size(); j++){
+	for(uint j =0; j<niveau.size(); j++){
 		niv_tot *= niveau.at(j);
 	}
 
 	for(int b = 0; b<niv; b++){
-		std::vector<int> branche;
+		std::vector<uint> branche;
 		int cpt = 0;
 		while(cpt != niveau.at(niveau.size()-1)+1){
 			branche.push_back((b*niveau.at(niveau.size()-1)+cpt)*nbr_npb);
 			cpt++;
 		}
 
-		for(int i =0; i<branche.size()-1;i++){
-			for(int j = branche.at(i); j<branche.at(i+1); j++){
+		for(uint i =0; i<branche.size()-1;i++){
+			for(uint j = branche.at(i); j<branche.at(i+1); j++){
 				if(j==branche.at(branche.size()-1)-1){
 					break;
 				}
 				else{
 					nbr_voisin = rand_fini(nbr_v_min, nbr_v_max+1);
-					int cpt=0;
+					uint cpt=0;
 					Entiers ensemble;
 					int cpt_nbr_s = 0;
-					while(cpt!=nbr_voisin){
+					while(cpt != nbr_voisin){
 						int val;
 						if(j<branche.at(i)+nbr_source){ // Les sommets sont des sources donc imossible de recevoir des données
 							val = rand_fini(j + 4, j + nbr_v_max + nbr_passe);
@@ -402,13 +402,13 @@ void brhtg_source(OrientedGraph *go,int nbr_vertex, int nbr_source, int nbr_v_mi
 							val = rand_fini(j+1, j+nbr_passe);
 						}
 
-						if(In_tab(ensemble,val)!=1){
+						if(In_tab(ensemble,val) != 1){
 							ensemble.push_back(val);
 							boost::add_edge(Vertexs.at(j), Vertexs.at(val), EdgeProperties(1.), *go);
 							cpt++;
 						}
 						else{
-							if((nbr_vertex-j)==cpt)
+							if((nbr_vertex-j) == cpt)
 								break;
 							else
 								cpt_nbr_s++;
@@ -442,8 +442,8 @@ void brhtg_source(OrientedGraph *go,int nbr_vertex, int nbr_source, int nbr_v_mi
 
 	if(niveau.size()>1){
 		nbr_voisin = 2;
-		for(int k =0; k<Exu.size(); k++){
-			for(int l = Exu.at(k)-2; l<Exu.at(k)+1; l++){
+		for(uint k =0; k<Exu.size(); k++){
+			for(uint l = Exu.at(k)-2; l<Exu.at(k)+1; l++){
 				int cpt=0;
 				Entiers ensemble;
 				int cpt_nbr_s = 0;
@@ -920,7 +920,7 @@ void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_cou
 	}
 }
 
-void build_graph_grid(OrientedGraph *go, int side, std::vector<std::pair<int,int>> vertex_selection, Entiers weight_vertex,const char *edge_weight, bool rec){
+void build_graph_grid(OrientedGraph *go, int side, const std::vector<std::pair<int,int>> &vertex_selection, const Entiers &weight_vertex,const char *edge_weight, bool rec){
 	int nbr_vertex = side*side;
 	std::vector<vertex_to> Vertexs;
 	for(int i =0; i<nbr_vertex; i++){

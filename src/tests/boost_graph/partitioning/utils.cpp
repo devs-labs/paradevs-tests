@@ -3220,103 +3220,50 @@ void Weight_Matrix_Txt(UnorientedGraph *g, const char* text){
 		 std::cerr << "Impossible d'ouvrir le fichier dans Weight_Matrix_Txt !" << std::endl;
 }
 
-void Plot_OrientedGraph(OrientedGraph *go, const EntiersEntiers &Partition, const char* text, bool Color){
-	if(Partition.size()<16){
-		std::vector<std::string> color;
-		color.push_back("[color=blue2, fontcolor=blue2];");
-		color.push_back("[color=red, fontcolor=red];");
-		color.push_back("[color=green, fontcolor=green];");
-		color.push_back("[color=turquoise, fontcolor=turquoise];");
-		color.push_back("[color=saddlebrown, fontcolor=saddlebrown];");
-		color.push_back("[color=indigo, fontcolor=indigo];");
-		color.push_back("[color=yellow, fontcolor=yellow2];");
-		color.push_back("[color=orange, fontcolor=orange];");
-		color.push_back("[color=olivedrab, fontcolor=olivedrab];");
-		color.push_back("[color=gold, fontcolor=gold];");
-		color.push_back("[color=slateblue2, fontcolor=slateblue2];");
-		color.push_back("[color=dimgrey, fontcolor=dimgrey];");
-		color.push_back("[color=cyan, fontcolor=cyan];");
-		color.push_back("[color=purple1, fontcolor=purpule1];");
-		color.push_back("[color=crimson, fontcolor=crimson];");
-		color.push_back("[color=black, fontcolor=black];");
+void Plot_OrientedGraph(OrientedGraph *go, const char* text){
+	edge_to e1;
+	bool found;
 		
-		std::ofstream fichier2 (text, std::ios::out);
-	    fichier2<<"digraph G {"<<std::endl;   
-	    tie(vertexIto, vertexEndo) = vertices(*go);
-	    for (; vertexIto != vertexEndo; ++vertexIto) {
-			fichier2<<(*go)[*vertexIto]._index<<"-> {";
-	    	tie(neighbourIto, neighbourEndo) = adjacent_vertices(*vertexIto,
-	    			*go);
-	    	for (; neighbourIto != neighbourEndo; ++neighbourIto){
-	    		fichier2<<(*go)[*neighbourIto]._index<<";";
-	    	}
-	    	fichier2<<"}"<<std::endl;
-		}
-	    
-	    if(Color == true){
-			for(uint k=0; k<Partition.size(); k++){
-				for(uint j=0; j<Partition.at(k)->size(); j++)
-				{
-					fichier2<<Partition.at(k)->at(j)<<color.at(k)<<std::endl;
-				}
-			}  
-		} 
-	    
-		fichier2<<"}";	
-		fichier2.close();
-		
-	}else{
-		std::cout<<"Error : Le nombre de couleur est insuffisant pour réaliser l'affichange"<<std::endl;
-	}
+	std::ofstream fichier2 (text, std::ios::out);
+    fichier2<<"digraph G {"<<std::endl;   
+    tie(vertexIto, vertexEndo) = vertices(*go);
+    for (; vertexIto != vertexEndo; ++vertexIto) {
+    	tie(neighbourIto, neighbourEndo) = adjacent_vertices(*vertexIto,
+    			*go);
+    	for (; neighbourIto != neighbourEndo; ++neighbourIto){
+    		tie(e1,found)=edge(vertex(*vertexIto,*go),
+							   vertex(*neighbourIto,*go),*go);
+			fichier2<<(*go)[*vertexIto]._index<<" -> "
+					<<(*go)[*neighbourIto]._index<<" [label="
+					<<(*go)[e1]._weight
+					<<", fontsize=10, fontcolor= blue];"<<std::endl;
+    	}
+	} 
+    
+	fichier2<<"}";	
+	fichier2.close();
+	
 }
 
-void Plot_UnorientedGraph(UnorientedGraph *g, const EntiersEntiers &Partition, const char* text, bool Color){	
-	if(Partition.size()<16){
-		std::vector<std::string> color;
-		color.push_back("[color=blue2, fontcolor=blue2];");
-		color.push_back("[color=red, fontcolor=red];");
-		color.push_back("[color=green, fontcolor=green];");
-		color.push_back("[color=turquoise, fontcolor=turquoise];");
-		color.push_back("[color=saddlebrown, fontcolor=saddlebrown];");
-		color.push_back("[color=indigo, fontcolor=indigo];");
-		color.push_back("[color=yellow, fontcolor=yellow2];");
-		color.push_back("[color=orange, fontcolor=orange];");
-		color.push_back("[color=olivedrab, fontcolor=olivedrab];");
-		color.push_back("[color=gold, fontcolor=gold];");
-		color.push_back("[color=slateblue2, fontcolor=slateblue2];");
-		color.push_back("[color=dimgrey, fontcolor=dimgrey];");
-		color.push_back("[color=cyan, fontcolor=cyan];");
-		color.push_back("[color=purple1, fontcolor=purpule1];");
-		color.push_back("[color=crimson, fontcolor=crimson];");
-		color.push_back("[color=black, fontcolor=black];");
-		
-		std::ofstream GRAPH2 (text, std::ios::out);
-		GRAPH2<<"graph G {"<<std::endl;   
-		tie(vertexIt, vertexEnd) = vertices(*g);
-		for (; vertexIt != vertexEnd; ++vertexIt) {
-			GRAPH2<<(*g)[*vertexIt]._index<<" -- {";
-			tie(neighbourIt, neighbourEnd) = adjacent_vertices(*vertexIt,*g);
-			for (; neighbourIt != neighbourEnd; ++neighbourIt){
-				if((*g)[*neighbourIt]._index>(*g)[*vertexIt]._index)
-					GRAPH2<<(*g)[*neighbourIt]._index<<";";
-			}
-			GRAPH2<<"}"<<std::endl;
-		}   
-		
-		if(Color == true){
-			for(uint k=0; k<Partition.size(); k++){
-				for(uint t=0; t<Partition.at(k)->size(); t++)
-				{
-					GRAPH2<<(*g)[Partition.at(k)->at(t)]._index<<color.at(k)<<std::endl;
-				}
+void Plot_UnorientedGraph(UnorientedGraph *g, const char* text){	
+	edge_t e1;
+	bool found;
+	
+	std::ofstream GRAPH2 (text, std::ios::out);
+	GRAPH2<<"graph G {"<<std::endl;   
+	tie(vertexIt, vertexEnd) = vertices(*g);
+	for (; vertexIt != vertexEnd; ++vertexIt) {
+		tie(neighbourIt, neighbourEnd) = adjacent_vertices(*vertexIt,*g);
+		for (; neighbourIt != neighbourEnd; ++neighbourIt){
+			if((*g)[*neighbourIt]._index>(*g)[*vertexIt]._index){
+				tie(e1,found)=edge(vertex(*vertexIt,*g),vertex(*neighbourIt,*g),*g);
+				GRAPH2<<(*g)[*vertexIt]._index<<" -- "<<(*g)[*neighbourIt]._index<<" [label="<<(*g)[e1]._weight<<", fontsize=10, fontcolor= blue];"<<std::endl;
 			}
 		}
+	}  
 
-		GRAPH2<<"}";	
-		GRAPH2.close();
-	}else{
-		std::cout<<"Error : Le nombre de couleur est insuffisant pour réaliser l'affichange"<<std::endl;
-	}
+	GRAPH2<<"}";	
+	GRAPH2.close();
 }
 
 void Plot_UnorientedGraph_All(UnorientedGraph *g, const EntiersEntiers &Partition, const char* text, bool Color){

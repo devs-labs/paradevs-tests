@@ -195,12 +195,9 @@ void Adjacent_Matrix_Txt(UnorientedGraph *g, const char* text);
 
 void Weight_Matrix_Txt(UnorientedGraph *g, const char* text);
 
-void Plot_UnorientedGraph(UnorientedGraph *g, 
-						const EntiersEntiers &Partition, 
-						const char* text, bool Color);
+void Plot_UnorientedGraph(UnorientedGraph *g, const char* text);
 
-void Plot_OrientedGraph(OrientedGraph *g, const EntiersEntiers &Partition, 
-						const char* text, bool Color);
+void Plot_OrientedGraph(OrientedGraph *g, const char* text);
 
 void Affichage_OrientedGraph(OrientedGraph *go);
 
@@ -224,9 +221,13 @@ bool Est_voisin(UnorientedGraph *g, int vertex, int vertex_select);
 double In_modularity(UnorientedGraph *g , const Entiers &cluster);
 double Modularity(UnorientedGraph *g,const EntiersEntiers &part);
 
-bool contraction_HEM_degree(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &liste_corr, int val_reduc, int &val_cpt);
+bool contraction_HEM_degree(UnorientedGraph *g, Base_Graph &baseg, 
+						ListEntiersEntiers &liste_corr, int val_reduc,
+						int &val_cpt);
 
-void Merge_Boost_Graph(OrientedGraph *go1, OrientedGraph *go2, std::vector<std::pair<int,int>> &connection, std::vector<double> &connection_weight);
+void Merge_Boost_Graph(OrientedGraph *go1, OrientedGraph *go2, 
+						std::vector<std::pair<int,int>> &connection, 
+						std::vector<double> &connection_weight);
 
 } } } // namespace paradevs tests boost_graph
 

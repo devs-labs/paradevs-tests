@@ -41,7 +41,7 @@ namespace paradevs { namespace tests { namespace boost_graph {
 class PartitioningGraphBuilder
 {
 public:
-    PartitioningGraphBuilder(int cn, std::string pmn, int cc, bool ccf,
+    PartitioningGraphBuilder(uint cn, std::string pmn, uint cc, bool ccf,
                              GraphGenerator& g) :
         cluster_number(cn),/*ajout d'un paramètre nbr_tirage,*/ partitioning_method_name(pmn),
         contraction_coef(cc), contraction_coef_flag(ccf), generator(g)
@@ -55,12 +55,9 @@ public:
 		std::cout<<"**"<<cluster_number<<"**"<<std::endl;
         OrientedGraph go;
         
-        std::vector<std::string> parameters;
-		parameters.push_back("HEM");
-		parameters.push_back(partitioning_method_name);
-		parameters.push_back("diff");
-		parameters.push_back("ratio");
-
+        std::vector<std::string> parameters = {"HEM", 
+											  partitioning_method_name, 
+											  "diff", "ratio"};
         generator.generate(go);
 
         Edges edge_partie;
@@ -69,17 +66,26 @@ public:
         output_edges = OutputEdgeList(cluster_number);
 
         if (contraction_coef_flag) {
-            graphs = Multiniveau(num_vertices(go) / contraction_coef,
-                                 &go,cluster_number,10, 
+			uint coars = num_vertices(go) / contraction_coef;
+			uint nbr_tirage = 10;
+			std::vector<uint> numeric_parameters = {coars, 
+													cluster_number, 
+													nbr_tirage};
+        
+            graphs = Multiniveau(&go, numeric_parameters,
                                  parameters, edge_partie ,
                                  output_edges, input_edges,
-                                 parent_connections,false, 2);
+                                 parent_connections,false , 2);
         } else {
-            graphs = Multiniveau(contraction_coef, &go,
-                                 cluster_number,10,
+			uint nbr_tirage = 10;
+			std::vector<uint> numeric_parameters = {contraction_coef ,
+													cluster_number, 
+													nbr_tirage};
+	        
+            graphs = Multiniveau(&go, numeric_parameters,
                                  parameters, edge_partie ,
                                  output_edges, input_edges,
-                                 parent_connections,false, 2);
+                                 parent_connections,false , 2);
         }
 
         // std::cout << "*********************************" << std::endl;
@@ -138,9 +144,9 @@ public:
     }
 
 private:
-    int             cluster_number;
+    uint             cluster_number;
     std::string     partitioning_method_name;
-    int             contraction_coef;
+    uint             contraction_coef;
     bool            contraction_coef_flag;
     GraphGenerator& generator;
 };

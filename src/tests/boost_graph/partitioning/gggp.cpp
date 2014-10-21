@@ -57,10 +57,12 @@ void ggp(UnorientedGraph *g, Entiers *sommetsSource,
 				}
 				index_partition = i;
 				if(distance != -1){
-					ggp(g, sommetsSource, sommetsDestination, Partition, Partition.at(i)->at(rand_fini(0,Partition.at(i)->size())), 
+					ggp(g, sommetsSource, sommetsDestination, Partition, 
+						Partition.at(i)->at(rand_fini(0,Partition.at(i)->size())), 
 						index_partition, distance);
 				}else{
-					ggp(g, sommetsSource, sommetsDestination, Partition, rand_fini(0,Partition.at(i)->size()),
+					ggp(g, sommetsSource, sommetsDestination, Partition, 
+						rand_fini(0,Partition.at(i)->size()),
 						index_partition, distance);
 				}
                 return;
@@ -219,13 +221,11 @@ bool Best_transfert_vertex_bissection(UnorientedGraph *g, Entiers *sommetsSource
 void gggp_pond(UnorientedGraph *g, Entiers *sommetsSource, Entiers *sommetsDestination,
 				EntiersEntiers &Partition, int rand, int &index_partition, const std::string &name, int distance)
 {
-	//std::cout<<"bissec"<<std::endl;
     Entiers sommets_adj;
     double poids_max = 0;
     double poids, cut;
     
     if(sommetsSource->size()==1){
-		//std::cout<<"Changement de Partition"<<std::endl;
         Entiers tailles;
         for(uint i=0;i<Partition.size();i++){
             tailles.push_back(Partition.at(i)->size());
@@ -239,13 +239,14 @@ void gggp_pond(UnorientedGraph *g, Entiers *sommetsSource, Entiers *sommetsDesti
 					sommetsSource->push_back(Partition.at(i)->at(id));
 				}
 				index_partition = i;
-				if(distance != -1){
+				if(distance != -1)
 					gggp_pond(g,sommetsSource,sommetsDestination,Partition,
-							  Partition.at(i)->at(rand_fini(0,Partition.at(i)->size())),index_partition ,name, distance);
-				}else{
-					gggp_pond(g,sommetsSource,sommetsDestination,Partition,
-							  rand_fini(0,Partition.at(i)->size()),index_partition, name ,distance);
-				}
+						Partition.at(i)->at(rand_fini(0,Partition.at(i)->size())),
+						index_partition, name, distance);
+				else
+					gggp_pond(g, sommetsSource, sommetsDestination,
+						Partition, rand_fini(0,Partition.at(i)->size()), 
+						index_partition, name ,distance);
                 return;
             }
         }
@@ -255,10 +256,8 @@ void gggp_pond(UnorientedGraph *g, Entiers *sommetsSource, Entiers *sommetsDesti
         poids_max+=(*g)[sommetsSource->at(i)]._weight;
     }
     poids_max/=2.;
-    //std::cout<<"Poids total : "<<poids_max<<std::endl;
    
     if(distance == -1){
-		//std::cout<<"Sommet de départ : "<<(*g)[sommetsSource->at(rand)]._index<<std::endl;
 		poids=(*g)[sommetsSource->at(rand)]._weight;
 		if(name == "cut"){
 			cut = Degree(*g,sommetsSource->at(rand));
@@ -271,7 +270,6 @@ void gggp_pond(UnorientedGraph *g, Entiers *sommetsSource, Entiers *sommetsDesti
 		sommetsDestination->push_back(sommetsSource->at(rand));
 		sommetsSource->erase(sommetsSource->begin() + rand);
 	}else{
-		//std::cout<<"Sommet de départ : "<<(*g)[rand]._index<<std::endl;
 		poids=(*g)[rand]._weight;
 		cut = Degree(*g,rand);
 		if(name == "ratio"){
@@ -321,75 +319,64 @@ else{
 
 
 void Iter_2l(EntiersEntiers &part, int nbr_parties, UnorientedGraph *g,
-             const std::string &nom_cut, int nbr_tirage, const std::string &nom_strat, int distance)
+             const std::string &nom_cut, int nbr_tirage, 
+             const std::string &nom_strat, bool rec, int distance)
 {
-	std::vector<std::string> color;
-	color.push_back("[color=blue2, fontcolor=blue2];");
-	color.push_back("[color=red, fontcolor=red];");
-	color.push_back("[color=green, fontcolor=green];");
-	color.push_back("[color=turquoise, fontcolor=turquoise];");
-	color.push_back("[color=saddlebrown, fontcolor=saddlebrown];");
-	color.push_back("[color=indigo, fontcolor=indigo];");
-	color.push_back("[color=yellow, fontcolor=yellow2];");
-	color.push_back("[color=orange, fontcolor=orange];");
-	color.push_back("[color=olivedrab, fontcolor=olivedrab];");
-	color.push_back("[color=gold, fontcolor=gold];");
-	color.push_back("[color=slateblue2, fontcolor=slateblue2];");
-	color.push_back("[color=dimgrey, fontcolor=dimgrey];");
-	color.push_back("[color=cyan, fontcolor=cyan];");
-	color.push_back("[color=purple1, fontcolor=purpule1];");
-	color.push_back("[color=crimson, fontcolor=crimson];");
-	color.push_back("[color=black, fontcolor=black];");
 	
 	UnorientedGraph copy_graph;
 	boost::copy_graph(*g,copy_graph);
-	
-	std::vector<char* > nom;
-	char * tmp_nom1 = new char();
-	tmp_nom1 = "../../sortie_graphe/Tests/Graphes/Evolution_bissection/bissection_1.txt";
-	nom.push_back(tmp_nom1);
-	char * tmp_nom2 = new char();
-	tmp_nom2 = "../../sortie_graphe/Tests/Graphes/Evolution_bissection/bissection_2.txt";
-	nom.push_back(tmp_nom2);
-	char * tmp_nom3 = new char();
-	tmp_nom3= "../../sortie_graphe/Tests/Graphes/Evolution_bissection/bissection_3.txt";
-	nom.push_back(tmp_nom3);
-	char * tmp_nom4 = new char();
-	tmp_nom4= "../../sortie_graphe/Tests/Graphes/Evolution_bissection/bissection_4.txt";
-	nom.push_back(tmp_nom4);
-	char * tmp_nom5 = new char();
-	tmp_nom5= "../../sortie_graphe/Tests/Graphes/Evolution_bissection/bissection_5.txt";
-	nom.push_back(tmp_nom5);	
-	char * tmp_nom6 = new char();
-	tmp_nom6= "../../sortie_graphe/Tests/Graphes/Evolution_bissection/bissection_6.txt";
-	nom.push_back(tmp_nom6);
-	char * tmp_nom7 = new char();
-	tmp_nom7= "../../sortie_graphe/Tests/Graphes/Evolution_bissection/bissection_7.txt";
-	nom.push_back(tmp_nom7);
-	char * tmp_nom8 = new char();
-	tmp_nom8= "../../sortie_graphe/Tests/Graphes/Evolution_bissection/bissection_8.txt";
-	nom.push_back(tmp_nom8);
-	char * tmp_nom9 = new char();
-	tmp_nom9= "../../sortie_graphe/Tests/Graphes/Evolution_bissection/bissection_9.txt";
-	nom.push_back(tmp_nom9);
-	char * tmp_nom10 = new char();
-	tmp_nom10= "../../sortie_graphe/Tests/Graphes/Evolution_bissection/bissection_10.txt";
-	nom.push_back(tmp_nom10);
 	int cpt = 0;
 	
-	for(int i = 0; i<floor(log(nbr_parties)/log(2)); i++)
-    {
-		for(int j = 0; j< pow(2,i);j++)
-        {
+	for(int i = 0; i<floor(log(nbr_parties)/log(2)); i++){
+		for(int j = 0; j< pow(2,i);j++) {
 			if(distance == -1){
-				if(nbr_tirage != 0){
+				if(nbr_tirage != 0)
 					Optimisation_method_neighbour(g,part,j,nbr_tirage, nom_cut, nom_strat);
-				}else{
+				else
 					Optimisation_method_neighbour_minweight(g,part,j, nom_cut, nom_strat);
-				}
-			}else{
+			}else
 				Optimisation_method_neighbour_distance(g,part,j,nbr_tirage, distance, nom_cut, nom_strat);
-			}
+				
+			if(rec){
+				std::vector<std::string> color;
+				color.push_back("[color=blue2, fontcolor=blue2];");
+				color.push_back("[color=red, fontcolor=red];");
+				color.push_back("[color=green, fontcolor=green];");
+				color.push_back("[color=turquoise, fontcolor=turquoise];");
+				color.push_back("[color=saddlebrown, fontcolor=saddlebrown];");
+				color.push_back("[color=indigo, fontcolor=indigo];");
+				color.push_back("[color=yellow, fontcolor=yellow2];");
+				color.push_back("[color=orange, fontcolor=orange];");
+				color.push_back("[color=olivedrab, fontcolor=olivedrab];");
+				color.push_back("[color=gold, fontcolor=gold];");
+				color.push_back("[color=slateblue2, fontcolor=slateblue2];");
+				color.push_back("[color=dimgrey, fontcolor=dimgrey];");
+				color.push_back("[color=cyan, fontcolor=cyan];");
+				color.push_back("[color=purple1, fontcolor=purpule1];");
+				color.push_back("[color=crimson, fontcolor=crimson];");
+				color.push_back("[color=black, fontcolor=black];");
+	    		
+	    		std::vector<char* > nom;
+				char * tmp_nom1 = "../../sortie_graphe/Tests/Graphes/Bissection/txt/bissection_1.txt";
+				nom.push_back(tmp_nom1);
+				char * tmp_nom2 = "../../sortie_graphe/Tests/Graphes/Bissection/txt/bissection_2.txt";
+				nom.push_back(tmp_nom2);
+				char * tmp_nom3 = "../../sortie_graphe/Tests/Graphes/Bissection/txt/bissection_3.txt";
+				nom.push_back(tmp_nom3);
+				char * tmp_nom4 = "../../sortie_graphe/Tests/Graphes/Bissection/txt/bissection_4.txt";
+				nom.push_back(tmp_nom4);
+				char * tmp_nom5 = "../../sortie_graphe/Tests/Graphes/Bissection/txt/bissection_5.txt";
+				nom.push_back(tmp_nom5);	
+				char * tmp_nom6 = "../../sortie_graphe/Tests/Graphes/Bissection/txt/bissection_6.txt";
+				nom.push_back(tmp_nom6);
+				char * tmp_nom7 = "../../sortie_graphe/Tests/Graphes/Bissection/txt/bissection_7.txt";
+				nom.push_back(tmp_nom7);
+				char * tmp_nom8 = "../../sortie_graphe/Tests/Graphes/Bissection/txt/bissection_8.txt";
+				nom.push_back(tmp_nom8);
+				char * tmp_nom9 = "../../sortie_graphe/Tests/Graphes/Bissection/txt/bissection_9.txt";
+				nom.push_back(tmp_nom9);
+				char * tmp_nom10 = "../../sortie_graphe/Tests/Graphes/Bissection/txt/bissection_10.txt";
+				nom.push_back(tmp_nom10);
 			
 	    		std::ofstream GRAPH2 (nom.at(cpt), std::ios::out);
 				GRAPH2<<"graph G {"<<std::endl;   
@@ -414,23 +401,22 @@ void Iter_2l(EntiersEntiers &part, int nbr_parties, UnorientedGraph *g,
 	    
 				GRAPH2<<"}";	
 				GRAPH2.close();
-				
-				cpt ++;
-        }
+			}
+			
+			cpt ++;
+		}
     }
 }
 
 void bissectionRec(UnorientedGraph *g, EntiersEntiers &Partition,
-                   int nbr_parties, const std::string &nom_cut, int nbr_tirage, const std::string &nom_strat, int distance)
-{
-	
-    if((nbr_parties&(nbr_parties-1))==0)
-    {
-        //std::cout<<"C'est de la forme 2l : "<<nbr_parties<<std::endl;
-        Iter_2l(Partition,nbr_parties,g,nom_cut,nbr_tirage,nom_strat, distance);
-    }
-    else
-    {
+                   int nbr_parties, const std::string &nom_cut, 
+                   int nbr_tirage, const std::string &nom_strat, 
+                   int distance)
+{	
+    if((nbr_parties&(nbr_parties-1)) == 0)
+        Iter_2l(Partition, nbr_parties, g, nom_cut, nbr_tirage, 
+						   nom_strat, false, distance);
+    else{
         int puissance_2=0;
 
         Entiers tailles;
@@ -438,11 +424,13 @@ void bissectionRec(UnorientedGraph *g, EntiersEntiers &Partition,
         while(pow(2,puissance_2)<nbr_parties)
             puissance_2++;
 
-        Iter_2l(Partition,pow(2,puissance_2-1),g,nom_cut,nbr_tirage,nom_strat, distance);
+        Iter_2l(Partition, pow(2,puissance_2-1), g,
+				nom_cut, nbr_tirage, nom_strat, false, distance);
 
         for(unsigned int i = 0; i< Partition.size() -1 ; i++)
         {
-            for(EntiersEntiers::iterator it1 = Partition.begin() + i ; it1!=Partition.end(); it1++)
+            for(EntiersEntiers::iterator it1 = Partition.begin() + i ;
+				it1!=Partition.end(); it1++)
             {
                 if((*it1)->size() > Partition.at(i)->size())
                     Partition.at(i)->swap(**it1);
@@ -453,22 +441,18 @@ void bissectionRec(UnorientedGraph *g, EntiersEntiers &Partition,
         {
 			if(distance == -1){
 				if(nbr_tirage != 0){
-					Optimisation_method_neighbour(g,Partition,j,nbr_tirage, nom_cut, nom_strat);
+					Optimisation_method_neighbour(g, Partition, j,
+												  nbr_tirage, nom_cut, 
+												  nom_strat);
 				}else{
-					Optimisation_method_neighbour_degree(g,Partition,j, nom_cut, nom_strat);
+					Optimisation_method_neighbour_degree(g, Partition, j,
+												  nom_cut, nom_strat);
 				}
 			}else{
-				Optimisation_method_neighbour_distance(g,Partition,j,nbr_tirage, distance, nom_cut, nom_strat);
+				Optimisation_method_neighbour_distance(g, Partition, j, 
+												  nbr_tirage, distance, 
+												  nom_cut, nom_strat);
 			}
-			
-			/*for(int x =0; x<Partition.size(); x++){
-				std::cout<<"** ";
-				for(int y =0; y<Partition.at(x)->size();y++){
-					std::cout<<Partition.at(x)->at(y)<<" ";
-				}
-				std::cout<<std::endl;
-			}
-			std::cout<<std::endl;*/
         }
     }
 }
@@ -609,64 +593,207 @@ EntiersEntiers Random_partitioning(UnorientedGraph *g,
 	return Partition;
 }
 
-OrientedGraphs Multiniveau(uint niveau_contraction,
-                           OrientedGraph *go,
-                           int nbr_parties,
-                           int nbr_tirage,
+/* std::vector<std::string> parameters :
+ * 0 -> contraction    : nom de la méthode de contraction
+ * 1 -> type_methode   : nom de la méthode de partitionnement
+ * 2 -> choix_affinage : nom de la méthode d'affinage
+ * 3 -> type_cut       : nom de la fonction objectif étudiée
+ * 
+ * std::vector<uint> numeric_parameters :
+ * 0 -> niveau_contraction : niveau de contraction à atteindre
+ * 1 -> nbr_parties        : nombre de parties de la partition
+ * 2 -> nbr_tirage         : nombre de tirage de sommet de depart
+ * 3 -> distance           : distance minimum de selection de sommet 
+ * 							 de depart par default -1
+ */
+
+void Coarsening_Phase(Base_Graph &baseg, ListEntiersEntiers &liste_corr, 
+					  uint niveau, int nbr_vertex, 
+					  std::string parameter){
+	uint cpt = 0;
+	bool stop = false;
+	
+    while(!stop){
+    	if(parameter == "HEM")
+			stop = contraction_HEM_degree(baseg.at(cpt), baseg, 
+									liste_corr, niveau, nbr_vertex);
+    	else
+    		stop = contraction_Random_Maching(baseg.at(cpt), baseg, 
+									liste_corr, niveau, nbr_vertex);
+        cpt++;
+    }
+    
+}
+
+EntiersEntiers Partitioning_Phase(const Base_Graph &baseg, 
+					const std::vector<uint> &numeric_parameters, 
+					const std::vector<std::string> &parameters, 
+					int distance){
+	
+	EntiersEntiers Partition;
+    Entiers *part = new Entiers();
+    
+	for(uint i = 0; i<num_vertices(*baseg.at(baseg.size() - 1)); i++)
+		part->push_back(i);
+			
+	Partition.push_back(part);
+    
+    if(parameters.at(1) == "gggp" || parameters.at(1) == "ggp"){
+		bissectionRec(baseg.at(baseg.size()-1), Partition,
+					  numeric_parameters.at(1), parameters.at(3), 
+					  numeric_parameters.at(2), parameters.at(1), 
+					  distance);
+    }
+    else
+    	Partition = Random_partitioning(baseg.at(baseg.size()-1),
+										numeric_parameters.at(1));
+	
+	return Partition;
+    
+}
+
+void Uncoarsening_Phase(const Base_Graph &baseg, 
+						EntiersEntiers &Partition, 
+						const std::vector<std::string> &parameters, 
+						ListEntiersEntiers &liste_corr, 
+						double poids_moy, bool rec){
+	
+    ListEntiersEntiers::iterator lit(liste_corr.end());
+    bool proj;
+    uint taille_list = liste_corr.size();
+    if(liste_corr.size()==0){
+    	taille_list = 1;
+    	proj = true;
+    }
+    else{
+    	lit--;
+    	proj = false;
+    }
+
+	std::vector<const char* > nom;
+	std::vector<const char* > nom_a;
+	if(rec){
+		const char * tmp_nom1 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_1.txt";
+		nom.push_back(tmp_nom1);
+		const char * tmp_nom_a1 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_1.txt";
+		nom_a.push_back(tmp_nom_a1);
+		const char * tmp_nom2 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_2.txt";
+		nom.push_back(tmp_nom2);
+		const char * tmp_nom_a2 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_2.txt";
+		nom_a.push_back(tmp_nom_a2);
+		const char * tmp_nom3 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_3.txt";
+		nom.push_back(tmp_nom3);
+		const char * tmp_nom_a3 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_3.txt";
+		nom_a.push_back(tmp_nom_a3);
+		const char * tmp_nom4 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_4.txt";
+		nom.push_back(tmp_nom4);
+		const char * tmp_nom_a4 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_4.txt";
+		nom_a.push_back(tmp_nom_a4);
+		const char * tmp_nom5 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_5.txt";
+		nom.push_back(tmp_nom5);
+		const char * tmp_nom_a5 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_5.txt";
+		nom_a.push_back(tmp_nom_a5);
+		const char * tmp_nom6 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_6.txt";
+		nom.push_back(tmp_nom6);
+		const char * tmp_nom_a6 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_6.txt";
+		nom_a.push_back(tmp_nom_a6);
+		const char * tmp_nom7 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_7.txt";
+		nom.push_back(tmp_nom7);
+		const char * tmp_nom_a7 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_7.txt";
+		nom_a.push_back(tmp_nom_a7);
+		const char * tmp_nom8= "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_8.txt";
+		nom.push_back(tmp_nom8);
+		const char * tmp_nom_a8 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_8.txt";
+		nom_a.push_back(tmp_nom_a8);
+		const char * tmp_nom9 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_9.txt";
+		nom.push_back(tmp_nom9);
+		const char * tmp_nom_a9 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_9.txt";
+		nom_a.push_back(tmp_nom_a9);
+		const char * tmp_nom10 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_10.txt";
+		nom.push_back(tmp_nom10);
+		const char * tmp_nom_a10 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_10.txt";
+		nom_a.push_back(tmp_nom_a10);
+		const char * tmp_nom11 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_11.txt";
+		nom.push_back(tmp_nom11);
+		const char * tmp_nom_a11 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_11.txt";
+		nom_a.push_back(tmp_nom_a11);
+		const char * tmp_nom12 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_12.txt";
+		nom.push_back(tmp_nom12);
+		const char * tmp_nom_a12 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_12.txt";
+		nom_a.push_back(tmp_nom_a12);
+		const char * tmp_nom13 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_13.txt";
+		nom.push_back(tmp_nom13);
+		const char * tmp_nom_a13 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_13.txt";
+		nom_a.push_back(tmp_nom_a13);
+		const char * tmp_nom14 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_14.txt";
+		nom.push_back(tmp_nom14);
+		const char * tmp_nom_a14 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_14.txt";
+		nom_a.push_back(tmp_nom_a14);
+		const char * tmp_nom15 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_15.txt";
+		nom.push_back(tmp_nom15);
+		const char * tmp_nom_a15 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_15.txt";
+		nom_a.push_back(tmp_nom_a15);
+		const char * tmp_nom16 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_16.txt";
+		nom.push_back(tmp_nom16);
+		const char * tmp_nom_a16 = "../../sortie_graphe/Tests/Graphes/Multiniveau/txt/projection_partition_affine_16.txt";
+		nom_a.push_back(tmp_nom_a16);
+	}
+	
+    for(uint y =0 ; y < taille_list ; y++){
+    	if(!proj){
+    		projection(Partition,lit);
+    		if(rec)
+				Plot_UnorientedGraph_All(baseg.at(baseg.size()-2-y), 
+										 Partition,nom.at(y), true);
+
+    		double cut = Cut_cluster(Partition, 
+										*baseg.at(baseg.size()-2-y), 
+										parameters.at(3));
+    		if(parameters.at(2) == "charge")
+    			Affinage_equilibrage_charge(baseg.at(baseg.size()-2-y), 
+										Partition);
+    		else if(parameters.at(2) == "locale"){
+    			Affinage_recherche_locale(baseg.at(baseg.size()-2-y), 
+										Partition, cut, parameters.at(3));}
+    		else	
+    			Affinache_gain_diff(baseg.at(baseg.size()-2-y), 
+										Partition, cut, 
+										parameters.at(3), poids_moy);
+			
+			if(rec)
+				Plot_UnorientedGraph_All(baseg.at(baseg.size()-2-y), 
+										Partition, nom_a.at(y), true);
+			
+    		lit--;
+    	}
+
+    }
+}
+	 
+OrientedGraphs Multiniveau(OrientedGraph *go,
+                           const std::vector<uint> &numeric_parameters,
                            const std::vector<std::string> &parameters,
                            Edges& /* edge_partie */,
                            OutputEdgeList& outputedgelist,
                            InputEdgeList& inputedgelist,
-                           Connections& connections, bool rec, int distance)
+                           Connections& connections,
+                           bool rec, int distance)
 {   
-	/* std::vector<std::string> parameters :
-	 * 0 -> std::string contraction    : nom de la méthode de contraction
-	 * 1 -> std::string type_methode   : nom de la méthode de partitionnement
-	 * 2 -> std::string choix_affinage : nom de la méthode d'affinage
-	 * 3 -> std::string type_cut       : nom de la fonction objectif étudiée
-	 */
     boost::timer t;
     UnorientedGraph *g = new UnorientedGraph();
 	make_unoriented_graph(*go, *g); 
-    EntiersEntiers Partition;
-    Entiers *part = new Entiers();
     Base_Graph baseg;
     baseg.push_back(g);
     ListEntiersEntiers liste_corr;
     OrientedGraphs Graphes;
-    uint cpt =0;
     int val_cpt = num_vertices(*g);
     
-    if(niveau_contraction != val_cpt){
+    if(numeric_parameters.at(0) != val_cpt){
 			
-	    bool stop = false;
-	
-	    while(stop != true)
-	    {
-	    	if(parameters.at(0) == "HEM")
-				stop = contraction_HEM_degree(baseg.at(cpt),baseg,liste_corr,niveau_contraction,val_cpt);
-	    		//stop = contraction_HEM(baseg.at(cpt),baseg,liste_corr,niveau_contraction,val_cpt);
-	    	else
-	    		stop = contraction_Random_Maching(baseg.at(cpt),baseg,liste_corr,niveau_contraction,val_cpt);
-	        cpt++;
-	    }
-	
-		/*std::cout<<"Graphe contracté : "<<std::endl;
-		tie(vertexIt, vertexEnd) = vertices(*baseg.at(baseg.size()-1));
-		for (; vertexIt != vertexEnd; ++vertexIt) {
-		std::cout << (*baseg.at(baseg.size()-1))[*vertexIt]._index
-				<< " est connecté avec ";
-		tie(neighbourIt, neighbourEnd) = adjacent_vertices(*vertexIt,
-				*baseg.at(baseg.size()-1));
-		for (; neighbourIt != neighbourEnd; ++neighbourIt)
-			std::cout << (*baseg.at(baseg.size()-1))[*neighbourIt]._index << " ";
-		std::cout << " et son poids est de "
-				<< (*baseg.at(baseg.size()-1))[*vertexIt]._weight<<std::endl;
-				}
-		std::cout << std::endl;*/
+		Coarsening_Phase(baseg, liste_corr, numeric_parameters.at(0), val_cpt, parameters.at(0));
 	    
-	    if(rec == true){
-			std::ofstream GRAPHp ("../../sortie_graphe/Tests/Graphes/Evolution_bissection/poids_graphe.txt", std::ios::out);
+	    if(rec){
+			std::ofstream GRAPHp ("../../sortie_graphe/Tests/Graphes/Bissection/poids_graphe.txt", std::ios::out);
 			GRAPHp<<"Poids du graphe contracté : "<<std::endl;   
 			tie(vertexIt, vertexEnd) = vertices(*baseg.at(baseg.size()-1));
 			for (; vertexIt != vertexEnd; ++vertexIt) {
@@ -679,229 +806,61 @@ OrientedGraphs Multiniveau(uint niveau_contraction,
 	    //double t2 = t.elapsed();
 	    //std::cout << "C : " << t2 << " ; ";
 	    
-	    for(uint i = 0; i<num_vertices(*baseg.at(baseg.size() - 1)); i++){
-			part->push_back(i);
-		}
-		Partition.push_back(part);
+	    if(rec)
+			Plot_UnorientedGraph(baseg.at(baseg.size()-1),"../../sortie_graphe/Tests/Graphes/Multiniveau/txt/contraction_final.txt");
 		
 		UnorientedGraph copy_graph;
 		boost::copy_graph(*baseg.at(baseg.size()-1),copy_graph);
-		
-		if(rec == true){
-			Plot_UnorientedGraph_All(baseg.at(baseg.size()-1),Partition,"../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/contraction_final.txt", false);
-		}
-	    
-	    if(parameters.at(1) == "gggp" || parameters.at(1) == "ggp"){
-			bissectionRec(baseg.at(baseg.size()-1),Partition,nbr_parties, parameters.at(3), nbr_tirage, parameters.at(1), distance);
-	    }
-	    else
-	    	Partition = Random_partitioning(baseg.at(baseg.size()-1),nbr_parties);
+	
+		EntiersEntiers Partition = Partitioning_Phase(baseg, 
+							numeric_parameters, parameters, distance);
 	    
 	    //double t3 = t.elapsed();
 	    //std::cout << "P : " << (t3 - t2) << " ; ";
 	    
-	    if(rec == true){
-			Plot_UnorientedGraph_All(&copy_graph,Partition,"../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/contraction_final_partition.txt", true);
-		}
+	    if(rec)
+			Plot_UnorientedGraph_All(&copy_graph,Partition,"../../sortie_graphe/Tests/Graphes/Multiniveau/txt/contraction_final_partition.txt", true);
 				
 		double poids_moy = 0.;
-		for(uint i =0; i < Partition.size(); i++){
+		for(uint i =0; i < Partition.size(); i++)
 			poids_moy += Cluster_Weight(copy_graph,*Partition.at(i));
-		}
 		poids_moy/=Partition.size();
+		poids_moy = -1; /*poids faible*/
 		
-		poids_moy = -1;
-		
-		/*poids_moy = -1 implique un respect du poids faible*/
-		
-	    ListEntiersEntiers::iterator lit(liste_corr.end());
-	    bool proj;
-	    uint taille_list = liste_corr.size();
-	    if(liste_corr.size()==0){
-	    	taille_list = 1;
-	    	proj = true;
-	    }
-	    else{
-	    	lit--;
-	    	proj = false;
-	    }
-	
-		//std::cout<<"Nombre de contraction : "<<taille_list<<std::endl;
-		std::vector<const char* > nom;
-		std::vector<const char* > nom_a;
-		if(rec == true){
-			const char * tmp_nom1 = new const char();
-			tmp_nom1 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_1.txt";
-			nom.push_back(tmp_nom1);
-			const char * tmp_nom_a1 = new const char();
-			tmp_nom_a1 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_1.txt";
-			nom_a.push_back(tmp_nom_a1);
-			const char * tmp_nom2 = new const char();
-			tmp_nom2 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_2.txt";
-			nom.push_back(tmp_nom2);
-			const char * tmp_nom_a2 = new const char();
-			tmp_nom_a2 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_2.txt";
-			nom_a.push_back(tmp_nom_a2);
-			const char * tmp_nom3 = new const char();
-			tmp_nom3= "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_3.txt";
-			nom.push_back(tmp_nom3);
-			const char * tmp_nom_a3 = new const char();
-			tmp_nom_a3 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_3.txt";
-			nom_a.push_back(tmp_nom_a3);
-			const char * tmp_nom4 = new const char();
-			tmp_nom4= "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_4.txt";
-			nom.push_back(tmp_nom4);
-			const char * tmp_nom_a4 = new const char();
-			tmp_nom_a4 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_4.txt";
-			nom_a.push_back(tmp_nom_a4);
-			const char * tmp_nom5 = new const char();
-			tmp_nom5= "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_5.txt";
-			nom.push_back(tmp_nom5);
-			const char * tmp_nom_a5 = new const char();
-			tmp_nom_a5 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_5.txt";
-			nom_a.push_back(tmp_nom_a5);
-			const char * tmp_nom6 = new const char();
-			tmp_nom6= "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_6.txt";
-			nom.push_back(tmp_nom6);
-			const char * tmp_nom_a6 = new const char();
-			tmp_nom_a6 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_6.txt";
-			nom_a.push_back(tmp_nom_a6);
-			const char * tmp_nom7 = new const char();
-			tmp_nom7= "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_7.txt";
-			nom.push_back(tmp_nom7);
-			const char * tmp_nom_a7 = new const char();
-			tmp_nom_a7 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_7.txt";
-			nom_a.push_back(tmp_nom_a7);
-			const char * tmp_nom8 = new const char();
-			tmp_nom8= "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_8.txt";
-			nom.push_back(tmp_nom8);
-			const char * tmp_nom_a8 = new const char();
-			tmp_nom_a8 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_8.txt";
-			nom_a.push_back(tmp_nom_a8);
-			const char * tmp_nom9 = new const char();
-			tmp_nom9= "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_9.txt";
-			nom.push_back(tmp_nom9);
-			const char * tmp_nom_a9 = new const char();
-			tmp_nom_a9 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_9.txt";
-			nom_a.push_back(tmp_nom_a9);
-			const char * tmp_nom10 = new const char();
-			tmp_nom10= "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_10.txt";
-			nom.push_back(tmp_nom10);
-			const char * tmp_nom_a10 = new const char();
-			tmp_nom_a10 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_10.txt";
-			nom_a.push_back(tmp_nom_a10);
-			const char * tmp_nom11 = new const char();
-			tmp_nom11= "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_11.txt";
-			nom.push_back(tmp_nom11);
-			const char * tmp_nom_a11 = new const char();
-			tmp_nom_a11 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_11.txt";
-			nom_a.push_back(tmp_nom_a11);
-			const char * tmp_nom12 = new const char();
-			tmp_nom12= "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_12.txt";
-			nom.push_back(tmp_nom12);
-			const char * tmp_nom_a12 = new const char();
-			tmp_nom_a12 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_12.txt";
-			nom_a.push_back(tmp_nom_a12);
-			const char * tmp_nom13 = new const char();
-			tmp_nom13= "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_13.txt";
-			nom.push_back(tmp_nom13);
-			const char * tmp_nom_a13 = new const char();
-			tmp_nom_a13 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_13.txt";
-			nom_a.push_back(tmp_nom_a13);
-			const char * tmp_nom14 = new const char();
-			tmp_nom14= "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_14.txt";
-			nom.push_back(tmp_nom14);
-			const char * tmp_nom_a14 = new const char();
-			tmp_nom_a14 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_14.txt";
-			nom_a.push_back(tmp_nom_a14);
-			const char * tmp_nom15 = new const char();
-			tmp_nom15= "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_15.txt";
-			nom.push_back(tmp_nom15);
-			const char * tmp_nom_a15 = new const char();
-			tmp_nom_a15 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_15.txt";
-			nom_a.push_back(tmp_nom_a15);
-			const char * tmp_nom16 = new const char();
-			tmp_nom16= "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_16.txt";
-			nom.push_back(tmp_nom16);
-			const char * tmp_nom_a16 = new const char();
-			tmp_nom_a16 = "../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/projection_partition_affine_16.txt";
-			nom_a.push_back(tmp_nom_a16);
-		}
-	    for(uint y =0; y<taille_list;y++){
-	    	if(proj != true){
-	    		projection(Partition,lit);
-	    		if(rec == true){
-					Plot_UnorientedGraph_All(baseg.at(baseg.size()-2-y),Partition,nom.at(y), true);
-				}
-	
-	    		double cut = Cut_cluster(Partition,*baseg.at(baseg.size()-2-y),parameters.at(3));
-	    		//std::cout<<"Cout de coupe avant affinage : "<<cut<<std::endl;
-	    		if(parameters.at(2) == "charge")
-	    			Affinage_equilibrage_charge(baseg.at(baseg.size()-2-y),Partition);
-	    		else if(parameters.at(2) == "locale"){
-	    			Affinage_recherche_locale(baseg.at(baseg.size()-2-y),Partition,cut,parameters.at(3));}
-	    		else	
-	    			Affinache_gain_diff(baseg.at(baseg.size()-2-y), Partition, cut, parameters.at(3), poids_moy);
-				//std::cout<<"Cout de coupe après affinage : "<<cut<<std::endl;
-				
-				if(rec == true){
-					Plot_UnorientedGraph_All(baseg.at(baseg.size()-2-y),Partition,nom_a.at(y), true);
-				}
-				
-	    		lit--;
-	    	}
-	
-	    }
-	    
-	    //double t4 = t.elapsed();
-	    //std::cout << "A : " << (t4 - t3) << std::endl;
-	    //std::cout << "Temps total : " << t4  << " seconds" << std::endl;
-	    
-	   /*std::cout<<"Partition : "<<std::endl;
-		for(int x =0; x<Partition.size(); x++){
-			std::cout<<"*"<<x<<"* ";
-			for(int y =0; y<Partition.at(x)->size();y++){
-				std::cout<<Partition.at(x)->at(y)<<" ";
-			}
-			std::cout<<std::endl;
-		}
-		std::cout<<std::endl;
-		
-		for(uint i =0; i < Partition.size(); i++){
-			std::cout<<"Poids partie "<<i<<" : "<<Cluster_Weight(*g,*Partition.at(i))<<std::endl;
-		}*/
+		Uncoarsening_Phase(baseg, Partition, parameters, 
+								  liste_corr, poids_moy, rec);
 		
 		Graphes = Graph_Partition(Partition, go, g, outputedgelist,
-	                                             inputedgelist, connections);
-	                                             
+	                              inputedgelist, connections);
+	    if(rec)
+			Plot_OrientedGraph_All(go,Partition,"../../sortie_graphe/Tests/Graphes/Multiniveau/txt/résultat_partitionnement.txt", true);
+		
+		for(uint it = 0 ; it < Partition.size(); it++ )
+		{
+			delete Partition.at(it);
+		}	                                         
 	}else{
-		for(uint i = 0; i<num_vertices(*g); i++){
-			part->push_back(i);
-		}
-		Partition.push_back(part);
-	
 		UnorientedGraph *copie_g = new UnorientedGraph();
 		boost::copy_graph(*g,*copie_g);
-	    if(parameters.at(1) == "gggp" || parameters.at(1) == "ggp"){
-			bissectionRec(copie_g,Partition,nbr_parties,parameters.at(3),nbr_tirage,parameters.at(1), distance);
-		}
-		else
-			Partition = Random_partitioning(copie_g,nbr_parties);
+		
+		EntiersEntiers Partition = Partitioning_Phase(baseg, 
+								   numeric_parameters, parameters, 
+								   distance);
 			
-		Graphes = Graph_Partition(Partition, go, copie_g, outputedgelist,
-                                             inputedgelist, connections);
+		Graphes = Graph_Partition(Partition, go, copie_g, 
+								  outputedgelist, inputedgelist,
+								  connections);
+                                             
+        if(rec)
+			Plot_OrientedGraph_All(go,Partition,"../../sortie_graphe/Tests/Graphes/Multiniveau/txt/résultat_partitionnement.txt", true);
+		
+		delete copie_g;
+		for(uint it = 0 ; it < Partition.size(); it++ )
+		{
+			delete Partition.at(it);
+		}
 	}
     
-	if(rec == true){
-		Plot_OrientedGraph(go,Partition,"../../sortie_graphe/Tests/Graphes/txt/Niveau_contraction/résultat_partitionnement.txt", true);
-	}
-
-    for(EntiersEntiers::iterator it = Partition.begin(); it != Partition.end(); it++)
-    {
-        delete *it;
-        *it = NULL;
-    }
-
     for(ListEntiersEntiers::iterator it = liste_corr.begin(); it != liste_corr.end(); it++)
     {
         for(EntiersEntiers::iterator it1 = (*it)->begin(); it1 != (*it)->end(); it1++)
@@ -924,14 +883,16 @@ OrientedGraphs Multiniveau(uint niveau_contraction,
     return Graphes;
 }
 
-void Optimisation_method_neighbour(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition, int nbr_tirage, const std::string &name_cut, const std::string &name_strat){
+void Optimisation_method_neighbour(UnorientedGraph *g, 
+			EntiersEntiers &Partition, int index_partition, 
+			int nbr_tirage, const std::string &name_cut, 
+			const std::string &name_strat){
+				
 	/*Initialisation des parametres*/
-	//UnorientedGraph *copy_g_ref = new UnorientedGraph();
 	Entiers *part2_cons = new Entiers();
 	Entiers *part_cour_cons = new Entiers();
 	Entiers Random_list_vertices;
 	double cut = 1000000000.;
-	//boost::copy_graph(*g,*copy_g_ref);
 
 	for (uint i=0 ; i<Partition.at(index_partition)->size() ; i++)
 		Random_list_vertices.push_back(i);
@@ -941,49 +902,43 @@ void Optimisation_method_neighbour(UnorientedGraph *g, EntiersEntiers &Partition
 		Random_list_vertices[j] = Random_list_vertices[rand_pos];
 		Random_list_vertices[rand_pos] = tmp;
 	}
-	
-	/*for(uint i = 0; i < Partition.at(index_partition)->size(); i++){
-		std::cout<<Partition.at(index_partition)->at(i)<<" ";
-	}
-	std::cout<<std::endl;*/
 		
 	if(Partition.at(index_partition)->size()< nbr_tirage)
 		nbr_tirage = Partition.at(index_partition)->size();
 		
 	/*Boucle de conservation de la meilleure bissection*/
 	for(int k = 0; k<nbr_tirage; k++){
-		//UnorientedGraph *copy_g =  new UnorientedGraph();
 		Entiers *part2 = new Entiers();
 		Entiers *tmp_part = new Entiers();
 		double new_cut;
-		//boost::copy_graph(*g,*copy_g);
 
 		/*Recopie de la partie faisant l'objet de la bissection */
-		for(uint t=0; t<Partition.at(index_partition)->size();t++){
+		for(uint t=0; t<Partition.at(index_partition)->size();t++)
 			tmp_part->push_back(Partition.at(index_partition)->at(t));
-		}
 		
-		//std::cout<<"Sommet de départ : "<<(*g)[Random_list_vertices.at(k)]._index<<std::endl;
-		if(name_strat == "gggp"){
-			gggp_pond(g,tmp_part,part2,Partition,Random_list_vertices.at(k),index_partition, name_cut ,-1);
-		} else if(name_strat == "ggp"){
-			ggp(g,tmp_part,part2,Partition,Random_list_vertices.at(k), index_partition ,-1);
-		} else {
+		if(name_strat == "gggp")
+			gggp_pond(g, tmp_part, part2, Partition, 
+					  Random_list_vertices.at(k), index_partition,
+					  name_cut , -1);
+		else if(name_strat == "ggp")
+			ggp(g, tmp_part, part2, Partition, 
+					  Random_list_vertices.at(k), index_partition ,-1);
+		else
 			std::cout<<"Nom de stratégie de partitionnement non valide ! "<<std::endl;
-		}
 		
-		new_cut = Best_Cut_cluster(Partition, tmp_part, part2, index_partition,*g,name_cut);
+		new_cut = Best_Cut_cluster(Partition, tmp_part, 
+					  part2, index_partition, *g, name_cut);
 		
-		//std::cout<<"Cout de coupe : "<<new_cut<<std::endl;
-		//std::cout<<std::endl;
-		if(new_cut<cut){ /*conservation de l'information en cas d'amélioration de la contrainte*/
+		/*conservation de l'information en cas d'amélioration 
+		 * de la contrainte*/
+		if(new_cut<cut){ 
 			cut = new_cut;
-			//copy_g_ref = copy_g;
+			delete part2_cons;
+			delete part_cour_cons;
 			part2_cons = part2;
 			part_cour_cons = tmp_part;
 		}
 		else{
-			//delete copy_g;
 			delete tmp_part;
 			delete part2;
 		}	
@@ -997,31 +952,18 @@ void Optimisation_method_neighbour(UnorientedGraph *g, EntiersEntiers &Partition
         }
     }
     
-    /*std::cout<<"Ensemble 1 : ";
-		for(uint i = 0; i < part_cour_cons->size(); i++){
-			std::cout<<part_cour_cons->at(i)<<" ";
-		}
-		std::cout<<std::endl;
-		std::cout<<"Ensemble 2 : ";
-		for(uint j = 0; j < part2_cons->size(); j++){
-			std::cout<<part2_cons->at(j)<<" ";
-		}
-		std::cout<<std::endl;
-		std::cout<<std::endl;*/
 	/*Modification des informations*/
+	delete Partition.at(index_partition);
 	Partition.at(index_partition)=part_cour_cons;
 	Partition.push_back(part2_cons);
-	//g=copy_g_ref;
-	
-	/*std::cout<<std::endl;
-	std::cout<<"Bissection réalisé"<<std::endl;
-	std::cout<<std::endl;*/
 }
 
-void Optimisation_method_neighbour_distance(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition, int nbr_tirage, int distance,
-	const std::string &name_cut, const std::string &name_strat){
+void Optimisation_method_neighbour_distance(UnorientedGraph *g, 
+			EntiersEntiers &Partition, int index_partition, 
+			int nbr_tirage, int distance, const std::string &name_cut, 
+			const std::string &name_strat){
 	
-	//Initialisation des parametres
+	/*Initialisation des parametres*/
 	Entiers *part2_cons = new Entiers();
 	Entiers *part_cour_cons = new Entiers();
 	double cut=1000000000.;
@@ -1032,31 +974,20 @@ void Optimisation_method_neighbour_distance(UnorientedGraph *g, EntiersEntiers &
 		vertex_list.push_back(Partition.at(index_partition)->at(verx));
 	}
 	
-	/*std::list<int>::iterator toto;
-	for(toto = vertex_list.begin(); toto != vertex_list.end(); toto ++)
-		std::cout<<*toto<<" ";
-		
-	std::cout<<std::endl;*/
-	
 	if(Partition.at(index_partition)->size()< nbr_tirage)
 		nbr_tirage = Partition.at(index_partition)->size();
 		
-	//Boucle de conservation de la meilleure bissection
+	/*Boucle de conservation de la meilleure bissection*/
 	for(int k = 0; k<nbr_tirage; k++){
-		//Tirage
 		std::list<int>::iterator Iter;
 		if(vertex_list.size()!=0){
-		//std::cout<<"Il reste des sommets à tirer"<<std::endl;
-		Iter = vertex_list.begin();
-		for(int i = 0; i<rand_fini(0,vertex_list.size()); i++){
-			Iter++;
-		}
-		val = *Iter;
-		//std::cout<<"Sommet tiré : "<<*Iter<<std::endl;
-		tirage_distance(g, *Iter, vertex_list, distance);
+			Iter = vertex_list.begin();
+			for(int i = 0; i<rand_fini(0,vertex_list.size()); i++)
+				Iter++;
+			val = *Iter;
+			tirage_distance(g, *Iter, vertex_list, distance);
 		}
 		else{	
-			//std::cout<<"Tous les sommets sont verrouillés"<<std::endl;
 			break;
 		}
 		
@@ -1064,38 +995,26 @@ void Optimisation_method_neighbour_distance(UnorientedGraph *g, EntiersEntiers &
 		Entiers *tmp_part = new Entiers();
 		double new_cut;
 
-		//Recopie de la partie faisant l'objet de la bissection 
-		for(uint t=0; t<Partition.at(index_partition)->size();t++){
+		/*Recopie de la partie faisant l'objet de la bissection*/
+		for(uint t=0; t<Partition.at(index_partition)->size();t++)
 			tmp_part->push_back(Partition.at(index_partition)->at(t));
-		}
 		
-		//std::cout<<"Sommet tirée avant entré dans gggp : "<<*Iter<<std::endl;
-		if(name_strat == "gggp"){
-			gggp_pond(g,tmp_part,part2,Partition,val,index_partition, name_cut, distance);
-		} else if(name_strat == "ggp"){
-			ggp(g,tmp_part,part2,Partition,val,index_partition, distance);
-		} else {
+		if(name_strat == "gggp")
+			gggp_pond(g, tmp_part, part2, Partition, val, 
+					  index_partition, name_cut, distance);
+		else if(name_strat == "ggp")
+			ggp(g, tmp_part, part2, Partition, val, 
+					  index_partition, distance);
+		else
 			std::cout<<"Nom de stratégie de partitionnement non valide ! "<<std::endl;
-		}
 		
-		/*std::cout<<"tmp_part"<<std::endl;
-		for(int alpha = 0; alpha<tmp_part->size(); alpha ++){
-			std::cout<<tmp_part->at(alpha)<<" ";
-		}
-		std::cout<<std::endl;
-		std::cout<<"part2"<<std::endl;
-		for(int alpho = 0; alpho<part2->size(); alpho ++){
-			std::cout<<part2->at(alpho)<<" ";
-		}
-		std::cout<<std::endl;
-		std::cout<<std::endl;*/
+		new_cut = Best_Cut_cluster(Partition, tmp_part, part2, 
+					  index_partition, *g,name_cut);
 		
-		new_cut = Best_Cut_cluster(Partition, tmp_part, part2, index_partition, *g,name_cut);
-
-		//std::cout<<"Cout de coupe : "<<new_cut<<std::endl;
-		
-		if(new_cut<cut){ //conservation de l'information en cas d'amélioration de la contrainte
+		if(new_cut<cut){ 
 			cut = new_cut;
+			delete part2_cons;
+			delete part_cour_cons;
 			part2_cons = part2;
 			part_cour_cons = tmp_part;
 		}
@@ -1103,34 +1022,34 @@ void Optimisation_method_neighbour_distance(UnorientedGraph *g, EntiersEntiers &
 			delete tmp_part;
 			delete part2;
 		}
-		//std::cout<<"Un tour de plus dans la boucle k"<<std::endl;	
 	}
 	
 	for (uint i=0; i<part_cour_cons->size();i++)
     {
         for (uint j=0; j<part2_cons->size();j++)
         {
-			remove_edge(part_cour_cons->at(i),part2_cons->at(j),*g);
+			remove_edge(part_cour_cons->at(i), part2_cons->at(j), *g);
         }
     }
-	//Modification des informations
+    
+	/*Modification des informations*/
+	delete Partition.at(index_partition);
 	Partition.at(index_partition)=part_cour_cons;
 	Partition.push_back(part2_cons);
-	
-	/*std::cout<<std::endl;
-	std::cout<<"Bissection réalisé"<<std::endl;
-	std::cout<<std::endl;*/
 }
 
-void Optimisation_method_neighbour_degree(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition,
-	const std::string &name_cut, const std::string &name_strat){
+void Optimisation_method_neighbour_degree(UnorientedGraph *g, 
+			EntiersEntiers &Partition, int index_partition,
+			const std::string &name_cut, 
+			const std::string &name_strat){
 	
 	std::vector<double> vertex_degree;
 	Entiers *part2 = new Entiers();
 	
-	for(uint i =0; i<Partition.at(index_partition)->size(); i++){
-		vertex_degree.push_back(Degree(*g, Partition.at(index_partition)->at(i)));
-	}
+	for(uint i =0; i<Partition.at(index_partition)->size(); i++)
+		vertex_degree.push_back(Degree(*g, 
+								Partition.at(index_partition)->at(i)));
+
 	
 	uint best_cpt = 0;
 	double  best_degree = vertex_degree.at(0);
@@ -1142,28 +1061,30 @@ void Optimisation_method_neighbour_degree(UnorientedGraph *g, EntiersEntiers &Pa
 		}
 	}
 	
-	if(name_strat == "gggp"){
-		gggp_pond(g,Partition.at(index_partition),part2,Partition,best_cpt,index_partition,name_cut,-1);
-	} else if(name_strat == "ggp"){
-		ggp(g,Partition.at(index_partition),part2,Partition,best_cpt,index_partition,-1);
-	} else {
+	if(name_strat == "gggp")
+		gggp_pond(g, Partition.at(index_partition), part2, 
+				  Partition, best_cpt, index_partition,
+				  name_cut, -1);
+	else if(name_strat == "ggp")
+		ggp(g ,Partition.at(index_partition), part2, Partition, 
+				  best_cpt, index_partition, -1);
+	else
 		std::cout<<"Nom de stratégie de partitionnement non valide ! "<<std::endl;
-	}
 	
-	for (uint i=0; i<Partition.at(index_partition)->size();i++)
-    {
-        for (uint j=0; j<part2->size();j++)
-        {
-			remove_edge(Partition.at(index_partition)->at(i),part2->at(j),*g);
+	for (uint i=0; i<Partition.at(index_partition)->size();i++){
+        for (uint j=0; j<part2->size();j++){
+			remove_edge(Partition.at(index_partition)->at(i), 
+						part2->at(j), *g);
         }
     }
 
-	Partition.push_back(part2);
-	
+	Partition.push_back(part2);	
 }
 
-void Optimisation_method_neighbour_minweight(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition,
-	const std::string &name_cut, const std::string &name_strat){
+void Optimisation_method_neighbour_minweight(UnorientedGraph *g, 
+					EntiersEntiers &Partition, int index_partition,
+					const std::string &name_cut, 
+					const std::string &name_strat){
 	
 	std::vector<double> vertex_weight;
 	Entiers *part2 = new Entiers();
@@ -1189,9 +1110,12 @@ void Optimisation_method_neighbour_minweight(UnorientedGraph *g, EntiersEntiers 
 	}
 	
 	if(name_strat == "gggp"){
-		gggp_pond(g,Partition.at(index_partition),part2,Partition,best_cpt,index_partition,name_cut,-1);
+		gggp_pond(g, Partition.at(index_partition), part2,
+					 Partition, best_cpt, index_partition, 
+					 name_cut, -1);
 	} else if(name_strat == "ggp"){
-		ggp(g,Partition.at(index_partition),part2,Partition,best_cpt,index_partition,-1);
+		ggp(g, Partition.at(index_partition), part2,
+					 Partition, best_cpt, index_partition, -1);
 	} else {
 		std::cout<<"Nom de stratégie de partitionnement non valide ! "<<std::endl;
 	}
@@ -1200,7 +1124,8 @@ void Optimisation_method_neighbour_minweight(UnorientedGraph *g, EntiersEntiers 
     {
         for (uint j=0; j<part2->size();j++)
         {
-			remove_edge(Partition.at(index_partition)->at(i),part2->at(j),*g);
+			remove_edge(Partition.at(index_partition)->at(i), 
+					 part2->at(j), *g);
         }
     }
 
@@ -1208,48 +1133,36 @@ void Optimisation_method_neighbour_minweight(UnorientedGraph *g, EntiersEntiers 
 	
 }
 
-void tirage_distance(UnorientedGraph *g, int tirage, std::list<int> &vertex_list, int distance){
+void tirage_distance(UnorientedGraph *g, int tirage, 
+						std::list<int> &vertex_list, int distance){
 	std::vector<std::list<int> > vertex_delete;
 	std::list<int> liste1;
 	std::list<int> vd;
 
-	liste1.push_back(tirage); /*modif*/
+	liste1.push_back(tirage);
 	vertex_delete.push_back(liste1);
 		
 	for(int i=0; i<distance; i++){
 		std::list<int> liste_tmp;
 		std::list<int>::iterator Ite_tmp;
-		for(Ite_tmp = vertex_delete.at(i).begin(); Ite_tmp != vertex_delete.at(i).end(); Ite_tmp ++){
-			tie(neighbourIt, neighbourEnd) = adjacent_vertices(*Ite_tmp,*g);
+		for(Ite_tmp = vertex_delete.at(i).begin();
+								Ite_tmp != vertex_delete.at(i).end();
+								Ite_tmp ++){
+			tie(neighbourIt, neighbourEnd) = 
+								adjacent_vertices(*Ite_tmp,*g);
 			for (; neighbourIt != neighbourEnd; ++neighbourIt){
-				liste_tmp.push_back(*neighbourIt);/*modif*/
+				liste_tmp.push_back(*neighbourIt);
 			}
 		}
 		liste_tmp.sort();
 		liste_tmp.unique();
 		vertex_delete.push_back(liste_tmp);
 	}
-	//std::cout<<std::endl;
-		
-	/*for(int i =0; i<vertex_delete.size(); i++){
-		std::list<int>::iterator Ite_tmp;
-		for(Ite_tmp = vertex_delete.at(i).begin(); Ite_tmp != vertex_delete.at(i).end(); Ite_tmp ++){
-			std::cout<<*Ite_tmp<<" ";	
-		}
-		std::cout<<std::endl;
-	}
-	std::cout<<std::endl;*/
 	
 	for(int index = 0; index < vertex_delete.size(); index ++){
 		vd.merge(vertex_delete.at(index));
 	}
 	vd.unique();
-	
-	/*std::list<int>::iterator Ite_tmp;
-	for(Ite_tmp = vd.begin(); Ite_tmp != vd.end(); Ite_tmp ++){
-		std::cout<<*Ite_tmp<<" ";	
-	}
-	std::cout<<std::endl;*/
 		
 	std::list<int>::iterator Ite;
 	for(Ite = vd.begin(); Ite != vd.end(); Ite ++){

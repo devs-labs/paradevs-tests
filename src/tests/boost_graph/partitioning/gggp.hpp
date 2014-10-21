@@ -33,43 +33,69 @@
 namespace paradevs { namespace tests { namespace boost_graph {
 
 void ggp(UnorientedGraph *g, Entiers *sommetsSource,
-         Entiers *sommetsDestination, EntiersEntiers &Partition, int rand , int &index_partition, int distance);
+							Entiers *sommetsDestination, 
+							EntiersEntiers &Partition, 
+							int rand , int &index_partition,
+							int distance);
 
 void gggp_pond(UnorientedGraph *g, Entiers *sommetsSource,
-               Entiers *sommetsDestination, EntiersEntiers &Partition, int rand, int &index_partition, const std::string &name , int distance);
+							Entiers *sommetsDestination, 
+							EntiersEntiers &Partition, int rand, 
+							int &index_partition,
+							const std::string &name, int distance);
 
 void Iter_2l(EntiersEntiers &part, int nbr_parties, UnorientedGraph *g,
-             const std::string &nom_cut, int nbr_tirage, const std::string &nom_strat, int distance = -1);
+							const std::string &nom_cut, int nbr_tirage, 
+							const std::string &nom_strat, bool rec,
+							int distance = -1);
 
 void bissectionRec(UnorientedGraph *g, EntiersEntiers &Partition,
-                   int nbr_parties, const std::string &nom_cut, int nbr_tirage, const std::string &nom_strat, int distance = -1);
+							int nbr_parties, const std::string &nom_cut, 
+							int nbr_tirage, const std::string &nom_strat,
+							int distance = -1);
 
-void Pseudo_random_partitioning(UnorientedGraph *g, EntiersEntiers &Partition,
-                                uint nbr_parties);
+void Pseudo_random_partitioning(UnorientedGraph *g, 
+							EntiersEntiers &Partition,
+                            uint nbr_parties);
 
 EntiersEntiers Random_partitioning(UnorientedGraph *g,
-                                uint parts_number);
+                            uint parts_number);
 
-OrientedGraphs Multiniveau(uint niveau_contraction,
-                           OrientedGraph *go, int nbr_parties, int nbr_tirage,
-                           const std::vector<std::string> &parameters, 
-                           /*std::string contraction,
-                           std::string type_methode,
-                           std::string choix_affinage,
-                           std::string type_cut,*/
-                           Edges &edge_partie,
-                           OutputEdgeList &outputedgeslist,
-                           InputEdgeList &inputedgelist,
-                           Connections &connections,
-                           bool rec,
-                           int distance = -1);
-void Optimisation_method_neighbour(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition, int nbr_tirage, const std::string &name_cut, const std::string &name_strat);
-void Optimisation_method_neighbour_distance(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition, int nbr_tirage, int distance, const std::string &name_cut, 
-	const std::string &name_strat);
-void Optimisation_method_neighbour_degree(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition,const std::string &name_cut, const std::string &name_strat);
-void Optimisation_method_neighbour_minweight(UnorientedGraph *g, EntiersEntiers &Partition, int index_partition,
-	const std::string &name_cut, const std::string &name_strat);
-void tirage_distance(UnorientedGraph *g, int tirage, std::list<int> &vertex_list, int distance);
+OrientedGraphs Multiniveau(OrientedGraph *go,
+							const std::vector<uint> &numeric_parameters,
+							const std::vector<std::string> &parameters, 
+							Edges &edge_partie,
+							OutputEdgeList &outputedgeslist,
+							InputEdgeList &inputedgelist,
+							Connections &connections,
+							bool rec, int distance = -1);
+
+void Optimisation_method_neighbour(UnorientedGraph *g, 
+						    EntiersEntiers &Partition,
+							int index_partition, int nbr_tirage,
+						    const std::string &name_cut, 
+				   		    const std::string &name_strat);
+								   
+void Optimisation_method_neighbour_distance(UnorientedGraph *g, 
+							EntiersEntiers &Partition, 
+							int index_partition, int nbr_tirage, 
+							int distance, const std::string &name_cut, 
+							const std::string &name_strat);
+							
+void Optimisation_method_neighbour_degree(UnorientedGraph *g, 
+							EntiersEntiers &Partition, 
+							int index_partition, 
+							const std::string &name_cut, 
+							const std::string &name_strat);
+							
+void Optimisation_method_neighbour_minweight(UnorientedGraph *g, 
+							EntiersEntiers &Partition, 
+							int index_partition,
+							const std::string &name_cut, 
+							const std::string &name_strat);
+							
+void tirage_distance(UnorientedGraph *g, int tirage, 
+							std::list<int> &vertex_list, int distance);
 
 } } } // namespace paradevs tests boost_graph
 

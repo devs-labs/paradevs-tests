@@ -290,7 +290,7 @@ const double duration_random = 0;
 void test_flat_random()
 {
     boost::timer t;
-    int nbr_ite = 20;
+    uint nbr_ite = 20;
 
     log_file << "== Random Graph ==" << std::endl;
     log_file << "flat graph with heap = ";
@@ -405,7 +405,7 @@ const double duration_random_grid = 40;
 void test_flat_random_grid()
 {
     boost::timer t;
-    int nbr_ite = 10;
+    uint nbr_ite = 10;
 
     log_file << "== Random Graph ==" << std::endl;
     log_file << "flat graph with heap = ";
@@ -458,7 +458,7 @@ const double duration_random_linked = 30;
 void test_flat_random_linked()
 {
     boost::timer t;
-    int nbr_ite = 20;
+    uint nbr_ite = 20;
 
     log_file << "== Random Linked Graph ==" << std::endl;
     log_file << "flat graph with heap = ";
