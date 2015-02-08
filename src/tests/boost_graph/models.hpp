@@ -35,15 +35,13 @@ namespace paradevs { namespace tests { namespace boost_graph {
 struct TopPixelParameters
 { };
 
-template < class SchedulerHandle>
 class TopPixel :
-    public paradevs::pdevs::Dynamics < common::DoubleTime, SchedulerHandle,
-                                       TopPixelParameters >
+    public paradevs::pdevs::Dynamics < common::DoubleTime, TopPixelParameters >
 {
 public:
     TopPixel(const std::string& name,
              const TopPixelParameters& parameters) :
-        paradevs::pdevs::Dynamics < common::DoubleTime, SchedulerHandle,
+        paradevs::pdevs::Dynamics < common::DoubleTime,
                                     TopPixelParameters >(name, parameters),
         _value(0)
     { }
@@ -69,18 +67,17 @@ public:
         typename common::DoubleTime::type /* t */) const
     { return 1; }
 
-    virtual common::Bag < common::DoubleTime, SchedulerHandle > lambda(
+    virtual common::Bag < common::DoubleTime > lambda(
         typename common::DoubleTime::type /* t */) const
     {
 
         // std::cout << TopPixel < SchedulerHandle >::get_name() << " at "
         //           << t << ": lambda" << std::endl;
 
-        common::Bag < common::DoubleTime, SchedulerHandle > bag;
+        common::Bag < common::DoubleTime > bag;
 
-        bag.push_back(common::ExternalEvent <
-                          common::DoubleTime, SchedulerHandle >(
-                              "out", (void*)&_value));
+        bag.push_back(common::ExternalEvent < common::DoubleTime >(
+                          "out", (void*)&_value));
         return bag;
     }
 
@@ -96,15 +93,14 @@ struct NormalPixelParameters
     unsigned int _neighbour_number;
 };
 
-template < class SchedulerHandle>
 class NormalPixel :
-    public paradevs::pdevs::Dynamics < common::DoubleTime, SchedulerHandle,
+    public paradevs::pdevs::Dynamics < common::DoubleTime,
                                        NormalPixelParameters >
 {
 public:
     NormalPixel(const std::string& name,
              const NormalPixelParameters& parameters) :
-        paradevs::pdevs::Dynamics < common::DoubleTime, SchedulerHandle,
+        paradevs::pdevs::Dynamics < common::DoubleTime,
                                     NormalPixelParameters >(name, parameters),
         _neighbour_number(parameters._neighbour_number), _value(0)
     { }
@@ -127,16 +123,14 @@ public:
 
     virtual void dext(typename common::DoubleTime::type t,
                       typename common::DoubleTime::type /* e */,
-                      const common::Bag < common::DoubleTime,
-                                          SchedulerHandle >& bag)
+                      const common::Bag < common::DoubleTime >& bag)
     {
 
         // std::cout << NormalPixel < SchedulerHandle >::get_name() << " at "
         //           << t << ": dext -> "
         //           << bag.to_string() << std::endl;
 
-        for (typename common::Bag < common::DoubleTime,
-                                    SchedulerHandle >::const_iterator it =
+        for (typename common::Bag < common::DoubleTime >::const_iterator it =
                  bag.begin(); it != bag.end(); ++it) {
             if (it->on_port("in")) {
                 if (_last_time == t) {
@@ -183,19 +177,18 @@ public:
         }
     }
 
-    virtual common::Bag < common::DoubleTime, SchedulerHandle > lambda(
+    virtual common::Bag < common::DoubleTime > lambda(
         typename common::DoubleTime::type /* t */) const
     {
 
         // std::cout << NormalPixel < SchedulerHandle >::get_name() << " at "
         //           << t << ": lambda" << std::endl;
 
-        common::Bag < common::DoubleTime, SchedulerHandle > bag;
+        common::Bag < common::DoubleTime > bag;
 
         if (_phase == SEND) {
-            bag.push_back(common::ExternalEvent <
-                              common::DoubleTime, SchedulerHandle >(
-                                  "out", (void*)&_value));
+            bag.push_back(common::ExternalEvent < common::DoubleTime >(
+                              "out", (void*)&_value));
         }
         return bag;
     }

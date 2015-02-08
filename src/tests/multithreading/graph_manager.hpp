@@ -36,31 +36,27 @@
 
 namespace paradevs { namespace tests { namespace multithreading {
 
-template < class SchedulerHandle >
 class S1GraphManager :
-        public paradevs::pdevs::GraphManager < common::DoubleTime,
-                                               SchedulerHandle >
+        public paradevs::pdevs::GraphManager < common::DoubleTime >
 {
 public:
-    S1GraphManager(common::Coordinator < common::DoubleTime,
-                                         SchedulerHandle >* coordinator,
+    S1GraphManager(common::Coordinator < common::DoubleTime >* coordinator,
                    const paradevs::common::NoParameters& parameters) :
-        paradevs::pdevs::GraphManager < common::DoubleTime,
-                                        SchedulerHandle >(coordinator,
+        paradevs::pdevs::GraphManager < common::DoubleTime >(coordinator,
                                                           parameters),
-        a("a1", common::NoParameters()), b("b1", common::NoParameters())
+        a("a1", common::NoParameters()),
+        b("b1", common::NoParameters())
     {
-        S1GraphManager < SchedulerHandle >::add_child(&a);
-        S1GraphManager < SchedulerHandle >::add_child(&b);
+        add_child(&a);
+        add_child(&b);
 
         a.add_out_port("out");
         b.add_in_port("in");
         b.add_out_port("out");
         coordinator->add_out_port("out");
 
-        S1GraphManager < SchedulerHandle >::add_link(&a, "out", &b, "in");
-        S1GraphManager < SchedulerHandle >::add_link(&b, "out",
-                                                     coordinator, "out");
+        add_link(&a, "out", &b, "in");
+        add_link(&b, "out", coordinator, "out");
     }
 
     void init()
@@ -70,8 +66,7 @@ public:
     { }
 
     void transition(
-        const common::Models < common::DoubleTime,
-                               pdevs::SchedulerHandle >& /* receivers */,
+        const common::Models < common::DoubleTime >& /* receivers */,
         common::DoubleTime::type /* t */)
     { }
 
@@ -79,39 +74,30 @@ public:
     { }
 
 private:
-    paradevs::pdevs::Simulator < common::DoubleTime,
-                                 pdevs::A < SchedulerHandle >,
-                                 SchedulerHandle > a;
-    paradevs::pdevs::Simulator < common::DoubleTime,
-                                 pdevs::B < SchedulerHandle >,
-                                 SchedulerHandle > b;
+    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::A  > a;
+    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::B  > b;
 };
 
-template < class SchedulerHandle >
 class S2GraphManager :
-        public paradevs::pdevs::GraphManager < common::DoubleTime,
-                                               SchedulerHandle >
+        public paradevs::pdevs::GraphManager < common::DoubleTime >
 {
 public:
-    S2GraphManager(common::Coordinator < common::DoubleTime,
-                                         SchedulerHandle >* coordinator,
+    S2GraphManager(common::Coordinator < common::DoubleTime >* coordinator,
                    const paradevs::common::NoParameters& parameters) :
-        paradevs::pdevs::GraphManager < common::DoubleTime,
-                                        SchedulerHandle >(coordinator,
-                                                          parameters),
+        paradevs::pdevs::GraphManager < common::DoubleTime >(coordinator,
+                                                             parameters),
         a("a2", common::NoParameters()), b("b2", common::NoParameters())
     {
-        S2GraphManager < SchedulerHandle >::add_child(&a);
-        S2GraphManager < SchedulerHandle >::add_child(&b);
+        add_child(&a);
+        add_child(&b);
 
         a.add_in_port("in");
         a.add_out_port("out");
         b.add_in_port("in");
         coordinator->add_in_port("in");
 
-        S2GraphManager < SchedulerHandle >::add_link(&a, "out", &b, "in");
-        S2GraphManager < SchedulerHandle >::add_link(coordinator, "in",
-                                                     &a, "in");
+        add_link(&a, "out", &b, "in");
+        add_link(coordinator, "in", &a, "in");
     }
 
     void init()
@@ -121,8 +107,7 @@ public:
     { }
 
     void transition(
-        const common::Models < common::DoubleTime,
-                               pdevs::SchedulerHandle >& /* receivers */,
+        const common::Models < common::DoubleTime >& /* receivers */,
         common::DoubleTime::type /* t */)
     { }
 
@@ -130,25 +115,18 @@ public:
     { }
 
 private:
-    paradevs::pdevs::Simulator < common::DoubleTime,
-                                 pdevs::A < SchedulerHandle >,
-                                 SchedulerHandle > a;
-    paradevs::pdevs::Simulator < common::DoubleTime,
-                                 pdevs::B < SchedulerHandle >,
-                                 SchedulerHandle > b;
+    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::A  > a;
+    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::B  > b;
 };
 
 class RootGraphManager :
-        public paradevs::pdevs::GraphManager < common::DoubleTime,
-                                               pdevs::SchedulerHandle >
+        public paradevs::pdevs::GraphManager < common::DoubleTime >
 {
 public:
     RootGraphManager(
-        common::Coordinator < common::DoubleTime,
-                              pdevs::SchedulerHandle >* coordinator,
+        common::Coordinator < common::DoubleTime >* coordinator,
         const paradevs::common::NoParameters& parameters) :
-        paradevs::pdevs::GraphManager < common::DoubleTime,
-                                        pdevs::SchedulerHandle >(
+        paradevs::pdevs::GraphManager < common::DoubleTime >(
                                             coordinator, parameters),
         S1("S1", paradevs::common::NoParameters(),
            paradevs::common::NoParameters()),
@@ -166,17 +144,11 @@ public:
         S1.set_sender(
             dynamic_cast < paradevs::pdevs::multithreading::Coordinator <
                 common::DoubleTime,
-                paradevs::common::scheduler::HeapScheduler <
-                    common::DoubleTime, pdevs::SchedulerHandle >,
-                pdevs::SchedulerHandle,
                 paradevs::tests::multithreading::RootGraphManager >*
             >(get_coordinator())->get_sender());
         S2.set_sender(
             dynamic_cast < paradevs::pdevs::multithreading::Coordinator <
                 common::DoubleTime,
-                paradevs::common::scheduler::HeapScheduler <
-                    common::DoubleTime, pdevs::SchedulerHandle >,
-                pdevs::SchedulerHandle,
                 paradevs::tests::multithreading::RootGraphManager >*
             >(get_coordinator())->get_sender());
     }
@@ -191,8 +163,7 @@ public:
                 common::DoubleTime >(t));
     }
 
-    void transition(const common::Models < common::DoubleTime,
-                                           pdevs::SchedulerHandle >& receivers,
+    void transition(const common::Models < common::DoubleTime >& receivers,
                     common::DoubleTime::type t)
     {
         if (std::find(receivers.begin(), receivers.end(),
@@ -215,28 +186,20 @@ public:
 private:
     paradevs::pdevs::multithreading::Coordinator <
         common::DoubleTime,
-        pdevs::SchedulerType,
-        pdevs::SchedulerHandle,
-        S1GraphManager < pdevs::SchedulerHandle > > S1;
+        S1GraphManager > S1;
     paradevs::pdevs::multithreading::Coordinator <
         common::DoubleTime,
-        pdevs::SchedulerType,
-        pdevs::SchedulerHandle,
-        S2GraphManager < pdevs::SchedulerHandle > > S2;
+        S2GraphManager > S2;
 };
 
-template < class SchedulerHandle >
 class S3GraphManager :
-        public paradevs::pdevs::GraphManager < common::DoubleTime,
-                                               SchedulerHandle >
+        public paradevs::pdevs::GraphManager < common::DoubleTime >
 {
 public:
-    S3GraphManager(common::Coordinator < common::DoubleTime,
-                                         SchedulerHandle >* coordinator,
+    S3GraphManager(common::Coordinator < common::DoubleTime >* coordinator,
                    const paradevs::common::NoParameters& parameters) :
-        paradevs::pdevs::GraphManager < common::DoubleTime,
-                                        SchedulerHandle >(coordinator,
-                                                          parameters)
+        paradevs::pdevs::GraphManager < common::DoubleTime >(coordinator,
+                                                             parameters)
     {
         coordinator->add_out_port("out");
         for (unsigned int i = 0; i < 10; ++i) {
@@ -246,7 +209,7 @@ public:
 
             ss << "a" << (i + 1);
             _simulators.push_back(s);
-            S3GraphManager < SchedulerHandle >::add_child(s);
+            add_child(s);
             s->add_out_port("out");
         }
     }
@@ -258,8 +221,7 @@ public:
     { }
 
     void transition(
-        const common::Models < common::DoubleTime,
-                               pdevs::SchedulerHandle >& /* receivers */,
+        const common::Models < common::DoubleTime >& /* receivers */,
         common::DoubleTime::type /* t */)
     { }
 
@@ -273,23 +235,19 @@ public:
 
 private:
     typedef paradevs::pdevs::Simulator < common::DoubleTime,
-                                         pdevs::A < SchedulerHandle >,
-                                         SchedulerHandle > simulator_type;
+                                         pdevs::A > simulator_type;
 
     std::vector < simulator_type* > _simulators;
 };
 
 class Root2GraphManager :
-        public paradevs::pdevs::GraphManager < common::DoubleTime,
-                                               pdevs::SchedulerHandle >
+        public paradevs::pdevs::GraphManager < common::DoubleTime >
 {
 public:
     Root2GraphManager(
-        common::Coordinator < common::DoubleTime,
-                              pdevs::SchedulerHandle >* coordinator,
+        common::Coordinator < common::DoubleTime >* coordinator,
         const paradevs::common::NoParameters& parameters) :
-        paradevs::pdevs::GraphManager < common::DoubleTime,
-                                        pdevs::SchedulerHandle >(
+        paradevs::pdevs::GraphManager < common::DoubleTime >(
                                             coordinator, parameters),
         S1("S1", paradevs::common::NoParameters(),
            paradevs::common::NoParameters()),
@@ -305,17 +263,11 @@ public:
         S1.set_sender(
             dynamic_cast < paradevs::pdevs::multithreading::Coordinator <
                 common::DoubleTime,
-                paradevs::common::scheduler::HeapScheduler <
-                    common::DoubleTime, pdevs::SchedulerHandle >,
-                pdevs::SchedulerHandle,
                 paradevs::tests::multithreading::Root2GraphManager >*
             >(get_coordinator())->get_sender());
         S2.set_sender(
             dynamic_cast < paradevs::pdevs::multithreading::Coordinator <
                 common::DoubleTime,
-                paradevs::common::scheduler::HeapScheduler <
-                    common::DoubleTime, pdevs::SchedulerHandle >,
-                pdevs::SchedulerHandle,
                 paradevs::tests::multithreading::Root2GraphManager >*
             >(get_coordinator())->get_sender());
     }
@@ -330,8 +282,7 @@ public:
                 common::DoubleTime >(t));
     }
 
-    void transition(const common::Models < common::DoubleTime,
-                                           pdevs::SchedulerHandle >& receivers,
+    void transition(const common::Models < common::DoubleTime >& receivers,
                     common::DoubleTime::type t)
     {
         if (std::find(receivers.begin(), receivers.end(),
@@ -354,27 +305,20 @@ public:
 private:
     paradevs::pdevs::multithreading::Coordinator <
         common::DoubleTime,
-        pdevs::SchedulerType,
-        pdevs::SchedulerHandle,
-        S3GraphManager < pdevs::SchedulerHandle > > S1;
+        S3GraphManager > S1;
     paradevs::pdevs::multithreading::Coordinator <
         common::DoubleTime,
-        pdevs::SchedulerType,
-        pdevs::SchedulerHandle,
-        S3GraphManager < pdevs::SchedulerHandle > > S2;
+        S3GraphManager > S2;
 };
 
 class Root3GraphManager :
-        public paradevs::pdevs::GraphManager < common::DoubleTime,
-                                               pdevs::SchedulerHandle >
+        public paradevs::pdevs::GraphManager < common::DoubleTime >
 {
 public:
     Root3GraphManager(
-        common::Coordinator < common::DoubleTime,
-                              pdevs::SchedulerHandle >* coordinator,
+        common::Coordinator < common::DoubleTime >* coordinator,
         const paradevs::common::NoParameters& parameters) :
-        paradevs::pdevs::GraphManager < common::DoubleTime,
-                                        pdevs::SchedulerHandle >(
+        paradevs::pdevs::GraphManager < common::DoubleTime >(
                                             coordinator, parameters),
         S1("S1", paradevs::common::NoParameters(),
            paradevs::common::NoParameters()),
@@ -391,14 +335,10 @@ public:
 private:
     paradevs::pdevs::Coordinator <
         common::DoubleTime,
-        pdevs::SchedulerType,
-        pdevs::SchedulerHandle,
-        S3GraphManager < pdevs::SchedulerHandle > > S1;
+        S3GraphManager > S1;
     paradevs::pdevs::Coordinator <
         common::DoubleTime,
-        pdevs::SchedulerType,
-        pdevs::SchedulerHandle,
-        S3GraphManager < pdevs::SchedulerHandle > > S2;
+        S3GraphManager > S2;
 };
 
 } } } // namespace paradevs tests multithreading

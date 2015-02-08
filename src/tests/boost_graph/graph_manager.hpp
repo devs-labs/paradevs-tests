@@ -28,7 +28,7 @@
 #define __TESTS_BOOST_GRAPH_GRAPH_MANAGER_HPP 1
 
 #include <paradevs/common/scheduler/HeapScheduler.hpp>
-#include <paradevs/common/scheduler/VectorScheduler.hpp>
+// #include <paradevs/common/scheduler/VectorScheduler.hpp>
 
 #include <paradevs/kernel/pdevs/Coordinator.hpp>
 #include <paradevs/kernel/pdevs/GraphManager.hpp>
@@ -41,28 +41,28 @@
 
 namespace paradevs { namespace tests { namespace boost_graph {
 
-struct SchedulerHandle;
+// struct SchedulerHandle;
 
-typedef typename paradevs::common::scheduler::HeapScheduler <
-    common::DoubleTime, SchedulerHandle >::type SchedulerType;
+// typedef typename paradevs::common::scheduler::HeapScheduler <
+//     common::DoubleTime, SchedulerHandle >::type SchedulerType;
 
-struct SchedulerHandle
-{
-    SchedulerHandle()
-    { }
+// struct SchedulerHandle
+// {
+//     SchedulerHandle()
+//     { }
 
-    SchedulerHandle(const SchedulerType::handle_type& handle)
-        : _handle(handle)
-    { }
+//     SchedulerHandle(const SchedulerType::handle_type& handle)
+//         : _handle(handle)
+//     { }
 
-    const SchedulerHandle& handle() const
-    { return *this; }
+//     const SchedulerHandle& handle() const
+//     { return *this; }
 
-    void handle(const SchedulerHandle& handle)
-    { _handle = handle._handle; }
+//     void handle(const SchedulerHandle& handle)
+//     { _handle = handle._handle; }
 
-    SchedulerType::handle_type _handle;
-};
+//     SchedulerType::handle_type _handle;
+// };
 
 struct GraphParameters
 {
@@ -77,18 +77,15 @@ struct GraphParameters
     { }
 };
 
-template < class SchedulerHandle, class Parameters >
+template < class Parameters >
 class FlatGraphManager :
         public paradevs::pdevs::GraphManager < common::DoubleTime,
-                                               SchedulerHandle,
                                                Parameters >
 {
 public:
-    FlatGraphManager(common::Coordinator < common::DoubleTime,
-                                           SchedulerHandle >* coordinator,
+    FlatGraphManager(common::Coordinator < common::DoubleTime >* coordinator,
         const Parameters& parameters) :
-        paradevs::pdevs::GraphManager < common::DoubleTime, SchedulerHandle,
-                                        Parameters >(
+        paradevs::pdevs::GraphManager < common::DoubleTime, Parameters >(
             coordinator, parameters)
     { }
 
@@ -119,11 +116,10 @@ public:
             case TOP_PIXEL:
                 _top_simulators[g[*vertexIt]._index] =
                     new pdevs::Simulator <
-                        common::DoubleTime, TopPixel < SchedulerHandle >,
-                        SchedulerHandle,
+                        common::DoubleTime, TopPixel,
                         TopPixelParameters >(ss.str(), TopPixelParameters());
                 _top_simulators[g[*vertexIt]._index]->add_out_port("out");
-                FlatGraphManager < SchedulerHandle, Parameters >::add_child(
+                FlatGraphManager < Parameters >::add_child(
                     _top_simulators[g[*vertexIt]._index]);
                 break;
             case NORMAL_PIXEL:
@@ -151,12 +147,12 @@ public:
                 }
                 _normal_simulators[g[*vertexIt]._index] =
                     new pdevs::Simulator <
-                        common::DoubleTime, NormalPixel < SchedulerHandle >,
-                        SchedulerHandle, NormalPixelParameters >(
+                        common::DoubleTime, NormalPixel,
+                        NormalPixelParameters >(
                             ss.str(), NormalPixelParameters(n));
                 _normal_simulators[g[*vertexIt]._index]->add_in_port("in");
                 _normal_simulators[g[*vertexIt]._index]->add_out_port("out");
-                FlatGraphManager < SchedulerHandle, Parameters >::add_child(
+                FlatGraphManager < Parameters >::add_child(
                     _normal_simulators[g[*vertexIt]._index]);
                 break;
             };
@@ -170,10 +166,8 @@ public:
             boost::tie(neighbourIt, neighbourEnd) =
                 boost::adjacent_vertices(*vertexIt, g);
             for (; neighbourIt != neighbourEnd; ++neighbourIt) {
-                paradevs::common::Model < common::DoubleTime,
-                                          SchedulerHandle >* a = 0;
-                paradevs::common::Model < common::DoubleTime,
-                                          SchedulerHandle >* b = 0;
+                paradevs::common::Model < common::DoubleTime >* a = 0;
+                paradevs::common::Model < common::DoubleTime >* b = 0;
 
                 if (g[*vertexIt]._type == TOP_PIXEL) {
                     a = _top_simulators[g[*vertexIt]._index];
@@ -185,8 +179,7 @@ public:
                 } else {
                     b = _normal_simulators[g[*neighbourIt]._index];
                 }
-                FlatGraphManager < SchedulerHandle,
-                                   Parameters >::add_link(a, "out",
+                FlatGraphManager < Parameters >::add_link(a, "out",
                                                           b, "in");
             }
         }
@@ -195,32 +188,28 @@ public:
 protected:
     typedef std::map < int, pdevs::Simulator <
                                 common::DoubleTime,
-                                TopPixel < SchedulerHandle >,
-                                SchedulerHandle,
+                                TopPixel,
                                 TopPixelParameters >* > TopSimulators;
     typedef std::map < int, pdevs::Simulator <
                                 common::DoubleTime,
-                                NormalPixel < SchedulerHandle >,
-                                SchedulerHandle,
+                                NormalPixel,
                                 NormalPixelParameters >* > NormalSimulators;
 
     TopSimulators    _top_simulators;
     NormalSimulators _normal_simulators;
 };
 
-template < class SchedulerHandle >
 class BuiltFlatGraphManager :
-        public FlatGraphManager < SchedulerHandle, GraphParameters >
+        public FlatGraphManager < GraphParameters >
 {
 public:
     BuiltFlatGraphManager(
-        common::Coordinator < common::DoubleTime,
-                              SchedulerHandle >* coordinator,
+        common::Coordinator < common::DoubleTime >* coordinator,
         const GraphParameters& parameters) :
-        FlatGraphManager < SchedulerHandle, GraphParameters >(
+        FlatGraphManager < GraphParameters >(
             coordinator, parameters)
     {
-        BuiltFlatGraphManager < SchedulerHandle >::build_flat_graph(
+        BuiltFlatGraphManager::build_flat_graph(
             parameters._graph, parameters._input_edges);
         // input
 
@@ -234,10 +223,9 @@ public:
             if (not coordinator->exist_in_port(ss_in.str())) {
                 coordinator->add_in_port(ss_in.str());
             }
-            BuiltFlatGraphManager < SchedulerHandle>::add_link(
+            BuiltFlatGraphManager::add_link(
                 coordinator, ss_in.str(),
-                BuiltFlatGraphManager <
-                    SchedulerHandle >::_normal_simulators[it->second], "in");
+                BuiltFlatGraphManager::_normal_simulators[it->second], "in");
 
             // std::cout << "link = " << coordinator->get_name()
             //           << "::" << ss_in.str() << " -> "
@@ -259,17 +247,13 @@ public:
                 coordinator->add_out_port(ss_out.str());
             }
 
-            if (BuiltFlatGraphManager <
-                    SchedulerHandle >::_normal_simulators.find(it->first) !=
-                BuiltFlatGraphManager <
-                    SchedulerHandle >::_normal_simulators.end()) {
-                if (not BuiltFlatGraphManager < SchedulerHandle>::exist_link(
-                        BuiltFlatGraphManager <
-                            SchedulerHandle >::_normal_simulators[it->first],
+            if (BuiltFlatGraphManager::_normal_simulators.find(it->first) !=
+                BuiltFlatGraphManager::_normal_simulators.end()) {
+                if (not BuiltFlatGraphManager::exist_link(
+                        BuiltFlatGraphManager::_normal_simulators[it->first],
                         "out", coordinator, ss_out.str())) {
-                    BuiltFlatGraphManager < SchedulerHandle>::add_link(
-                        BuiltFlatGraphManager <
-                            SchedulerHandle >::_normal_simulators[it->first],
+                    BuiltFlatGraphManager::add_link(
+                        BuiltFlatGraphManager::_normal_simulators[it->first],
                         "out", coordinator, ss_out.str());
 
                     // std::cout << "link = " << BuiltFlatGraphManager <
@@ -280,13 +264,11 @@ public:
                     //           << std::endl;
                 }
             } else {
-                if (not BuiltFlatGraphManager < SchedulerHandle>::exist_link(
-                        BuiltFlatGraphManager <
-                            SchedulerHandle >::_top_simulators[it->first],
+                if (not BuiltFlatGraphManager::exist_link(
+                        BuiltFlatGraphManager::_top_simulators[it->first],
                         "out", coordinator, ss_out.str())) {
-                    BuiltFlatGraphManager < SchedulerHandle>::add_link(
-                        BuiltFlatGraphManager <
-                            SchedulerHandle >::_top_simulators[it->first],
+                    BuiltFlatGraphManager::add_link(
+                        BuiltFlatGraphManager::_top_simulators[it->first],
                         "out", coordinator, ss_out.str());
 
                     // std::cout << "link = " << BuiltFlatGraphManager <
@@ -305,19 +287,17 @@ public:
     { }
 };
 
-template < class SchedulerHandle >
 class ParallelBuiltFlatGraphManager :
-        public FlatGraphManager < SchedulerHandle, GraphParameters >
+        public FlatGraphManager < GraphParameters >
 {
 public:
     ParallelBuiltFlatGraphManager(
-        common::Coordinator < common::DoubleTime,
-                              SchedulerHandle >* coordinator,
+        common::Coordinator < common::DoubleTime >* coordinator,
         const GraphParameters& parameters) :
-        FlatGraphManager < SchedulerHandle, GraphParameters >(
+        FlatGraphManager < GraphParameters >(
             coordinator, parameters)
     {
-        ParallelBuiltFlatGraphManager < SchedulerHandle >::build_flat_graph(
+        ParallelBuiltFlatGraphManager::build_flat_graph(
             parameters._graph, parameters._input_edges);
         // input
         for (Edges::const_iterator it = parameters._input_edges.begin();
@@ -328,10 +308,10 @@ public:
             if (not coordinator->exist_in_port(ss_in.str())) {
                 coordinator->add_in_port(ss_in.str());
             }
-            ParallelBuiltFlatGraphManager < SchedulerHandle>::add_link(
+            ParallelBuiltFlatGraphManager::add_link(
                 coordinator, ss_in.str(),
-                ParallelBuiltFlatGraphManager <
-                    SchedulerHandle >::_normal_simulators[it->second], "in");
+                ParallelBuiltFlatGraphManager::_normal_simulators[it->second],
+                "in");
         }
         // output
         for (Edges::const_iterator it = parameters._output_edges.begin();
@@ -342,13 +322,12 @@ public:
             if (not coordinator->exist_out_port(ss_out.str())) {
                 coordinator->add_out_port(ss_out.str());
             }
-            if (not ParallelBuiltFlatGraphManager < SchedulerHandle >::exist_link(
-                ParallelBuiltFlatGraphManager <
-                    SchedulerHandle >::_normal_simulators[it->first], "out",
+            if (not ParallelBuiltFlatGraphManager::exist_link(
+                ParallelBuiltFlatGraphManager::_normal_simulators[it->first],
+                "out",
                 coordinator, ss_out.str())) {
-                ParallelBuiltFlatGraphManager < SchedulerHandle>::add_link(
-                    ParallelBuiltFlatGraphManager <
-                        SchedulerHandle >::_normal_simulators[it->first], "out",
+                ParallelBuiltFlatGraphManager::add_link(
+                    ParallelBuiltFlatGraphManager::_normal_simulators[it->first], "out",
                     coordinator, ss_out.str());
             }
         }
@@ -361,8 +340,7 @@ public:
     { }
 
     void transition(
-        const common::Models < common::DoubleTime,
-                               SchedulerHandle >& /* receivers */,
+        const common::Models < common::DoubleTime >& /* receivers */,
         common::DoubleTime::type /* t */)
     { }
 
@@ -370,17 +348,15 @@ public:
     { }
 };
 
-template < class SchedulerHandle, class GraphBuilder >
+template < class GraphBuilder >
 class InBuildFlatGraphManager :
-        public FlatGraphManager < SchedulerHandle,
-                                  paradevs::common::NoParameters >
+        public FlatGraphManager < paradevs::common::NoParameters >
 {
 public:
     InBuildFlatGraphManager(
-        common::Coordinator < common::DoubleTime,
-                              SchedulerHandle >* coordinator,
+        common::Coordinator < common::DoubleTime >* coordinator,
         const paradevs::common::NoParameters& parameters) :
-        FlatGraphManager < SchedulerHandle, paradevs::common::NoParameters >(
+        FlatGraphManager < paradevs::common::NoParameters >(
             coordinator, parameters)
     {
         GraphBuilder   builder;
@@ -390,8 +366,7 @@ public:
         Connections    parent_connections;
 
         builder.build(graphs, input_edges, output_edges, parent_connections);
-        InBuildFlatGraphManager < SchedulerHandle,
-                                  GraphBuilder >::build_flat_graph(
+        InBuildFlatGraphManager < GraphBuilder >::build_flat_graph(
                                       graphs.front(), InputEdges());
     }
 
@@ -417,18 +392,16 @@ struct PartitioningParameters
     { }
 };
 
-template < class SchedulerHandle, class GraphBuilder >
+template < class GraphBuilder >
 class HeapHierarchicalGraphManager :
         public paradevs::pdevs::GraphManager < common::DoubleTime,
-                                               SchedulerHandle,
                                                PartitioningParameters >
 {
 public:
     HeapHierarchicalGraphManager(
-        common::Coordinator < common::DoubleTime,
-                              SchedulerHandle >* coordinator,
+        common::Coordinator < common::DoubleTime >* coordinator,
         const PartitioningParameters& parameters) :
-        paradevs::pdevs::GraphManager < common::DoubleTime, SchedulerHandle,
+        paradevs::pdevs::GraphManager < common::DoubleTime,
                                         PartitioningParameters >(
                                             coordinator, parameters)
     {
@@ -446,7 +419,7 @@ public:
                             parent_connections);
 
         // build coordinators (graphs)
-        //boost::timer t; 
+        //boost::timer t;
 
         for (unsigned int i = 0; i < graphs.size(); ++i) {
             Coordinator* coordinator = 0;
@@ -458,8 +431,7 @@ public:
                                 GraphParameters(graphs[i], input_edges[i],
                                                 output_edges[i]));
             _coordinators.push_back(coordinator);
-            HeapHierarchicalGraphManager < SchedulerHandle,
-                                           GraphBuilder >::add_child(
+            HeapHierarchicalGraphManager < GraphBuilder >::add_child(
                                                coordinator);
 
         }
@@ -477,7 +449,7 @@ public:
             ss_in << "in_" << connection.first.second;
 
             if (not HeapHierarchicalGraphManager <
-                    SchedulerHandle, GraphBuilder >::exist_link(
+                    GraphBuilder >::exist_link(
                         _coordinators[connection.first.first - 1],
                         ss_out.str(),
                         _coordinators[connection.second.first - 1],
@@ -492,7 +464,7 @@ public:
                 //           << "::" << ss_in.str() << std::endl;
 
                 HeapHierarchicalGraphManager <
-                    SchedulerHandle, GraphBuilder >::add_link(
+                    GraphBuilder >::add_link(
                         _coordinators[connection.first.first - 1],
                         ss_out.str(),
                         _coordinators[connection.second.first - 1],
@@ -514,9 +486,7 @@ public:
 private:
     typedef paradevs::pdevs::Coordinator <
         common::DoubleTime,
-        SchedulerType,
-        SchedulerHandle,
-        BuiltFlatGraphManager < SchedulerHandle >,
+        BuiltFlatGraphManager,
         common::NoParameters,
         GraphParameters > Coordinator;
     typedef std::vector < Coordinator* > Coordinators;
@@ -524,111 +494,16 @@ private:
     Coordinators _coordinators;
 };
 
-template < class SchedulerHandle, class GraphBuilder >
-class VectorHierarchicalGraphManager :
-        public paradevs::pdevs::GraphManager < common::DoubleTime,
-                                               SchedulerHandle,
-                                               PartitioningParameters >
-{
-public:
-    VectorHierarchicalGraphManager(
-        common::Coordinator < common::DoubleTime,
-                              SchedulerHandle >* coordinator,
-        const PartitioningParameters& parameters) :
-        paradevs::pdevs::GraphManager < common::DoubleTime, SchedulerHandle,
-                                        PartitioningParameters >(
-                                            coordinator, parameters)
-    {
-        GraphBuilder   graph_builder(parameters.cluster_number,
-                                     parameters.partitioning_method_name,
-                                     parameters.contraction_coef,
-                                     parameters.contraction_coef_flag,
-                                     parameters.generator);
-        OrientedGraphs graphs;
-        InputEdgeList  input_edges;
-        OutputEdgeList output_edges;
-        Connections    parent_connections;
-
-        graph_builder.build(graphs, input_edges, output_edges,
-                            parent_connections);
-
-        // build coordinators (graphs)
-        for (unsigned int i = 0; i < graphs.size(); ++i) {
-            Coordinator* coordinator = 0;
-            std::ostringstream ss;
-
-            ss << "S" << i;
-            coordinator =
-                new Coordinator(ss.str(), paradevs::common::NoParameters(),
-                                GraphParameters(graphs[i], input_edges[i],
-                                                output_edges[i]));
-            _coordinators.push_back(coordinator);
-            VectorHierarchicalGraphManager < SchedulerHandle,
-                                             GraphBuilder >::add_child(
-                                                 coordinator);
-
-        }
-
-        // builds internal connections (edges)
-        for (Connections::const_iterator it = parent_connections.begin();
-             it != parent_connections.end(); ++it) {
-            const Connection& connection = *it;
-            std::ostringstream ss_out;
-            std::ostringstream ss_in;
-
-            ss_out << "out_" << connection.first.second;
-            ss_in << "in_" << connection.first.second;
-
-            if (not VectorHierarchicalGraphManager <
-                    SchedulerHandle, GraphBuilder >::exist_link(
-                        _coordinators[connection.first.first - 1],
-                        ss_out.str(),
-                        _coordinators[connection.second.first - 1],
-                        ss_in.str())) {
-                VectorHierarchicalGraphManager <
-                    SchedulerHandle, GraphBuilder >::add_link(
-                        _coordinators[connection.first.first - 1],
-                        ss_out.str(),
-                        _coordinators[connection.second.first - 1],
-                        ss_in.str());
-            }
-        }
-    }
-
-    virtual ~VectorHierarchicalGraphManager()
-    {
-        for (typename Coordinators::const_iterator it = _coordinators.begin();
-             it != _coordinators.end(); ++it) {
-            delete *it;
-        }
-    }
-
-private:
-    typedef paradevs::pdevs::Coordinator <
-    common::DoubleTime,
-    paradevs::common::scheduler::VectorScheduler <
-        paradevs::common::DoubleTime >,
-    paradevs::common::scheduler::NoSchedulerHandle,
-    BuiltFlatGraphManager < paradevs::common::scheduler::NoSchedulerHandle >,
-    common::NoParameters,
-    GraphParameters > Coordinator;
-    typedef std::vector < Coordinator* > Coordinators;
-
-    Coordinators _coordinators;
-};
-
-template < class SchedulerHandle, class GraphBuilder >
+template < class GraphBuilder >
 class ParallelHeapHierarchicalGraphManager :
         public paradevs::pdevs::GraphManager < common::DoubleTime,
-                                               SchedulerHandle,
                                                PartitioningParameters >
 {
 public:
     ParallelHeapHierarchicalGraphManager(
-        common::Coordinator < common::DoubleTime,
-                              SchedulerHandle >* coordinator,
+        common::Coordinator < common::DoubleTime >* coordinator,
         const PartitioningParameters& parameters) :
-        paradevs::pdevs::GraphManager < common::DoubleTime, SchedulerHandle,
+        paradevs::pdevs::GraphManager < common::DoubleTime,
                                         PartitioningParameters >(
                                             coordinator, parameters)
     {
@@ -658,9 +533,8 @@ public:
                                                         input_edges[i],
                                                         output_edges[i]));
             _coordinators.push_back(coordinator);
-            ParallelHeapHierarchicalGraphManager < SchedulerHandle,
-                                                   GraphBuilder >::add_child(
-                                                       coordinator);
+            ParallelHeapHierarchicalGraphManager < GraphBuilder >::add_child(
+                coordinator);
 
         }
 
@@ -675,13 +549,13 @@ public:
             ss_in << "in_" << connection.first.second;
 
             if (not ParallelHeapHierarchicalGraphManager <
-                    SchedulerHandle, GraphBuilder >::exist_link(
+                    GraphBuilder >::exist_link(
                         _coordinators[connection.first.first - 1],
                         ss_out.str(),
                         _coordinators[connection.second.first - 1],
                         ss_in.str())) {
                 ParallelHeapHierarchicalGraphManager <
-                    SchedulerHandle, GraphBuilder >::add_link(
+                    GraphBuilder >::add_link(
                         _coordinators[connection.first.first - 1],
                         ss_out.str(),
                         _coordinators[connection.second.first - 1],
@@ -705,15 +579,11 @@ public:
             (*it)->set_sender(
                 dynamic_cast < paradevs::pdevs::multithreading::Coordinator <
                     common::DoubleTime,
-                    SchedulerType,
-                    SchedulerHandle,
                     ParallelHeapHierarchicalGraphManager <
-                        SchedulerHandle,
                         PartitioningGraphBuilder >,
                     paradevs::common::NoParameters,
                     PartitioningParameters >*
-                >(ParallelHeapHierarchicalGraphManager < SchedulerHandle,
-                                                         GraphBuilder >::
+                >(ParallelHeapHierarchicalGraphManager < GraphBuilder >::
                   get_coordinator())->get_sender());
         }
     }
@@ -728,8 +598,7 @@ public:
         }
     }
 
-    void transition(const common::Models < common::DoubleTime,
-                    SchedulerHandle >& receivers,
+    void transition(const common::Models < common::DoubleTime >& receivers,
                     paradevs::common::DoubleTime::type t)
     {
         typename Coordinators::const_iterator it = _coordinators.begin();
@@ -751,10 +620,7 @@ public:
 private:
     typedef paradevs::pdevs::multithreading::Coordinator <
     common::DoubleTime,
-    SchedulerType,
-    SchedulerHandle,
-    ParallelBuiltFlatGraphManager
-    < SchedulerHandle >,
+    ParallelBuiltFlatGraphManager,
     common::NoParameters,
     GraphParameters > ParallelCoordinator;
 

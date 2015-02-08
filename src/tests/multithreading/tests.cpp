@@ -46,9 +46,6 @@ TEST_CASE("pdevs/multithreading/hierachical", "run")
     paradevs::common::RootCoordinator <
         DoubleTime, paradevs::pdevs::multithreading::Coordinator <
             DoubleTime,
-            paradevs::common::scheduler::HeapScheduler <
-                DoubleTime, SchedulerHandle >,
-            SchedulerHandle,
             paradevs::tests::multithreading::RootGraphManager >
         > rc(0, 100, "root", paradevs::common::NoParameters(),
              paradevs::common::NoParameters());
@@ -71,9 +68,6 @@ TEST_CASE("pdevs/classic/hierachical", "run")
     paradevs::common::RootCoordinator <
         DoubleTime, paradevs::pdevs::Coordinator <
             DoubleTime,
-            paradevs::common::scheduler::HeapScheduler <
-                DoubleTime, SchedulerHandle >,
-            SchedulerHandle,
             paradevs::tests::pdevs::RootGraphManager >
         > rc(0, 100, "root", paradevs::common::NoParameters(),
              paradevs::common::NoParameters());
@@ -95,9 +89,6 @@ TEST_CASE("pdevs/multithreading/independant", "run")
     paradevs::common::RootCoordinator <
         DoubleTime, paradevs::pdevs::multithreading::Coordinator <
             DoubleTime,
-            paradevs::common::scheduler::HeapScheduler <
-                DoubleTime, SchedulerHandle >,
-            SchedulerHandle,
             paradevs::tests::multithreading::Root2GraphManager >
         > rc(0, 100, "root", paradevs::common::NoParameters(),
              paradevs::common::NoParameters());
@@ -120,9 +111,6 @@ TEST_CASE("pdevs/classic/independant", "run")
     paradevs::common::RootCoordinator <
         DoubleTime, paradevs::pdevs::Coordinator <
             DoubleTime,
-            paradevs::common::scheduler::HeapScheduler <
-                DoubleTime, SchedulerHandle >,
-            SchedulerHandle,
             paradevs::tests::multithreading::Root3GraphManager >
         > rc(0, 100, "root", paradevs::common::NoParameters(),
              paradevs::common::NoParameters());
@@ -136,4 +124,3 @@ TEST_CASE("pdevs/classic/independant", "run")
 
     std::cout << "classic/independant -> " << time_span.count() << std::endl;
 }
-

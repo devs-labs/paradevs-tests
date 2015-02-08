@@ -41,9 +41,6 @@ TEST_CASE("mixed/hierachical", "run")
         DoubleTime,
         paradevs::pdevs::Coordinator <
             DoubleTime,
-            paradevs::common::scheduler::HeapScheduler <
-                DoubleTime, SchedulerHandle >,
-            SchedulerHandle,
             RootGraphManager >
         > rc(0, 100, "root");
 

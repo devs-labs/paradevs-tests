@@ -27,24 +27,22 @@
 #ifndef TESTS_DTSS_GRAPH_MANAGER_HPP
 #define TESTS_DTSS_GRAPH_MANAGER_HPP 1
 
+#include <tests/dtss/models.hpp>
+
 #include <paradevs/kernel/dtss/Coordinator.hpp>
 #include <paradevs/kernel/dtss/GraphManager.hpp>
 #include <paradevs/kernel/dtss/Simulator.hpp>
 
-#include <tests/dtss/models.hpp>
-
 namespace paradevs { namespace tests { namespace dtss {
 
-template < class SchedulerHandle >
 struct Policy
 {
-    const common::Bag < common::DoubleTime, SchedulerHandle >& bag() const
+    const common::Bag < common::DoubleTime >& bag() const
     { return _bag; }
 
     virtual void operator()(
         common::DoubleTime::type /* t */,
-        const common::ExternalEvent < common::DoubleTime,
-                                      SchedulerHandle >& event,
+        const common::ExternalEvent < common::DoubleTime >& event,
         common::DoubleTime::type /* tl */,
         common::DoubleTime::type /* tn */)
     {
@@ -53,65 +51,56 @@ struct Policy
     }
 
 private:
-    common::Bag < common::DoubleTime, SchedulerHandle > _bag;
+    common::Bag < common::DoubleTime > _bag;
 };
 
-template < class SchedulerHandle >
 class OnlyOneGraphManager :
         public paradevs::dtss::GraphManager < common::DoubleTime,
-                                              SchedulerHandle,
                                               paradevs::common::NoParameters >
 {
 public:
-    OnlyOneGraphManager(common::Coordinator < common::DoubleTime,
-                                              SchedulerHandle >* coordinator,
+    OnlyOneGraphManager(common::Coordinator < common::DoubleTime >* coordinator,
                         const paradevs::common::NoParameters& parameters) :
-        paradevs::dtss::GraphManager < common::DoubleTime, SchedulerHandle,
+        paradevs::dtss::GraphManager < common::DoubleTime,
                                        paradevs::common::NoParameters >(
                                            coordinator, parameters),
-        a("a", 1, common::NoParameters())
+        a("a", 1., common::NoParameters())
     {
-        OnlyOneGraphManager < SchedulerHandle >::add_child(&a);
+        add_child(&a);
     }
 
     virtual ~OnlyOneGraphManager()
     { }
 
 private:
-    paradevs::dtss::Simulator < common::DoubleTime, A < SchedulerHandle >,
-                                SchedulerHandle > a;
+    paradevs::dtss::Simulator < common::DoubleTime, A > a;
 };
 
-template < class SchedulerHandle >
 class TwoGraphManager :
         public paradevs::dtss::GraphManager < common::DoubleTime,
-                                              SchedulerHandle,
                                               paradevs::common::NoParameters >
 {
 public:
-    TwoGraphManager(common::Coordinator < common::DoubleTime,
-                                          SchedulerHandle >* coordinator,
+    TwoGraphManager(common::Coordinator < common::DoubleTime >* coordinator,
                     const paradevs::common::NoParameters& parameters) :
-        paradevs::dtss::GraphManager < common::DoubleTime, SchedulerHandle,
+        paradevs::dtss::GraphManager < common::DoubleTime,
                                        paradevs::common::NoParameters >(
                                            coordinator, parameters),
-        a("a", 1, common::NoParameters()), b("b", 1, common::NoParameters())
+        a("a", 1., common::NoParameters()), b("b", 1., common::NoParameters())
     {
-        TwoGraphManager < SchedulerHandle >::add_child(&a);
-        TwoGraphManager < SchedulerHandle >::add_child(&b);
+        add_child(&a);
+        add_child(&b);
         a.add_out_port("out");
         b.add_in_port("in");
-        TwoGraphManager < SchedulerHandle >::add_link(&a, "out", &b, "in");
+        add_link(&a, "out", &b, "in");
     }
 
     virtual ~TwoGraphManager()
     { }
 
 private:
-    paradevs::dtss::Simulator < common::DoubleTime, A < SchedulerHandle >,
-                                SchedulerHandle > a;
-    paradevs::dtss::Simulator < common::DoubleTime, B < SchedulerHandle >,
-                                SchedulerHandle > b;
+    paradevs::dtss::Simulator < common::DoubleTime, A > a;
+    paradevs::dtss::Simulator < common::DoubleTime, B > b;
 };
 
 } } } // namespace paradevs tests dtss

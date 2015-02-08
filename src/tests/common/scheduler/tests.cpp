@@ -42,32 +42,31 @@ using namespace paradevs::pdevs;
 
 using namespace std::chrono;
 
-struct SchedulerHandle;
+// struct SchedulerHandle;
 
-typedef typename HeapScheduler < DoubleTime,
-                                 SchedulerHandle >::type SchedulerType;
+// typedef typename HeapScheduler < DoubleTime,
+//                                  SchedulerHandle >::type SchedulerType;
 
-struct SchedulerHandle
-{
-    SchedulerHandle()
-    { }
+// struct SchedulerHandle
+// {
+//     SchedulerHandle()
+//     { }
 
-    SchedulerHandle(const SchedulerType::handle_type& handle)
-        : _handle(handle)
-    { }
+//     SchedulerHandle(const SchedulerType::handle_type& handle)
+//         : _handle(handle)
+//     { }
 
-    const SchedulerHandle& handle() const
-    { return *this; }
+//     const SchedulerHandle& handle() const
+//     { return *this; }
 
-    void handle(const SchedulerHandle& handle)
-    { _handle = handle._handle; }
+//     void handle(const SchedulerHandle& handle)
+//     { _handle = handle._handle; }
 
-    SchedulerType::handle_type _handle;
-};
+//     SchedulerType::handle_type _handle;
+// };
 
-typedef Dynamics < DoubleTime, SchedulerHandle > MyDynamics;
-typedef paradevs::pdevs::Simulator < DoubleTime, MyDynamics,
-                                     SchedulerHandle > MySimulator;
+typedef Dynamics < DoubleTime > MyDynamics;
+typedef paradevs::pdevs::Simulator < DoubleTime, MyDynamics > MySimulator;
 typedef std::vector < MySimulator* > MySimulators;
 
 const int simulator_number = 5000;
@@ -77,7 +76,7 @@ const int sample_number = 20;
 double unit_test(unsigned int n)
 {
     MySimulators simulators;
-    HeapScheduler < DoubleTime, SchedulerHandle > scheduler;
+    HeapScheduler < DoubleTime > scheduler;
 
     for (unsigned int i = 0; i < simulator_number; ++i) {
         std::ostringstream ss;

@@ -27,21 +27,21 @@
 #ifndef TESTS_DTSS_MODELS_HPP
 #define TESTS_DTSS_MODELS_HPP 1
 
-#include <paradevs/kernel/dtss/Dynamics.hpp>
-
 #include <paradevs/common/time/DoubleTime.hpp>
+#include <paradevs/common/utils/Trace.hpp>
+
+#include <paradevs/kernel/dtss/Dynamics.hpp>
 
 namespace paradevs { namespace tests { namespace dtss {
 
-template < class SchedulerHandle>
 class A :
-        public paradevs::dtss::Dynamics < common::DoubleTime, SchedulerHandle,
+        public paradevs::dtss::Dynamics < common::DoubleTime,
                                           paradevs::common::NoParameters >
 {
 public:
     A(const std::string& name,
       const paradevs::common::NoParameters& parameters) :
-        paradevs::dtss::Dynamics < common::DoubleTime, SchedulerHandle,
+        paradevs::dtss::Dynamics < common::DoubleTime,
                                    paradevs::common::NoParameters >(name,
                                                                     parameters),
         _value(0)
@@ -49,8 +49,7 @@ public:
     virtual ~A()
     { }
 
-    void transition(const common::Bag < common::DoubleTime,
-                    SchedulerHandle >& /* x */,
+    void transition(const common::Bag < common::DoubleTime >& /* x */,
                     common::DoubleTime::type t)
     {
 
@@ -61,7 +60,7 @@ public:
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
             << common::TraceElement < common::DoubleTime >(
-                A < SchedulerHandle >::get_name(), t,
+                get_name(), t,
                 common::DELTA_INT);
         common::Trace < common::DoubleTime >::trace().flush();
 #endif
@@ -78,7 +77,7 @@ public:
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
             << common::TraceElement < common::DoubleTime >(
-                A < SchedulerHandle >::get_name(), t,
+                get_name(), t,
                 common::START);
         common::Trace < common::DoubleTime >::trace().flush();
 #endif
@@ -86,7 +85,7 @@ public:
         return 0;
     }
 
-    common::Bag < common::DoubleTime, SchedulerHandle > lambda(
+    common::Bag < common::DoubleTime > lambda(
         common::DoubleTime::type t) const
     {
 
@@ -94,16 +93,16 @@ public:
         (void)t;
 #endif
 
-        common::Bag < common::DoubleTime, SchedulerHandle > msgs;
+        common::Bag < common::DoubleTime > msgs;
 
         msgs.push_back(common::ExternalEvent <
-                           common::DoubleTime, SchedulerHandle >(
+                           common::DoubleTime >(
                                "out", (void*)&_value));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
             << common::TraceElement < common::DoubleTime >(
-                A < SchedulerHandle >::get_name(), t,
+                get_name(), t,
                 common::LAMBDA)
             << "messages = " << msgs.to_string();
         common::Trace < common::DoubleTime >::trace().flush();
@@ -116,15 +115,14 @@ private:
     double _value;
 };
 
-template < class SchedulerHandle>
 class B :
-        public paradevs::dtss::Dynamics < common::DoubleTime, SchedulerHandle,
+        public paradevs::dtss::Dynamics < common::DoubleTime,
                                           paradevs::common::NoParameters >
 {
 public:
     B(const std::string& name,
       const paradevs::common::NoParameters& parameters) :
-        paradevs::dtss::Dynamics < common::DoubleTime, SchedulerHandle,
+        paradevs::dtss::Dynamics < common::DoubleTime,
                                    paradevs::common::NoParameters >(name,
                                                                     parameters),
         _value(0)
@@ -132,8 +130,7 @@ public:
     virtual ~B()
     { }
 
-    void transition(const common::Bag < common::DoubleTime,
-                    SchedulerHandle >& x,
+    void transition(const common::Bag < common::DoubleTime >& x,
                     common::DoubleTime::type t)
     {
 
@@ -145,7 +142,7 @@ public:
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
             << common::TraceElement < common::DoubleTime >(
-                B < SchedulerHandle >::get_name(), t,
+                get_name(), t,
                 common::DELTA_INT)
             << "x = " << x.to_string();
         common::Trace < common::DoubleTime >::trace().flush();
@@ -162,7 +159,7 @@ public:
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
             << common::TraceElement < common::DoubleTime >(
-                B < SchedulerHandle >::get_name(), t,
+                get_name(), t,
                 common::START);
         common::Trace < common::DoubleTime >::trace().flush();
 #endif
@@ -170,7 +167,7 @@ public:
         return 0;
     }
 
-    common::Bag < common::DoubleTime, SchedulerHandle > lambda(
+    common::Bag < common::DoubleTime > lambda(
         common::DoubleTime::type t) const
     {
 
@@ -178,17 +175,16 @@ public:
         (void)t;
 #endif
 
-        common::Bag < common::DoubleTime, SchedulerHandle > msgs;
+        common::Bag < common::DoubleTime > msgs;
 
         msgs.push_back(common::ExternalEvent <
-                           common::DoubleTime, SchedulerHandle >(
+                           common::DoubleTime >(
                                "out", (void*)&_value));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
             << common::TraceElement < common::DoubleTime >(
-                B < SchedulerHandle >::get_name(), t,
-                common::LAMBDA)
+                get_name(), t, common::LAMBDA)
             << "messages = " << msgs.to_string();
         common::Trace < common::DoubleTime >::trace().flush();
 #endif

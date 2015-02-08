@@ -24,8 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <paradevs/common/scheduler/SchedulerHandle.hpp>
-
 #include <tests/dtss/graph_manager.hpp>
 #include <tests/dtss/models.hpp>
 
@@ -43,10 +41,8 @@ TEST_CASE("dtss/only_one", "run")
     paradevs::common::RootCoordinator <
         DoubleTime, paradevs::dtss::Coordinator <
             DoubleTime,
-            Policy < paradevs::common::scheduler::NoSchedulerHandle >,
-            OnlyOneGraphManager <
-                paradevs::common::scheduler::NoSchedulerHandle >,
-            paradevs::common::scheduler::NoSchedulerHandle,
+            Policy,
+            OnlyOneGraphManager,
             paradevs::dtss::Parameters < DoubleTime > >
         > rc(0, 10, "root",
              paradevs::dtss::Parameters < DoubleTime >(1),
@@ -76,10 +72,8 @@ TEST_CASE("dtss/two", "run")
     paradevs::common::RootCoordinator <
         DoubleTime, paradevs::dtss::Coordinator <
             DoubleTime,
-            Policy < paradevs::common::scheduler::NoSchedulerHandle >,
-            TwoGraphManager <
-                paradevs::common::scheduler::NoSchedulerHandle >,
-            paradevs::common::scheduler::NoSchedulerHandle,
+            Policy,
+            TwoGraphManager,
             paradevs::dtss::Parameters < DoubleTime > >
         > rc(0, 10, "root",
              paradevs::dtss::Parameters < DoubleTime >(1),
