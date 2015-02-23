@@ -58,6 +58,7 @@ ENDIF (COMMAND CMAKE_POLICY)
 
 PKG_CHECK_MODULES(PARADEVS REQUIRED paradevs-1.0)
 PKG_CHECK_MODULES(LIBXML REQUIRED libxml-2.0)
+
 #
  # Test the libboost header and libboost-text library.
 #
@@ -70,21 +71,28 @@ SET(Boost_USE_STATIC_RUNTIME ON)
 IF (WIN32)
   SET(Boost_THREADAPI "win32")
 ENDIF (WIN32)
-SET(Boost_DETAILED_FAILURE_MSG FALSE)
-SET(Boost_DEBUG FALSE)
 
-FIND_PACKAGE(Boost COMPONENTS graph timer system)
-IF (NOT Boost_GRAPH_FOUND)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_BINARY_DIR})
+
+find_package(MPI REQUIRED)
+if (NOT MPI_CXX_FOUND)
+  message(ERROR " failed to found a C++ compiler with MPI support.")
+else()
+  message(STATUS " MPI support enabled")
+  include_directories(${MPI_CXX_INCLUDE_PATH})
+endif ()
+
+message(STATUS "checking for Boost headers and libraries")
+find_package(Boost 1.55 REQUIRED COMPONENTS graph mpi timer serialization
+  system)
+if (NOT Boost_FOUND)
   MESSAGE(FATAL_ERROR "The boost graph library is required")
-ENDIF (NOT Boost_GRAPH_FOUND)
-IF (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "35")
-  SET(Boost_SYSTEM_LIBRARY "")
-ENDIF (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "35")
-IF (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
-  SET(PARADEVS_HAVE_BOOST_SPIRIT2 0 CACHE INTERNAL "" FORCE)
-ELSE (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
-  SET(PARADEVS_HAVE_BOOST_SPIRIT2 1 CACHE INTERNAL "" FORCE)
-ENDIF (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
+else ()
+  message(STATUS " Boost found")
+  include_directories(${Boost_INCLUDE_DIRS})
+  link_directories(${Boost_LIBRARY_DIRS})
+endif ()
 
 #
  # Generate the config.h
@@ -93,7 +101,6 @@ ENDIF (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
 CHECK_INCLUDE_FILE_CXX(cxxabi.h PARADEVS_HAVE_GCC_ABI_DEMANGLE)
 CHECK_INCLUDE_FILE_CXX(execinfo.h PARADEVS_HAVE_EXECINFO)
 CHECK_INCLUDE_FILE_CXX(signal.h PARADEVS_HAVE_SIGNAL)
-INCLUDE_DIRECTORIES(${PARADEVS_BINARY_DIR})
 
 #
  # Browse the src subdirectory

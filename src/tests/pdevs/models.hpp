@@ -292,6 +292,7 @@ public:
                 common::START);
         common::Trace < common::DoubleTime >::trace().flush();
 #endif
+
         _phase = WAIT;
         return std::numeric_limits < double >::max();
     }
