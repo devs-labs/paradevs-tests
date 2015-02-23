@@ -557,22 +557,12 @@ void Pseudo_random_partitioning(UnorientedGraph *g, EntiersEntiers &Partition,
     }
 }
 
-
-
-EntiersEntiers Random_partitioning(UnorientedGraph *g,
+EntiersEntiers Random_equal_weight_partitioning(UnorientedGraph *g,
                                 uint parts_number)
 {
 	EntiersEntiers Partition;
-	Entiers random_order; //gestion d'un tableau contenant tout les sommets et ranger de façon aléatoire
+	Entiers random_order =  Random_Sort_Vector(num_vertices(*g));
 	uint cpt = 0;
-	for (uint i=0 ; i<num_vertices(*g) ; i++)
-		random_order.push_back(i);
-	for (uint j=0 ; j<num_vertices(*g)-1 ; j++) {
-		int rand_pos = rand()%(num_vertices(*g)-j)+j;
-		int tmp      = random_order.at(j);
-		random_order.at(j) = random_order.at(rand_pos);
-		random_order.at(rand_pos) = tmp;
-	}
 	
 	for(uint j = 0 ; j < parts_number ; j++){
 		Entiers *part = new Entiers();
@@ -593,6 +583,54 @@ EntiersEntiers Random_partitioning(UnorientedGraph *g,
 	return Partition;
 }
 
+EntiersEntiers Random_partitioning(UnorientedGraph *g,
+                                uint parts_number)
+{
+	EntiersEntiers Partition;
+	uint nbr_vertices = num_vertices(*g);
+	Entiers random_order =  Random_Sort_Vector(nbr_vertices);
+	uint cpt = 0;
+	
+	std::vector<int> taille;
+	
+	int tmp_size = nbr_vertices;
+	for(uint i = 0; i < parts_number - 1; i++){
+		int t1;
+		if(parts_number < 10){
+			if(floor(tmp_size*0.5/10) != 0)
+				t1 = rand_fini(floor(tmp_size*0.5/100), floor(tmp_size*(60-10*i/2)/100));
+			else
+				t1 = rand_fini(1, floor(tmp_size*(60-10*i/2)/100));
+		}else{
+			if(floor(tmp_size*0.5/100) != 0)
+				t1 = rand_fini(floor(tmp_size*0.5/100), floor(tmp_size*(60-10*i/4)/100));
+			else
+				t1 = rand_fini(1, floor(tmp_size*(60-10*i/4)/100));
+		}
+		tmp_size -= t1;
+		taille.push_back(t1);	
+	}
+	
+	taille.push_back(tmp_size);
+	
+	for(uint id_size = 0; id_size < taille.size(); id_size ++){
+		Entiers *part = new Entiers();
+		uint cpt_taille = 0;
+		while(cpt_taille < taille.at(id_size)){
+			part->push_back(random_order.at(cpt));
+			cpt_taille++;
+			cpt++;
+		}
+		Partition.push_back(part);
+	}
+
+	for(uint i = 0 ; i < Partition.size() ; i++){
+		sort(Partition.at(i)->begin(),Partition.at(i)->end());
+	}
+
+	return Partition;
+}
+
 void Coarsening_Phase(Base_Graph &baseg, ListEntiersEntiers &liste_corr, 
 					  uint niveau, int nbr_vertex, 
 					  std::string parameter){
@@ -601,6 +639,9 @@ void Coarsening_Phase(Base_Graph &baseg, ListEntiersEntiers &liste_corr,
 	
     while(!stop){
     	if(parameter == "HEM")
+			stop = contraction_HEM(baseg.at(cpt), baseg, 
+									liste_corr, niveau, nbr_vertex);
+		else if(parameter == "HEM_degree")
 			stop = contraction_HEM_degree(baseg.at(cpt), baseg, 
 									liste_corr, niveau, nbr_vertex);
     	else
@@ -608,6 +649,7 @@ void Coarsening_Phase(Base_Graph &baseg, ListEntiersEntiers &liste_corr,
 									liste_corr, niveau, nbr_vertex);
         cpt++;
     }
+    std::cout<<std::endl;
     
 }
 
@@ -627,8 +669,11 @@ EntiersEntiers Partitioning_Phase(const Base_Graph &baseg,
 					  numeric_parameters.at(2), parameters.at(1), 
 					  distance);
     }
-    else
+    else if(parameters.at(1) == "rand")
     	Partition = Random_partitioning(baseg.at(baseg.size()-1),
+										numeric_parameters.at(1));
+	else
+		Partition = Random_equal_weight_partitioning(baseg.at(baseg.size()-1),
 										numeric_parameters.at(1));
 	
 	return Partition;
@@ -777,6 +822,7 @@ OrientedGraphs Multiniveau(OrientedGraph *go,
                            bool rec, int distance)
 {   
     boost::timer t;
+    double t1, t2, t3, t4;
     UnorientedGraph *g = new UnorientedGraph();
 	make_unoriented_graph(*go, *g); 
     Base_Graph baseg;
@@ -785,10 +831,9 @@ OrientedGraphs Multiniveau(OrientedGraph *go,
     OrientedGraphs Graphes;
     int val_cpt = num_vertices(*g);
     bool time = true;
-    double t1, t2, t3, t4;
     
-    if(numeric_parameters.at(0) != val_cpt && parameters.at(1) != "rand"){
-			
+    if(numeric_parameters.at(0) != val_cpt && parameters.at(1) != "rand" && parameters.at(1) != "rande"){
+		
 		Coarsening_Phase(baseg, liste_corr, numeric_parameters.at(0), val_cpt, parameters.at(0));
 	    
 	    if(rec){
@@ -838,8 +883,13 @@ OrientedGraphs Multiniveau(OrientedGraph *go,
 			std::cout << "A : " << (t4 - t3) << " ; "<<std::endl;
 	    }
 	    
+	    for(uint si = 0; si < Partition.size(); si++){
+			std::cout<<Partition.at(si)->size()<<std::endl;
+		}
+		std::cout<<std::endl;
+	    
 	    double ratio_cut = Cut_cluster(Partition, *g, parameters.at(3));
-	    std::cout<<"Coût de la fonction objectif : "<<ratio_cut<<std::endl;
+	    std::cout<<"Ratio : "<<ratio_cut<<std::endl;
 		
 		Graphes = Graph_Partition(Partition, go, g, outputedgelist,
 	                              inputedgelist, connections);
@@ -863,8 +913,13 @@ OrientedGraphs Multiniveau(OrientedGraph *go,
 			std::cout << "P : " << t1 << " ; "<<std::endl;
 	    }
 	    
-	    double ratio_cut = Cut_cluster(Partition, *g, parameters.at(3));
-	    std::cout<<"Coût de la fonction objectif : "<<ratio_cut<<std::endl;
+	    for(uint si = 0; si < Partition.size(); si++){
+			std::cout<<Partition.at(si)->size()<<std::endl;
+		}
+		std::cout<<std::endl;
+	    
+	    double ratio_cut = Cut_cluster(Partition, *copie_g, parameters.at(3));
+	    std::cout<<"Ratio : "<<ratio_cut<<std::endl;
 			
 		Graphes = Graph_Partition(Partition, go, copie_g, 
 								  outputedgelist, inputedgelist,
@@ -897,8 +952,6 @@ OrientedGraphs Multiniveau(OrientedGraph *go,
         *it = NULL;
     }
     
-    //double t5 = t.elapsed();
-    //std::cout << "Devs : " << (t5 - t4)<<std::endl;
     return Graphes;
 }
 
@@ -910,17 +963,9 @@ void Optimisation_method_neighbour(UnorientedGraph *g,
 	/*Initialisation des parametres*/
 	Entiers *part2_cons = new Entiers();
 	Entiers *part_cour_cons = new Entiers();
-	Entiers Random_list_vertices;
 	double cut = 1000000000.;
-
-	for (uint i=0 ; i<Partition.at(index_partition)->size() ; i++)
-		Random_list_vertices.push_back(i);
-	for (uint j=0 ; j<Partition.at(index_partition)->size()-1 ; j++) {
-		uint rand_pos = rand()%(Partition.at(index_partition)->size()-j)+j;
-		uint tmp      = Random_list_vertices[j];
-		Random_list_vertices[j] = Random_list_vertices[rand_pos];
-		Random_list_vertices[rand_pos] = tmp;
-	}
+	
+	Entiers Random_list_vertices =  Random_Sort_Vector(Partition.at(index_partition)->size());
 		
 	if(Partition.at(index_partition)->size()< nbr_tirage)
 		nbr_tirage = Partition.at(index_partition)->size();

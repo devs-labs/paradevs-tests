@@ -48,6 +48,7 @@ void build_graph_grid(OrientedGraph *go, int side,
 				const std::vector<std::pair<int,int>> &vertex_selection,
 				const Entiers &weight_vertex, const char *edge_weight, 
 				bool rec);
+void build_example_linked9(OrientedGraph& og);
 				
 //void build_corsen_graph(OrientedGraph& graph);
 

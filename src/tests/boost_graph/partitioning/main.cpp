@@ -48,11 +48,11 @@ int main()
 	/*** Génération du graphe ***/
 	
     OrientedGraph *go = new OrientedGraph();
-    std::string type_graph = "tree";
+    std::string type_graph = "linked";
     std::pair<bool,bool> Spectrale = {false,false};
     
     if(type_graph == "grid"){
-		int side = floor(sqrt(5000));
+		int side = floor(sqrt(100));
 		std::vector<std::pair<int,int>> vertex_selection;
 	    std::pair<int,int> tmp;
 	    tmp.first = 0;
@@ -64,14 +64,23 @@ int main()
 	    build_graph_grid(go, side, vertex_selection, weight_vertex,texte,true);
 	    Plot_OrientedGraph(go,"../../sortie_graphe/Tests/Graphes/Multiniveau/txt/grid_500.txt");
 	}else if (type_graph == "tree"){
-		int nbr_sommets = 5000;
-		int nbr_sources = nbr_sommets/100*1; 
-		Entiers niveau = {5,4,3,2};
-		build_generator_graph(go, nbr_sommets, nbr_sources , 2 , 4 ,niveau);
+		int nbr_sommets = 70;
+		int nbr_sources = 2; 
+		Entiers niveau = {2,2};
+		const char *texte;
+        //texte = "file/data_base/tree/tree_20000.txt";
+		build_generator_graph(go, nbr_sommets, nbr_sources, 2,
+												3, niveau);
+		Plot_OrientedGraph(go,"../../sortie_graphe/Tests/Graphes/Multiniveau/txt/grid_500.txt");
+		//Text_generator_graph(texte, go);
+        //Graph_constructor_txt(texte,go);
 	}else if (type_graph == "linked"){
-		int nbr_sommets = 1000;
-		int nbr_couches = 150;
-		build_generator_graph_linked(go, nbr_sommets, nbr_couches , 2, 3);
+		int nbr_sommets = 10;
+		int nbr_couches = 4;
+		build_example_linked9(*go);
+		//build_generator_graph_linked(go, nbr_sommets, nbr_couches , 2, 3);
+		//Text_generator_graph("file/data_base/linked/linked_50.txt",go);
+		Plot_OrientedGraph(go,"../../sortie_graphe/Tests/Graphes/Multiniveau/txt/grid_500.txt");
 	}else{
 		build_graph(*go, 38);
 	}
@@ -93,10 +102,11 @@ int main()
 	}
 
 	/*** Paramétrage du Multiniveau ***/
-	std::vector<uint> numeric_parameters = {num_vertices(*go)/20, 8, 10};
-	std::vector<std::string> parameters = {"HEM", "rand", "diff", "cut"};
+	std::vector<uint> numeric_parameters = {num_vertices(*go), 4, 10};
+	std::vector<std::string> parameters = {"HEM", "gggp", "diff", "ratio"};
 	
 	uint nbr_tirage = 1;
+
 	
 	for(uint i = 0 ; i < nbr_tirage ; i++){
 		Edges edge_partie;
@@ -111,16 +121,18 @@ int main()
 				Weight_Matrix_Txt(g,"../../Classif_R/Graphe/txt/Mwei.txt");
 				delete g;
 			}
+			
+			std::cout<<"Multiniveau"<<std::endl;
 			OrientedGraphs graphs = Multiniveau(go, numeric_parameters,
 												parameters, edge_partie ,
 												outputedgeslist, inputedgelist,
-												connections,true, i);  	
+												connections,true, 2);  	
 												std::cout<<std::endl;
 		}else{
 			OrientedGraphs graphs = Multiniveau(go, numeric_parameters,
 												parameters, edge_partie ,
 												outputedgeslist, inputedgelist,
-												connections,true, i); 
+												connections,true, 2); 
 												std::cout<<std::endl;
 		}
 	}

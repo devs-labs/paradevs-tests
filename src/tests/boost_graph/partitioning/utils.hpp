@@ -229,6 +229,7 @@ void Merge_Boost_Graph(OrientedGraph *go1, OrientedGraph *go2,
 						std::vector<std::pair<int,int>> &connection, 
 						std::vector<double> &connection_weight);
 
+Entiers Random_Sort_Vector(uint size);
 } } } // namespace paradevs tests boost_graph
 
 #endif

@@ -286,16 +286,7 @@ void Affinage_equilibrage_charge(UnorientedGraph *g, EntiersEntiers &Partition)
         /*
          * tirage aléatoire des sommets de la partie de poids maximum
          */
-        Entiers random_orders(Partition.at(cpt)->size());
-        for (uint i=0 ; i<Partition.at(cpt)->size() ; i++)
-            random_orders.at(i)=Partition.at(cpt)->at(i);
-
-        for (uint j=0 ; j<Partition.at(cpt)->size()-1 ; j++) {
-            int rand_pos = (rand() % Partition.at(cpt)->size()-j)+j;
-            int tmp = random_orders[j];
-            random_orders[j] = random_orders[rand_pos];
-            random_orders[rand_pos] = tmp;
-        }
+        Entiers random_orders = Random_Sort_Vector(Partition.at(cpt)->size());
 
         /*
          * Si le nombre de sommets d'une partie excéde les 400, on tire au hasar 400 sommets sans remise
@@ -433,17 +424,8 @@ Entiers Neigh_community(UnorientedGraph *g, EntiersEntiers &Partition, int verte
 
 void Affinage_recherche_locale(UnorientedGraph *g, EntiersEntiers &Partition, double &cut, std::string name)
 {
-    Entiers random_orders(num_vertices(*g)); //gestion d'un tableau contenant tout les sommets et ranger de façon aléatoire
+    Entiers random_orders = Random_Sort_Vector(num_vertices(*g)); //gestion d'un tableau contenant tout les sommets et ranger de façon aléatoire
 
-    for (uint i=0 ; i<num_vertices(*g) ; i++)
-        random_orders.at(i)=i;
-
-    for (uint j=0 ; j<num_vertices(*g)-1 ; j++) {
-        int rand_pos = (rand() % num_vertices(*g)-j)+j;
-        int tmp = random_orders[j];
-        random_orders[j] = random_orders[rand_pos];
-        random_orders[rand_pos] = tmp;
-    }
     uint size = random_orders.size();
 
     if(num_vertices(*g)>500)
@@ -671,35 +653,11 @@ void Modif_fonction_Gain_Cut(EntiersEntiers &Partition,UnorientedGraph *g, Entie
 			new_partition.push_back(tmp);
 		}
 
-		/*std::cout<<"Avant Modification partition"<<std::endl;
-		std::cout<<"************"<<std::endl;
-		for(uint t = 0; t< new_partition.size() ; t++)
-				{
-					for(uint j = 0 ; j<new_partition.at(t)->size() ; j++)
-					{
-						std::cout<<new_partition.at(t)->at(j)<<std::endl;
-					}
-					std::cout<<"\n"<<std::endl;
-				}
-		std::cout<<"************"<<std::endl;*/
-
 
 		new_partition.at(community.at(i))->push_back(val);
 		suprim_val(*new_partition.at(In_community_dichotomie(Partition,val)),val);
 		std::sort(new_partition.at(community.at(i))->begin(),
                     new_partition.at(community.at(i))->end());
-
-		/*std::cout<<"Modification partition"<<std::endl;
-		std::cout<<"************"<<std::endl;
-		for(uint t= 0; t< new_partition.size() ; t++)
-		{
-			for(uint j = 0 ; j<new_partition.at(t)->size() ; j++)
-			{
-				std::cout<<new_partition.at(t)->at(j)<<std::endl;
-			}
-			std::cout<<"\n"<<std::endl;
-		}
-		std::cout<<"************"<<std::endl;*/
 
 		double coupe = Cut_cluster(new_partition,*g,name);
 
@@ -727,8 +685,7 @@ void Modif_fonction_Gain_Cut(EntiersEntiers &Partition,UnorientedGraph *g, Entie
 
 bool contraction_HEM(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &liste_corr, int val_reduc, int &val_cpt){
 	UnorientedGraph *gtmp = new UnorientedGraph();
-	boost::copy_graph(*g, *gtmp);
-	Entiers Random_list_vertices;//, Index_Vertex; // Initialisation du tableau de sommets rangés aléatoirements
+	boost::copy_graph(*g, *gtmp);//, Index_Vertex; // Initialisation du tableau de sommets rangés aléatoirements
 	EntiersEntiers *tableau_de_correspondance = new EntiersEntiers();
 	edge_t e1,e2; // Iterateurs sur les arcs
 	bool found;
@@ -738,16 +695,9 @@ bool contraction_HEM(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &
 	 * Création d'un vecteur contenant l'ensemble des sommets du graphe. Ces sommets sont rangés
 	 * aléatoirement afin de simuler un tirage aléatoire
 	 */
-	for (uint i=0 ; i<nbr_vertex ; i++)
-		Random_list_vertices.push_back(i);
-		//Index_Vertex.push_back(i);
-	for (uint j=0 ; j<nbr_vertex-1 ; j++) {
-		int rand_pos = rand()%(nbr_vertex-j)+j;
-		int tmp      = Random_list_vertices[j];
-		Random_list_vertices[j] = Random_list_vertices[rand_pos];
-		Random_list_vertices[rand_pos] = tmp;
-	}
-
+	 
+	Entiers Random_list_vertices = Random_Sort_Vector(nbr_vertex);
+	
 	/*
 	 * Pour chaque sommet non verrouiller faire ....
 	 */
@@ -850,17 +800,6 @@ bool contraction_HEM(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &
 				tableau_de_correspondance->push_back(couple);
 				Random_list_vertices[i]=-1;
 			}
-
-
-
-			/*std::cout<<"Poids noeud graphe contracté : "<<std::endl;
-			tie(vertexIt, vertexEnd) = vertices(*gtmp);
-			for (; vertexIt != vertexEnd; ++vertexIt) {
-				std::cout << (*gtmp)[*vertexIt]._index
-						<< " -> ";
-				std::cout << (*gtmp)[*vertexIt]._weight<<" ; ";
-			}
-			std::cout << std::endl;*/
 		}
 
 		if(val_cpt == val_reduc){
@@ -886,22 +825,7 @@ bool contraction_HEM(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &
 		remove_vertex(sommets_a_detruire[j],*gtmp);
 	}
 
-	// std::clog<<"Affichage avant tri "<<std::endl;
-	// for(uint k = 0;k<tableau_de_correspondance->size();k++){
-	// 	for(uint v = 0; v<tableau_de_correspondance->at(k)->size();v++){
-	// 		std::cout<<tableau_de_correspondance->at(k)->at(v)<<" ";
-	// 	}
-	// 	std::cout<<"\n"<<std::endl;
-	// }
 	std::sort(tableau_de_correspondance->begin(),tableau_de_correspondance->end(),myobject); // Trie dans l'ordre croissant des couples de sommets de la liste de correspondance
-
-	// std::clog<<"Tableau de correspondance "<<std::endl;
-	// for(uint k = 0;k<tableau_de_correspondance->size();k++){
-	// 	for(uint v = 0; v<tableau_de_correspondance->at(k)->size();v++){
-	// 		std::cout<<tableau_de_correspondance->at(k)->at(v)<<" ";
-	// 	}
-	// 	std::cout<<"\n"<<std::endl;
-	// }
 
 	liste_corr.push_back(tableau_de_correspondance);
 	// std::cout<<"\n"<<std::endl;
@@ -914,29 +838,25 @@ bool contraction_HEM(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &
 
 }
 
-/*** Problème de segmentation avec cette méthode !!!  ***/
 bool contraction_HEM_tests(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &liste_corr, int val_reduc, int &val_cpt){
 	UnorientedGraph *gtmp = new UnorientedGraph();
 	boost::copy_graph(*g, *gtmp);
-	Entiers Random_list_vertices, Index_Vertex; // Initialisation du tableau de sommets rangés aléatoirements
+	Entiers Index_Vertex; // Initialisation du tableau de sommets rangés aléatoirements
 	EntiersEntiers *tableau_de_correspondance = new EntiersEntiers();
 	edge_t e1,e2; // Iterateurs sur les arcs
 	bool found;
 	uint nbr_vertex = num_vertices(*gtmp);
+	//std::cout<<"val_reduc  : "<<val_reduc<<std::endl;
+	//std::cout<<"nbr_vertex : "<<nbr_vertex<<std::endl;
 	Entiers sommets_a_detruire; // Initialisation d'un tableau pret à recevoir les "sommets à détruire"
 	/*
 	 * Création d'un vecteur contenant l'ensemble des sommets du graphe. Ces sommets sont rangés
 	 * aléatoirement afin de simuler un tirage aléatoire
 	 */
-	for (uint i=0 ; i<nbr_vertex ; i++){
-		Random_list_vertices.push_back(i);
-		Index_Vertex.push_back(i);}
-	for (uint j=0 ; j<nbr_vertex-1 ; j++) {
-		int rand_pos = rand()%(nbr_vertex-j)+j;
-		int tmp      = Random_list_vertices[j];
-		Random_list_vertices[j] = Random_list_vertices[rand_pos];
-		Random_list_vertices[rand_pos] = tmp;
-	}
+	for (uint i=0 ; i<nbr_vertex ; i++)
+		Index_Vertex.push_back(i);
+
+	Entiers Random_list_vertices = Random_Sort_Vector(nbr_vertex);
 
 	/*
 	 * Pour chaque sommet non verrouiller faire ....
@@ -946,7 +866,7 @@ bool contraction_HEM_tests(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEnt
 	//std::cout<<std::endl;
 	for(uint i=0; i<nbr_vertex; i++){
 		int vertexs = Index_Vertex.at(Random_list_vertices.at(i));
-		//std::cout<<"Le sommet tiré est : "<<vertexs<<" ça place est : "<<Random_list_vertices.at(i)<<" place : "<<i<<std::endl;
+		//std::cout<<"Le sommet tiré est : "<<(*gtmp)[vertexs]._index<<" ça place est : "<<vertexs<<" place : "<<i<<std::endl;
 		if(vertexs!=-1){
 			Entiers liste_voisin = Liste_adjacence_tests(*gtmp,vertexs,Index_Vertex); // Recherche des sommets adjacents au sommets  tiré
 			if(liste_voisin.size()!=0){
@@ -955,7 +875,7 @@ bool contraction_HEM_tests(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEnt
 				 * choisi celui dont l'arc les reliants est le plus fort. Dans le cas où les arcs ont tous
 				 * le même poids, on selectionne le sommet d'index le plus petit
 				 */
-				double poids_a = -1.;
+				double poids_a = 0.;
 				int best_vertexs = -1;
 				for(uint j=0;j<liste_voisin.size();j++){
 					tie(e1,found)=edge(vertex(vertexs,*gtmp),vertex(liste_voisin[j],*gtmp),*gtmp);
@@ -993,12 +913,15 @@ bool contraction_HEM_tests(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEnt
 				 */
 				for (; neighbourIt != neighbourEnd; ++neighbourIt){
 					neigh_vertex_save.push_back(*neighbourIt);
+					//std::cout<<(*gtmp)[*neighbourIt]._index<<" ";
 				}
-
+				//std::cout<<std::endl;
 				tie(neighbourIt, neighbourEnd) = adjacent_vertices(vertex_delete,*gtmp);
 				for (; neighbourIt != neighbourEnd; ++neighbourIt){
 					neigh_vertex_delete.push_back(*neighbourIt);
+					//std::cout<<(*gtmp)[*neighbourIt]._index<<" ";
 				}
+				//std::cout<<std::endl;
 				
 				sort(neigh_vertex_save.begin(),neigh_vertex_save.end());
 				sort(neigh_vertex_delete.begin(),neigh_vertex_delete.end());
@@ -1007,21 +930,32 @@ bool contraction_HEM_tests(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEnt
 				 * S'il existe un tel sommet "v" alors on ajoute le poids de l'arcs (vertex_delet,v)
 				 * à celui de l'arcs (vertex_save,v) et on détruit l'arcs reliant "v" au "sommet à détruire"
 				 */
+				 
 				for(uint j=0;j<neigh_vertex_delete.size();j++){
-					if(In_tab_dichotomie(neigh_vertex_save,neigh_vertex_delete[j])==1){
-						tie(e2,found)=edge(vertex(vertex_save,*gtmp),vertex(neigh_vertex_delete[j],*gtmp),*gtmp);
-						tie(e1,found)=edge(vertex(vertex_delete,*gtmp),vertex(neigh_vertex_delete[j],*gtmp),*gtmp);
-						(*gtmp)[e2]._weight+=(*gtmp)[e1]._weight;
-						remove_edge(vertex_delete,neigh_vertex_delete[j],*gtmp);
-					}
-					else
-					{
+					//std::cout<<"* "<<neigh_vertex_delete.size()<<" "<<(*gtmp)[neigh_vertex_delete[j]]._index<<std::endl;
+					if(neigh_vertex_save.size() != 0){
+						if(In_tab_dichotomie(neigh_vertex_save,neigh_vertex_delete[j])==1){
+						//	std::cout<<"*p"<<std::endl;
+							tie(e2,found)=edge(vertex(vertex_save,*gtmp),vertex(neigh_vertex_delete[j],*gtmp),*gtmp);
+							tie(e1,found)=edge(vertex(vertex_delete,*gtmp),vertex(neigh_vertex_delete[j],*gtmp),*gtmp);
+							(*gtmp)[e2]._weight+=(*gtmp)[e1]._weight;
+							remove_edge(vertex_delete,neigh_vertex_delete[j],*gtmp);
+						}
+						else
+						{
+							//std::cout<<"*t"<<std::endl;
+							tie(e1,found)=edge(vertex(vertex_delete,*gtmp),vertex(neigh_vertex_delete[j],*gtmp),*gtmp);
+							add_edge(vertex_save,neigh_vertex_delete[j],EdgeProperties((*gtmp)[e1]._weight),*gtmp);
+							remove_edge(vertex_delete,neigh_vertex_delete[j],*gtmp);
+						}
+					}else{
+						//std::cout<<"*t"<<std::endl;
 						tie(e1,found)=edge(vertex(vertex_delete,*gtmp),vertex(neigh_vertex_delete[j],*gtmp),*gtmp);
 						add_edge(vertex_save,neigh_vertex_delete[j],EdgeProperties((*gtmp)[e1]._weight),*gtmp);
 						remove_edge(vertex_delete,neigh_vertex_delete[j],*gtmp);
 					}
 				}
-
+				//std::cout<<"**"<<std::endl;
 				(*gtmp)[vertex_save]._weight+=(*gtmp)[vertex_delete]._weight; // ajout du poids du sommet détruit au sommet conservé
 				/*
 				 * Vérouillage du "sommet sauvegardé" et du "sommet à détruire"
@@ -1029,6 +963,7 @@ bool contraction_HEM_tests(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEnt
 				Index_Vertex.at(Random_list_vertices.at(i))=-1;
 				Index_Vertex.at(best_vertexs)=-1;
 				val_cpt--;
+				//std::cout<<"***"<<std::endl;
 				//std::cout<<std::endl;
 			}
 			else{
@@ -1042,20 +977,10 @@ bool contraction_HEM_tests(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEnt
 				tableau_de_correspondance->push_back(couple);
 				Index_Vertex.at(Random_list_vertices.at(i))=-1;
 			}
-
-
-
-			/*std::cout<<"Poids noeud graphe contracté : "<<std::endl;
-			tie(vertexIt, vertexEnd) = vertices(*gtmp);
-			for (; vertexIt != vertexEnd; ++vertexIt) {
-				std::cout << (*gtmp)[*vertexIt]._index
-						<< " -> ";
-				std::cout << (*gtmp)[*vertexIt]._weight<<" ; ";
-			}
-			std::cout << std::endl;*/
 		}
 
 		if(val_cpt == val_reduc){
+			//std::cout<<"égalité"<<std::endl;
 			for(uint j=i+1; j < nbr_vertex; j++){
 				if(Index_Vertex.at(Random_list_vertices.at(j)) != -1){
 				Entiers *couple = new Entiers();
@@ -1078,22 +1003,7 @@ bool contraction_HEM_tests(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEnt
 		remove_vertex(sommets_a_detruire[j],*gtmp);
 	}
 
-	// std::clog<<"Affichage avant tri "<<std::endl;
-	// for(uint k = 0;k<tableau_de_correspondance->size();k++){
-	// 	for(uint v = 0; v<tableau_de_correspondance->at(k)->size();v++){
-	// 		std::cout<<tableau_de_correspondance->at(k)->at(v)<<" ";
-	// 	}
-	// 	std::cout<<"\n"<<std::endl;
-	// }
 	std::sort(tableau_de_correspondance->begin(),tableau_de_correspondance->end(),myobject); // Trie dans l'ordre croissant des couples de sommets de la liste de correspondance
-
-	// std::clog<<"Tableau de correspondance "<<std::endl;
-	// for(uint k = 0;k<tableau_de_correspondance->size();k++){
-	// 	for(uint v = 0; v<tableau_de_correspondance->at(k)->size();v++){
-	// 		std::cout<<tableau_de_correspondance->at(k)->at(v)<<" ";
-	// 	}
-	// 	std::cout<<"\n"<<std::endl;
-	// }
 
 	liste_corr.push_back(tableau_de_correspondance);
 	// std::cout<<"\n"<<std::endl;
@@ -1109,7 +1019,7 @@ bool contraction_HEM_tests(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEnt
 bool contraction_HEM_max_degree_selection(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &liste_corr, int val_reduc, int &val_cpt){
 	UnorientedGraph *gtmp = new UnorientedGraph();
 	boost::copy_graph(*g, *gtmp);
-	Entiers Random_list_vertices, Index_Vertex; // Initialisation du tableau de sommets rangés aléatoirements
+	Entiers Index_Vertex; // Initialisation du tableau de sommets rangés aléatoirements
 	EntiersEntiers *tableau_de_correspondance = new EntiersEntiers();
 	edge_t e1,e2; // Iterateurs sur les arcs
 	bool found;
@@ -1119,16 +1029,10 @@ bool contraction_HEM_max_degree_selection(UnorientedGraph *g, Base_Graph &baseg,
 	 * Création d'un vecteur contenant l'ensemble des sommets du graphe. Ces sommets sont rangés
 	 * aléatoirement afin de simuler un tirage aléatoire
 	 */
-	for (uint i=0 ; i<nbr_vertex ; i++){
-		Random_list_vertices.push_back(i);
-		Index_Vertex.push_back(i);}
-	for (uint j=0 ; j<nbr_vertex-1 ; j++) {
-		int rand_pos = rand()%(nbr_vertex-j)+j;
-		int tmp      = Random_list_vertices[j];
-		Random_list_vertices[j] = Random_list_vertices[rand_pos];
-		Random_list_vertices[rand_pos] = tmp;
-	}
-
+	for (uint i=0 ; i<nbr_vertex ; i++)
+		Index_Vertex.push_back(i);
+	
+	Entiers Random_list_vertices = Random_Sort_Vector(nbr_vertex);
 	/*
 	 * Pour chaque sommet non verrouiller faire ....
 	 */
@@ -1292,15 +1196,6 @@ bool contraction_HEM_degree(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEn
 	 * Création d'un vecteur contenant l'ensemble des sommets du graphe. Ces sommets sont rangés
 	 * aléatoirement afin de simuler un tirage aléatoire
 	 */
-	/*for (uint i=0 ; i<nbr_vertex ; i++){
-		Random_list_vertices.push_back(i);
-		Index_Vertex.push_back(i);}
-	for (uint j=0 ; j<nbr_vertex-1 ; j++) {
-		int rand_pos = rand()%(nbr_vertex-j)+j;
-		int tmp      = Random_list_vertices[j];
-		Random_list_vertices[j] = Random_list_vertices[rand_pos];
-		Random_list_vertices[rand_pos] = tmp;
-	}*/
 	
 	for (uint i=0 ; i<nbr_vertex ; i++){
 		Index_Vertex.push_back(i);
@@ -1412,14 +1307,20 @@ bool contraction_HEM_degree(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEn
 			 * à celui de l'arcs (vertex_save,v) et on détruit l'arcs reliant "v" au "sommet à détruire"
 			 */
 			for(uint j=0;j<neigh_vertex_delete.size();j++){
-				if(In_tab_dichotomie(neigh_vertex_save,neigh_vertex_delete[j])==1){
-					tie(e2,found)=edge(vertex(vertex_save,*gtmp),vertex(neigh_vertex_delete[j],*gtmp),*gtmp);
-					tie(e1,found)=edge(vertex(vertex_delete,*gtmp),vertex(neigh_vertex_delete[j],*gtmp),*gtmp);
-					(*gtmp)[e2]._weight+=(*gtmp)[e1]._weight;
-					remove_edge(vertex_delete,neigh_vertex_delete[j],*gtmp);
-				}
-				else
-				{
+				if(neigh_vertex_save.size() != 0){
+					if(In_tab_dichotomie(neigh_vertex_save,neigh_vertex_delete[j])==1){
+						tie(e2,found)=edge(vertex(vertex_save,*gtmp),vertex(neigh_vertex_delete[j],*gtmp),*gtmp);
+						tie(e1,found)=edge(vertex(vertex_delete,*gtmp),vertex(neigh_vertex_delete[j],*gtmp),*gtmp);
+						(*gtmp)[e2]._weight+=(*gtmp)[e1]._weight;
+						remove_edge(vertex_delete,neigh_vertex_delete[j],*gtmp);
+					}
+					else
+					{
+						tie(e1,found)=edge(vertex(vertex_delete,*gtmp),vertex(neigh_vertex_delete[j],*gtmp),*gtmp);
+						add_edge(vertex_save,neigh_vertex_delete[j],EdgeProperties((*gtmp)[e1]._weight),*gtmp);
+						remove_edge(vertex_delete,neigh_vertex_delete[j],*gtmp);
+					}
+				}else{
 					tie(e1,found)=edge(vertex(vertex_delete,*gtmp),vertex(neigh_vertex_delete[j],*gtmp),*gtmp);
 					add_edge(vertex_save,neigh_vertex_delete[j],EdgeProperties((*gtmp)[e1]._weight),*gtmp);
 					remove_edge(vertex_delete,neigh_vertex_delete[j],*gtmp);
@@ -1492,7 +1393,7 @@ bool contraction_HEM_degree(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEn
 bool contraction_HEM_mds_ameliore_KK(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &liste_corr, int val_reduc, int &val_cpt){
 	UnorientedGraph *gtmp = new UnorientedGraph();
 	boost::copy_graph(*g, *gtmp);
-	Entiers Random_list_vertices, Index_Vertex; // Initialisation du tableau de sommets rangés aléatoirements
+	Entiers Index_Vertex; // Initialisation du tableau de sommets rangés aléatoirements
 	EntiersEntiers *tableau_de_correspondance = new EntiersEntiers();
 	edge_t e1,e2; // Iterateurs sur les arcs
 	bool found;
@@ -1502,15 +1403,10 @@ bool contraction_HEM_mds_ameliore_KK(UnorientedGraph *g, Base_Graph &baseg, List
 	 * Création d'un vecteur contenant l'ensemble des sommets du graphe. Ces sommets sont rangés
 	 * aléatoirement afin de simuler un tirage aléatoire
 	 */
-	for (uint i=0 ; i<nbr_vertex ; i++){
-		Random_list_vertices.push_back(i);
-		Index_Vertex.push_back(i);}
-	for (uint j=0 ; j<nbr_vertex-1 ; j++) {
-		int rand_pos = rand()%(nbr_vertex-j)+j;
-		int tmp      = Random_list_vertices[j];
-		Random_list_vertices[j] = Random_list_vertices[rand_pos];
-		Random_list_vertices[rand_pos] = tmp;
-	}
+	for (uint i=0 ; i<nbr_vertex ; i++)
+		Index_Vertex.push_back(i);
+	
+	Entiers Random_list_vertices = Random_Sort_Vector(nbr_vertex);
 
 	/*
 	 * Pour chaque sommet non verrouiller faire ....
@@ -1731,25 +1627,18 @@ bool Est_voisin(UnorientedGraph *g, int vertex, int vertex_select){
 
 bool contraction_Random_Maching(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &liste_corr, int val_reduc, int &val_cpt){
 	UnorientedGraph *gtmp = new UnorientedGraph();
-	*gtmp=*g;
-	Entiers Random_list_vertices; // Initialisation du tableau de sommets rangés aléatoirements
+	boost::copy_graph(*g, *gtmp);
 	EntiersEntiers *tableau_de_correspondance = new EntiersEntiers();
 	edge_t e1,e2; // Iterateurs sur les arcs
 	bool found;
 	uint nbr_vertex = num_vertices(*gtmp);
 	Entiers sommets_a_detruire; // Initialisation d'un tableau pret à recevoir les "sommets à détruire"
+	
 	/*
 	 * Création d'un vecteur contenant l'ensemble des sommets du graphe. Ces sommets sont rangés
 	 * aléatoirement afin de simuler un tirage aléatoire
 	 */
-	for (uint i=0 ; i<nbr_vertex ; i++)
-		Random_list_vertices.push_back(i);
-	for (uint j=0 ; j<nbr_vertex-1 ; j++) {
-		int rand_pos = rand()%(nbr_vertex-j)+j;
-		int tmp      = Random_list_vertices[j];
-		Random_list_vertices[j] = Random_list_vertices[rand_pos];
-		Random_list_vertices[rand_pos] = tmp;
-	}
+	Entiers Random_list_vertices = Random_Sort_Vector(nbr_vertex);
 
 	/*
 	 * Pour chaque sommet non verrouiller faire ....
@@ -1774,9 +1663,7 @@ bool contraction_Random_Maching(UnorientedGraph *g, Base_Graph &baseg, ListEntie
 
 				Entiers * couple = new Entiers(); // Initialisation du vecteur contenant le couple de sommet fusionné
 				int vertex_delete = std::max(vertexs, best_vertexs); // Sommet d'indentifiant le plus grand (qui sera détruit)
-				//std::cout<<"sommet détruit : "<<vertex_delete<<std::endl;
 				int vertex_save = std::min(vertexs,best_vertexs); // Sommet d'identifiant le plus petit (qui sera conservé)
-				//std::cout<<"sommet sauvé : "<<vertex_save<<std::endl;
 
 				sommets_a_detruire.push_back(vertex_delete); // On ajoute le sommet détruit au tableau des sommets à détruire
 				/*
@@ -1870,28 +1757,11 @@ bool contraction_Random_Maching(UnorientedGraph *g, Base_Graph &baseg, ListEntie
 		remove_vertex(sommets_a_detruire[j],*gtmp);
 	}
 
-	/**std::clog<<"Affichage avant tri "<<std::endl;
-	for(uint k = 0;k<tableau_de_correspondance->size();k++){
-		for(uint v = 0; v<tableau_de_correspondance->at(k)->size();v++){
-			std::cout<<tableau_de_correspondance->at(k)->at(v)<<" ";
-		}
-		std::cout<<"\n"<<std::endl;
-	}*/
 	std::sort(tableau_de_correspondance->begin(),tableau_de_correspondance->end(),myobject); // Trie dans l'ordre croissant des couples de sommets de la liste de correspondance
-
-	// std::clog<<"Tableau de correspondance "<<std::endl;
-	// for(uint k = 0;k<tableau_de_correspondance->size();k++){
-	// 	for(uint v = 0; v<tableau_de_correspondance->at(k)->size();v++){
-	// 		std::cout<<tableau_de_correspondance->at(k)->at(v)<<" ";
-	// 	}
-	// 	std::cout<<"\n"<<std::endl;
-	// }
-
 	liste_corr.push_back(tableau_de_correspondance);
-	// std::cout<<"\n"<<std::endl;
 	baseg.push_back(gtmp); // Ajout du graphe modifié à la "base des graphe"
 
-
+	
 	if(val_cpt == val_reduc)
 		return true;
 	else
@@ -3270,7 +3140,7 @@ void Plot_UnorientedGraph_All(UnorientedGraph *g, const EntiersEntiers &Partitio
 	edge_t e1;
 	bool found;
 	
-	if(Partition.size()<16){
+	if(Partition.size()<17){
 		std::ofstream GRAPH2 (text, std::ios::out);
 		GRAPH2<<"graph G {"<<std::endl;   
 		tie(vertexIt, vertexEnd) = vertices(*g);
@@ -3324,7 +3194,7 @@ void Plot_OrientedGraph_All(OrientedGraph *go, const EntiersEntiers &Partition, 
 	edge_to e1;
 	bool found;
 	
-	if(Partition.size()<16){
+	if(Partition.size()<17){
 		std::vector<std::string> color;
 		color.push_back("[color=blue2, fontcolor=blue2];");
 		color.push_back("[color=red, fontcolor=red];");
@@ -3474,6 +3344,21 @@ void Merge_Boost_Graph(OrientedGraph *go1, OrientedGraph *go2, std::vector<std::
 		 
 	}	
 	
+}
+
+Entiers Random_Sort_Vector(uint size){
+	
+	Entiers random_order;
+	for (uint i = 0 ; i<  size ; i++)
+		random_order.push_back(i);
+	for (uint j=0 ; j < size-1 ; j++) {
+		int rand_pos = rand()%(size-j)+j;
+		int tmp      = random_order.at(j);
+		random_order.at(j) = random_order.at(rand_pos);
+		random_order.at(rand_pos) = tmp;
+	}
+	
+	return random_order;
 }
 
 } } } // namespace paradevs tests boost_graph

@@ -58,6 +58,9 @@ void Pseudo_random_partitioning(UnorientedGraph *g,
 							EntiersEntiers &Partition,
                             uint nbr_parties);
 
+EntiersEntiers Random_equal_weight_partitioning(UnorientedGraph *g,
+                            uint parts_number);
+                            
 EntiersEntiers Random_partitioning(UnorientedGraph *g,
                             uint parts_number);
 

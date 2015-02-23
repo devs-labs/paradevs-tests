@@ -55,6 +55,11 @@ public:
 		std::cout<<"**"<<cluster_number<<"**"<<std::endl;
         OrientedGraph go;
         
+        /** Méthode de contraction possible :
+         *  HEM : hem standars amélioré en temps 
+         *  HEM_degree : hem aves suppression de l'aléatoire 
+         *  autre : random_matching
+         *  **/
         std::vector<std::string> parameters = {"HEM", 
 											  partitioning_method_name, 
 											  "diff", "ratio"};
@@ -75,7 +80,7 @@ public:
             graphs = Multiniveau(&go, numeric_parameters,
                                  parameters, edge_partie ,
                                  output_edges, input_edges,
-                                 parent_connections,false , 2);
+                                 parent_connections, true, 2);
         } else {
 			uint nbr_tirage = 10;
 			std::vector<uint> numeric_parameters = {contraction_coef ,
@@ -85,7 +90,7 @@ public:
             graphs = Multiniveau(&go, numeric_parameters,
                                  parameters, edge_partie ,
                                  output_edges, input_edges,
-                                 parent_connections,false , 2);
+                                 parent_connections, true, 2);
         }
 
         // std::cout << "*********************************" << std::endl;

@@ -47,35 +47,35 @@ void build_graph(OrientedGraph& og, unsigned int edge_number)
 		vertex_to v9 = boost::add_vertex(og);
 		vertex_to v10 = boost::add_vertex(og);
 
-		add_edge(v1, v0, EdgeProperties(2.), og);
-		add_edge(v2, v0, EdgeProperties(1.5), og);
-		add_edge(v3, v0, EdgeProperties(1.5), og);
-		add_edge(v1, v2, EdgeProperties(3.), og);
-		add_edge(v4, v1, EdgeProperties(3.), og);
-		add_edge(v5, v1, EdgeProperties(3.), og);
-		add_edge(v6, v1, EdgeProperties(3.), og);
-		add_edge(v6, v2, EdgeProperties(2.), og);
+		add_edge(v1, v0, EdgeProperties(1), og);
+		add_edge(v2, v0, EdgeProperties(1), og);
+		add_edge(v3, v0, EdgeProperties(1), og);
+		add_edge(v1, v2, EdgeProperties(1), og);
+		add_edge(v4, v1, EdgeProperties(1.), og);
+		add_edge(v5, v1, EdgeProperties(1.), og);
+		add_edge(v6, v1, EdgeProperties(1.), og);
+		add_edge(v6, v2, EdgeProperties(1.), og);
 		add_edge(v2, v3, EdgeProperties(1.), og);
 		add_edge(v9, v3, EdgeProperties(1.), og);
 		add_edge(v10, v3, EdgeProperties(1.), og);
-		add_edge(v4, v5, EdgeProperties(1.5), og);
-		add_edge(v5, v6, EdgeProperties(1.5), og);
+		add_edge(v4, v5, EdgeProperties(1), og);
+		add_edge(v5, v6, EdgeProperties(1), og);
 		add_edge(v7, v4, EdgeProperties(1.), og);
 		add_edge(v8, v4, EdgeProperties(1.), og);
-		add_edge(v7, v8, EdgeProperties(1.5), og);
-		add_edge(v9, v10, EdgeProperties(2.), og);
+		add_edge(v7, v8, EdgeProperties(1), og);
+		add_edge(v9, v10, EdgeProperties(1.), og);
 
-		og[v6] = VertexProperties(6, 1.5, NORMAL_PIXEL);
+		og[v6] = VertexProperties(6, 1, NORMAL_PIXEL);
 		og[v8] = VertexProperties(8, 1., NORMAL_PIXEL);
-		og[v10] = VertexProperties(10, 1.5, NORMAL_PIXEL);
-		og[v0] = VertexProperties(0, 3, NORMAL_PIXEL);
-		og[v1] = VertexProperties(1, 2, NORMAL_PIXEL);
-		og[v2] = VertexProperties(2, 2, NORMAL_PIXEL);
-		og[v3] = VertexProperties(3, 2, NORMAL_PIXEL);
-		og[v4] = VertexProperties(4, 1.5, NORMAL_PIXEL);
-		og[v5] = VertexProperties(5, 1.5, NORMAL_PIXEL);
+		og[v10] = VertexProperties(10, 1, NORMAL_PIXEL);
+		og[v0] = VertexProperties(0, 1, NORMAL_PIXEL);
+		og[v1] = VertexProperties(1, 1, NORMAL_PIXEL);
+		og[v2] = VertexProperties(2, 1, NORMAL_PIXEL);
+		og[v3] = VertexProperties(3, 1, NORMAL_PIXEL);
+		og[v4] = VertexProperties(4, 1, NORMAL_PIXEL);
+		og[v5] = VertexProperties(5, 1, NORMAL_PIXEL);
 		og[v7] = VertexProperties(7, 1., TOP_PIXEL);
-		og[v9] = VertexProperties(9, 1.5, TOP_PIXEL);
+		og[v9] = VertexProperties(9, 1., TOP_PIXEL);
 		
 	} else if(edge_number == 38){
 		
@@ -182,45 +182,58 @@ void build_graph(OrientedGraph& og, unsigned int edge_number)
 		add_edge(v36, v37, EdgeProperties(1.), og);
 		add_edge(v36, v33, EdgeProperties(1.), og);
 		add_edge(v37, v33, EdgeProperties(1.), og);
-
-		og[v6] = VertexProperties(6, 2.5, NORMAL_PIXEL);
-		og[v8] = VertexProperties(8, 2., NORMAL_PIXEL);
-		og[v10] = VertexProperties(10, 2.5, NORMAL_PIXEL);
-		og[v0] = VertexProperties(0, 4, NORMAL_PIXEL);
-		og[v1] = VertexProperties(1, 3, NORMAL_PIXEL);
-		og[v2] = VertexProperties(2, 3, NORMAL_PIXEL);
-		og[v3] = VertexProperties(3, 3, NORMAL_PIXEL);
-		og[v4] = VertexProperties(4, 2.5, NORMAL_PIXEL);
-		og[v5] = VertexProperties(5, 2.5, NORMAL_PIXEL);
-		og[v7] = VertexProperties(7, 2., NORMAL_PIXEL);
-		og[v9] = VertexProperties(9, 2.5, TOP_PIXEL);
-		og[v11] = VertexProperties(11, 2, NORMAL_PIXEL);
-		og[v12] = VertexProperties(12, 1.5, NORMAL_PIXEL);
-		og[v13] = VertexProperties(13, 1.5, NORMAL_PIXEL);
+		
+		add_edge(v4, v0, EdgeProperties(1.), og);
+		add_edge(v9, v2, EdgeProperties(1.), og);
+		add_edge(v28, v24, EdgeProperties(1.), og);
+		add_edge(v28, v31, EdgeProperties(1.), og);
+		add_edge(v33, v3, EdgeProperties(1.), og);
+		add_edge(v33, v0, EdgeProperties(1.), og);
+		add_edge(v36, v3, EdgeProperties(1.), og);
+		add_edge(v17, v13, EdgeProperties(1.), og);
+		add_edge(v17, v7, EdgeProperties(1.), og);
+		add_edge(v21, v23, EdgeProperties(1.), og);
+		add_edge(v23, v20, EdgeProperties(1.), og);
+		add_edge(v26, v4, EdgeProperties(1.), og);
+		
+		og[v6] = VertexProperties(6, 1, NORMAL_PIXEL);
+		og[v8] = VertexProperties(8, 1, NORMAL_PIXEL);
+		og[v10] = VertexProperties(10, 1, NORMAL_PIXEL);
+		og[v0] = VertexProperties(0, 1, NORMAL_PIXEL);
+		og[v1] = VertexProperties(1, 1, NORMAL_PIXEL);
+		og[v2] = VertexProperties(2, 1, NORMAL_PIXEL);
+		og[v3] = VertexProperties(3, 1, NORMAL_PIXEL);
+		og[v4] = VertexProperties(4, 1, NORMAL_PIXEL);
+		og[v5] = VertexProperties(5, 1, NORMAL_PIXEL);
+		og[v7] = VertexProperties(7, 1, NORMAL_PIXEL);
+		og[v9] = VertexProperties(9, 1, TOP_PIXEL);
+		og[v11] = VertexProperties(11, 1, NORMAL_PIXEL);
+		og[v12] = VertexProperties(12, 1, NORMAL_PIXEL);
+		og[v13] = VertexProperties(13, 1, NORMAL_PIXEL);
 		og[v14] = VertexProperties(14, 1, TOP_PIXEL);
 		og[v15] = VertexProperties(15, 1, NORMAL_PIXEL);
 		og[v16] = VertexProperties(16, 1, NORMAL_PIXEL);
 		og[v17] = VertexProperties(17, 1, NORMAL_PIXEL);
-		og[v18] = VertexProperties(18, 1.5, TOP_PIXEL);
-		og[v19] = VertexProperties(19, 1.5, NORMAL_PIXEL);
-		og[v20] = VertexProperties(20, 1.5, NORMAL_PIXEL);
+		og[v18] = VertexProperties(18, 1, TOP_PIXEL);
+		og[v19] = VertexProperties(19, 1, NORMAL_PIXEL);
+		og[v20] = VertexProperties(20, 1, NORMAL_PIXEL);
 		og[v21] = VertexProperties(21, 1, TOP_PIXEL);
 		og[v22] = VertexProperties(22, 1, NORMAL_PIXEL);
 		og[v23] = VertexProperties(23, 1, NORMAL_PIXEL);
-		og[v24] = VertexProperties(24, 2, NORMAL_PIXEL);
-		og[v25] = VertexProperties(25, 2, NORMAL_PIXEL);
-		og[v26] = VertexProperties(26, 1.5, TOP_PIXEL);
-		og[v27] = VertexProperties(27, 1.5, NORMAL_PIXEL);
-		og[v28] = VertexProperties(28, 1.5, NORMAL_PIXEL);
+		og[v24] = VertexProperties(24, 1, NORMAL_PIXEL);
+		og[v25] = VertexProperties(25, 1, NORMAL_PIXEL);
+		og[v26] = VertexProperties(26, 1, TOP_PIXEL);
+		og[v27] = VertexProperties(27, 1, NORMAL_PIXEL);
+		og[v28] = VertexProperties(28, 1, NORMAL_PIXEL);
 		og[v29] = VertexProperties(29, 1, TOP_PIXEL);
 		og[v30] = VertexProperties(30, 1, TOP_PIXEL);
-		og[v31] = VertexProperties(31, 2, NORMAL_PIXEL);
-		og[v32] = VertexProperties(32, 2, NORMAL_PIXEL);
-		og[v33] = VertexProperties(33, 2, NORMAL_PIXEL);
-		og[v34] = VertexProperties(34, 1.5, TOP_PIXEL);
-		og[v35] = VertexProperties(35, 1.5, NORMAL_PIXEL);
-		og[v36] = VertexProperties(36, 1.5, TOP_PIXEL);
-		og[v37] = VertexProperties(37, 1.5, NORMAL_PIXEL);
+		og[v31] = VertexProperties(31, 1, NORMAL_PIXEL);
+		og[v32] = VertexProperties(32, 1, NORMAL_PIXEL);
+		og[v33] = VertexProperties(33, 1, NORMAL_PIXEL);
+		og[v34] = VertexProperties(34, 1, TOP_PIXEL);
+		og[v35] = VertexProperties(35, 1, NORMAL_PIXEL);
+		og[v36] = VertexProperties(36, 1, TOP_PIXEL);
+		og[v37] = VertexProperties(37, 1, NORMAL_PIXEL);
 		
 	}else{
 		std::cout<<"Le type de artificiel graphe choisi n'existe pas ! "<<std::endl;
@@ -238,54 +251,94 @@ void modify_file_paths(std::string& absolutePath,
 
 void build_graph_cyclique(OrientedGraph& og)
 {
-		vertex_to v0 = boost::add_vertex(og);
-		vertex_to v1 = boost::add_vertex(og);
-		vertex_to v2 = boost::add_vertex(og);
-		vertex_to v3 = boost::add_vertex(og);
-		vertex_to v4 = boost::add_vertex(og);
-		vertex_to v5 = boost::add_vertex(og);
-		vertex_to v6 = boost::add_vertex(og);
-		vertex_to v7 = boost::add_vertex(og);
-		vertex_to v8 = boost::add_vertex(og);
-		vertex_to v9 = boost::add_vertex(og);
-		vertex_to v10 = boost::add_vertex(og);
+	vertex_to v0 = boost::add_vertex(og);
+	vertex_to v1 = boost::add_vertex(og);
+	vertex_to v2 = boost::add_vertex(og);
+	vertex_to v3 = boost::add_vertex(og);
+	vertex_to v4 = boost::add_vertex(og);
+	vertex_to v5 = boost::add_vertex(og);
+	vertex_to v6 = boost::add_vertex(og);
+	vertex_to v7 = boost::add_vertex(og);
+	vertex_to v8 = boost::add_vertex(og);
+	vertex_to v9 = boost::add_vertex(og);
+	vertex_to v10 = boost::add_vertex(og);
 
-		add_edge(v0, v1, EdgeProperties(1.), og);
-		add_edge(v0, v2, EdgeProperties(1.), og);
-		add_edge(v0, v3, EdgeProperties(1.), og);
-		add_edge(v1, v3, EdgeProperties(1.), og);
-		add_edge(v2, v1, EdgeProperties(1.), og);
-		add_edge(v2, v3, EdgeProperties(1.), og);
-		add_edge(v2, v4, EdgeProperties(1.), og);
-		add_edge(v2, v5, EdgeProperties(1.), og);
-		add_edge(v2, v7, EdgeProperties(1.), og);
-		add_edge(v2, v9, EdgeProperties(1.), og);
-		add_edge(v3, v4, EdgeProperties(1.), og);
-		add_edge(v3, v5, EdgeProperties(1.), og);
-		add_edge(v3, v7, EdgeProperties(1.), og);
-		add_edge(v3, v9, EdgeProperties(1.), og);
-		add_edge(v4, v6, EdgeProperties(1.), og);
-		add_edge(v5, v4, EdgeProperties(1.), og);
-		add_edge(v5, v6, EdgeProperties(1.), og);
-		add_edge(v6, v7, EdgeProperties(1.), og);
-		add_edge(v7, v8, EdgeProperties(1.), og);
-		add_edge(v7, v10, EdgeProperties(1.), og);
-		add_edge(v8, v9, EdgeProperties(1.), og);
-		add_edge(v8, v10, EdgeProperties(1.), og);
-		add_edge(v9, v10, EdgeProperties(1.), og);
-		add_edge(v10, v0, EdgeProperties(1.), og);
+	add_edge(v0, v1, EdgeProperties(1.), og);
+	add_edge(v0, v2, EdgeProperties(1.), og);
+	add_edge(v0, v3, EdgeProperties(1.), og);
+	add_edge(v1, v3, EdgeProperties(1.), og);
+	add_edge(v2, v1, EdgeProperties(1.), og);
+	add_edge(v2, v3, EdgeProperties(1.), og);
+	add_edge(v2, v4, EdgeProperties(1.), og);
+	add_edge(v2, v5, EdgeProperties(1.), og);
+	add_edge(v2, v7, EdgeProperties(1.), og);
+	add_edge(v2, v9, EdgeProperties(1.), og);
+	add_edge(v3, v4, EdgeProperties(1.), og);
+	add_edge(v3, v5, EdgeProperties(1.), og);
+	add_edge(v3, v7, EdgeProperties(1.), og);
+	add_edge(v3, v9, EdgeProperties(1.), og);
+	add_edge(v4, v6, EdgeProperties(1.), og);
+	add_edge(v5, v4, EdgeProperties(1.), og);
+	add_edge(v5, v6, EdgeProperties(1.), og);
+	add_edge(v6, v7, EdgeProperties(1.), og);
+	add_edge(v7, v8, EdgeProperties(1.), og);
+	add_edge(v7, v10, EdgeProperties(1.), og);
+	add_edge(v8, v9, EdgeProperties(1.), og);
+	add_edge(v8, v10, EdgeProperties(1.), og);
+	add_edge(v9, v10, EdgeProperties(1.), og);
+	add_edge(v10, v0, EdgeProperties(1.), og);
 
-		og[v6] = VertexProperties(6, 1, NORMAL_PIXEL);
-		og[v8] = VertexProperties(8, 1, NORMAL_PIXEL);
-		og[v10] = VertexProperties(10, 1, NORMAL_PIXEL);
-		og[v0] = VertexProperties(0, 1, NORMAL_PIXEL);
-		og[v1] = VertexProperties(1, 1, NORMAL_PIXEL);
-		og[v2] = VertexProperties(2, 1, NORMAL_PIXEL);
-		og[v3] = VertexProperties(3, 1, NORMAL_PIXEL);
-		og[v4] = VertexProperties(4, 1, NORMAL_PIXEL);
-		og[v5] = VertexProperties(5, 1, NORMAL_PIXEL);
-		og[v7] = VertexProperties(7, 1, NORMAL_PIXEL);
-		og[v9] = VertexProperties(9, 1, NORMAL_PIXEL);
+	og[v6] = VertexProperties(6, 1, NORMAL_PIXEL);
+	og[v8] = VertexProperties(8, 1, NORMAL_PIXEL);
+	og[v10] = VertexProperties(10, 1, NORMAL_PIXEL);
+	og[v0] = VertexProperties(0, 1, NORMAL_PIXEL);
+	og[v1] = VertexProperties(1, 1, NORMAL_PIXEL);
+	og[v2] = VertexProperties(2, 1, NORMAL_PIXEL);
+	og[v3] = VertexProperties(3, 1, NORMAL_PIXEL);
+	og[v4] = VertexProperties(4, 1, NORMAL_PIXEL);
+	og[v5] = VertexProperties(5, 1, NORMAL_PIXEL);
+	og[v7] = VertexProperties(7, 1, NORMAL_PIXEL);
+	og[v9] = VertexProperties(9, 1, NORMAL_PIXEL);
+}
+
+void build_example_linked9(OrientedGraph& og)
+{
+	vertex_to v0 = boost::add_vertex(og);
+	vertex_to v1 = boost::add_vertex(og);
+	vertex_to v2 = boost::add_vertex(og);
+	vertex_to v3 = boost::add_vertex(og);
+	vertex_to v4 = boost::add_vertex(og);
+	vertex_to v5 = boost::add_vertex(og);
+	vertex_to v6 = boost::add_vertex(og);
+	vertex_to v7 = boost::add_vertex(og);
+	vertex_to v8 = boost::add_vertex(og);
+	vertex_to v9 = boost::add_vertex(og);
+	
+	add_edge(v1, v0, EdgeProperties(1.), og);
+	add_edge(v2, v0, EdgeProperties(1.), og);
+	add_edge(v3, v0, EdgeProperties(1.), og);
+	add_edge(v4, v1, EdgeProperties(1.), og);
+	add_edge(v4, v2, EdgeProperties(1.), og);
+	add_edge(v5, v1, EdgeProperties(1.), og);
+	add_edge(v6, v1, EdgeProperties(1.), og);
+	add_edge(v6, v2, EdgeProperties(1.), og);
+	add_edge(v6, v3, EdgeProperties(1.), og);
+	add_edge(v7, v2, EdgeProperties(1.), og);
+	add_edge(v7, v3, EdgeProperties(1.), og);
+	add_edge(v8, v2, EdgeProperties(1.), og);
+	add_edge(v9, v1, EdgeProperties(1.), og);
+	add_edge(v9, v3, EdgeProperties(1.), og);
+	
+	og[v6] = VertexProperties(6, 1, TOP_PIXEL);
+	og[v8] = VertexProperties(8, 1, TOP_PIXEL);
+	og[v0] = VertexProperties(0, 1, NORMAL_PIXEL);
+	og[v1] = VertexProperties(1, 1, NORMAL_PIXEL);
+	og[v2] = VertexProperties(2, 1, NORMAL_PIXEL);
+	og[v3] = VertexProperties(3, 1, NORMAL_PIXEL);
+	og[v4] = VertexProperties(4, 1, TOP_PIXEL);
+	og[v5] = VertexProperties(5, 1, TOP_PIXEL);
+	og[v7] = VertexProperties(7, 1, TOP_PIXEL);
+	og[v9] = VertexProperties(9, 1, TOP_PIXEL);
 }
 /*void build_corsen_graph(OrientedGraph& graph)
 {
@@ -651,6 +704,7 @@ void brhtg_exutoire(OrientedGraph *go,int nbr_vertex,int nbr_v_min, int nbr_v_ma
 
 void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source, int nbr_v_min, int nbr_v_max,const std::vector<int> &niveau){
 	std::vector<vertex_to> Vertexs;
+	OrientedGraph::in_edge_iterator ei, edge_end;
 
 	int nbr_npb;
 	int nbr_branche = 0;
@@ -669,6 +723,7 @@ void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source, in
 		}
 		nbr_branche += nbr_tmp;
 	}
+	std::cout<<nbr_branche<<std::endl;
 
 	nbr_npb = nbr_vertex/(nbr_branche);
 
@@ -725,18 +780,29 @@ void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source, in
 		}
 	}
 	
+	int compteur = 0;
 	for(uint i = 0; i<num_vertices(*go); i++){
-		if(dg_in_vertex_list.at(i) == 0){
+		bool indic = false;
+		for(tie(ei,edge_end) = in_edges(i,*go); ei != edge_end; ++ei){
+			indic = true;
+			break;
+		}
+		if(dg_in_vertex_list.at(i) == 0 || indic == false){
+			compteur++;
 			(*go)[i] = VertexProperties(i, 1, TOP_PIXEL);
 		}else{
 			(*go)[i] = VertexProperties(i, 1, NORMAL_PIXEL);
 		}
+		//std::cout<<(*go)[i]._index<<" "<<indic<<" -> "<<(*go)[i]._type<<std::endl;
 	}
-
+	
+	std::cout<<"Compteur : "<<compteur<<std::endl;
 }
 
 void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_couche, int nbr_v_min, int nbr_v_max){
 	std::vector<vertex_to> Vertexs;
+	OrientedGraph::in_edge_iterator ei, edge_end;
+	
 	for(int i =0; i<nbr_vertex; i++){
 		vertex_to vo = boost::add_vertex(*go);
 		Vertexs.push_back(vo);
@@ -746,7 +812,7 @@ void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_cou
 	int midel_couche = nbr_couche-2;
 	int top_couche;
 	if(nbr_couche>5){
-		top_couche = floor(nbr_vertex/floor(midel_couche/2));
+		top_couche = floor(nbr_vertex/3);//floor(midel_couche/2));
 	}else{
 		top_couche = floor(nbr_vertex/2);
 	}
@@ -912,7 +978,12 @@ void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_cou
 	}
 	
 	for(uint i = 0; i<num_vertices(*go); i++){
-		if(dg_in_vertex_list.at(i) == 0){
+		bool indic = false;
+		for(tie(ei,edge_end) = in_edges(i,*go); ei != edge_end; ++ei){
+			indic = true;
+			break;
+		}
+		if(dg_in_vertex_list.at(i) == 0 || indic == false){
 			(*go)[i] = VertexProperties(i, 1, TOP_PIXEL);
 		}else{
 			(*go)[i] = VertexProperties(i, 1, NORMAL_PIXEL);
@@ -1002,6 +1073,29 @@ void build_graph_grid(OrientedGraph *go, int side, const std::vector<std::pair<i
 	}
 	
 }
+
+/*void build_graph_grid_center(OrientedGraph *go, int side, const std::vector<std::pair<int,int>> &vertex_selection, const Entiers &weight_vertex,const char *edge_weight, bool rec){
+	int nbr_vertex = side*side;
+	std::vector<vertex_to> Vertexs;
+	for(int i =0; i<nbr_vertex; i++){
+		vertex_to vo = boost::add_vertex(*go);
+		Vertexs.push_back(vo);
+	}
+	
+	// Ité 0
+	for(uint i = 0; i < 4; i++){
+		boost::add_edge(0, 2 + 2*i ,EdgeProperties(1) , *go);
+	}
+	
+	// Ité 1 
+	
+	for(uint i = 1; i < 9; i++){
+		
+	}
+	
+	
+	
+}*/
 
 /*Vérification de la pondération + vérification des poids de la contraction + vérification de la structure de contraction*/
 
