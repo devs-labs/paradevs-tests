@@ -9,7 +9,7 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXML_LIBRARY_DIR})
 
-SET(PARTITIONING_HPP utils.hpp gggp.hpp graph_build.hpp)
+SET(PARTITIONING_HPP utils.hpp gggp.hpp graph_build.hpp) 
 
 SET(PARTITIONING_CPP utils.cpp gggp.cpp graph_build.cpp)
 

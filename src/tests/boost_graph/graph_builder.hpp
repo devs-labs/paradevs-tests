@@ -419,6 +419,27 @@ public:
 
 };
 
+//créationd de la classe ParcelFlatGraphBuilder
+class ParcelFlatGraphBuilder
+{
+public:
+    ParcelFlatGraphBuilder()
+    { }
+
+    void build(OrientedGraphs& graphs, InputEdgeList& ,
+               OutputEdgeList& ,
+               Connections& )
+    {
+        
+        OrientedGraph graph;
+        uint size_max = 1000;
+        std::string name = "mono";
+        
+		build_parcellaire_graph(&graph, size_max, name);
+        graphs.push_back(graph);
+    }
+
+};
 
 } } } // namespace paradevs tests boost_graph
 

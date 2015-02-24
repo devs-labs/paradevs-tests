@@ -832,6 +832,9 @@ OrientedGraphs Multiniveau(OrientedGraph *go,
     int val_cpt = num_vertices(*g);
     bool time = true;
     
+    /*Eigen::MatrixXd Madj = adjacence_matrix(g);
+	std::cout << Madj << std::endl << std::endl;*/
+    
     if(numeric_parameters.at(0) != val_cpt && parameters.at(1) != "rand" && parameters.at(1) != "rande"){
 		
 		Coarsening_Phase(baseg, liste_corr, numeric_parameters.at(0), val_cpt, parameters.at(0));

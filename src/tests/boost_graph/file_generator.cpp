@@ -26,6 +26,7 @@
 
 #include <boost/format.hpp>
 #include <fstream>
+#include <boost/timer.hpp>
 
 //#include <tests/boost_graph/partitioning/graph_build.hpp>
 #include <tests/boost_graph/graph_generator.hpp>
@@ -35,6 +36,7 @@ using namespace paradevs::tests::boost_graph;
 
 int main()
 {
+	boost::timer t;
 	srand((unsigned)time(NULL));
 	/** Grid **/
 	/*int side = floor(sqrt(4900));
@@ -58,13 +60,16 @@ int main()
 	
 	/** Linked **/
 	//OrientedGraph gtmp;
-	int nbr_sommets = 10000;
-	int nbr_couches = 60;
-	RandomLinkedGraphGenerator generator(nbr_sommets, nbr_couches, 2, 3);
+	//int nbr_sommets = 10000;
+	//int nbr_couches = 60;
+	//RandomLinkedGraphGenerator generator(nbr_sommets, nbr_couches, 2, 3);
 	//generator.generate(gtmp);
 	//Text_generator_graph("file/data_base/linked/linked_10000.txt", &gtmp);
 	
 	//ArtificialGraphGenerator generator(38);
+	
+	ParcelGraphGenerator generator(10000, "mono");
+	std::cout << "Duration : " << t.elapsed() << " seconds" << std::endl;
 	
 	OrientedGraph::vertex_iterator vertexIt, vertexEnd;
 	
@@ -108,7 +113,7 @@ int main()
 	 * ggp
 	 * rand
 	 **/
-    PartitioningGraphBuilder graph_builder(2, "gggp", 200,
+    PartitioningGraphBuilder graph_builder(4, "gggp", 200,
                                            false, generator);
                                            
     OrientedGraphs graphs;
@@ -118,6 +123,8 @@ int main()
 
     graph_builder.build(graphs, input_edges, output_edges,
                         parent_connections);
+                        
+    std::cout << "Duration : " << t.elapsed() << " seconds" << std::endl;
     
     /*std::vector<const char*> name;
     name.push_back("../../sortie_graphe/Tests/Graphes/Multiniveau/txt/partie_0.txt");

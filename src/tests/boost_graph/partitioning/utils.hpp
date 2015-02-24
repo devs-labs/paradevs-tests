@@ -230,6 +230,10 @@ void Merge_Boost_Graph(OrientedGraph *go1, OrientedGraph *go2,
 						std::vector<double> &connection_weight);
 
 Entiers Random_Sort_Vector(uint size);
+Entiers Random_Sort_Vector2(uint min, uint size);
+
+double distance_t(std::pair<double,double> x, std::pair<double,double> y);
+
 } } } // namespace paradevs tests boost_graph
 
 #endif

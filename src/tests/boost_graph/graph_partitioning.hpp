@@ -80,7 +80,7 @@ public:
             graphs = Multiniveau(&go, numeric_parameters,
                                  parameters, edge_partie ,
                                  output_edges, input_edges,
-                                 parent_connections, true, 2);
+                                 parent_connections, false, 2);
         } else {
 			uint nbr_tirage = 10;
 			std::vector<uint> numeric_parameters = {contraction_coef ,
@@ -90,7 +90,7 @@ public:
             graphs = Multiniveau(&go, numeric_parameters,
                                  parameters, edge_partie ,
                                  output_edges, input_edges,
-                                 parent_connections, true, 2);
+                                 parent_connections, false, 2);
         }
 
         // std::cout << "*********************************" << std::endl;

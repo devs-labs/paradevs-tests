@@ -149,6 +149,29 @@ private:
     unsigned int edge_number;
 };
 
+class ParcelGraphGenerator : public GraphGenerator
+{
+public:
+    ParcelGraphGenerator(uint size_max,
+                         std::string name) :
+        size_max(size_max), name(name)
+    { }
+
+    virtual void generate(OrientedGraph& go)
+    {
+		//const char *texte = new const char();
+        //texte = "file/data_base/HO_models.txt";
+        //texte = "file/data_base/linked/linked10000.txt";
+        //Graph_constructor_txt(texte,&go);
+        
+		build_parcellaire_graph(&go, size_max, name);
+    }
+
+private:
+    uint size_max;
+    std::string name;
+};
+
 class CorsenGraphGenerator : public GraphGenerator
 {
 public:

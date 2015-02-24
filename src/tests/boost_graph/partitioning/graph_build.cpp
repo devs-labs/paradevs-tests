@@ -1074,6 +1074,357 @@ void build_graph_grid(OrientedGraph *go, int side, const std::vector<std::pair<i
 	
 }
 
+void build_example_ligne(OrientedGraph& og)
+{
+	vertex_to v0 = boost::add_vertex(og);
+	vertex_to v1 = boost::add_vertex(og);
+	vertex_to v2 = boost::add_vertex(og);
+	vertex_to v3 = boost::add_vertex(og);
+	vertex_to v4 = boost::add_vertex(og);
+	vertex_to v5 = boost::add_vertex(og);
+	vertex_to v6 = boost::add_vertex(og);
+	vertex_to v7 = boost::add_vertex(og);
+
+	add_edge(v0, v1, EdgeProperties(1.), og);
+	add_edge(v1, v2, EdgeProperties(1.), og);
+	add_edge(v2, v3, EdgeProperties(1.), og);
+	add_edge(v3, v4, EdgeProperties(1.), og);
+	add_edge(v4, v5, EdgeProperties(1.), og);
+	add_edge(v5, v6, EdgeProperties(1.), og);
+	add_edge(v6, v7, EdgeProperties(1.), og);
+
+	og[v6] = VertexProperties(6, 1, NORMAL_PIXEL);
+	og[v0] = VertexProperties(0, 1, TOP_PIXEL);
+	og[v1] = VertexProperties(1, 1, NORMAL_PIXEL);
+	og[v2] = VertexProperties(2, 1, NORMAL_PIXEL);
+	og[v3] = VertexProperties(3, 1, NORMAL_PIXEL);
+	og[v4] = VertexProperties(4, 1, NORMAL_PIXEL);
+	og[v5] = VertexProperties(5, 1, NORMAL_PIXEL);
+	og[v7] = VertexProperties(7, 1, NORMAL_PIXEL);	
+}
+
+void build_example_grid(OrientedGraph& og)
+{
+	vertex_to v0 = boost::add_vertex(og);
+	vertex_to v1 = boost::add_vertex(og);
+	vertex_to v2 = boost::add_vertex(og);
+	vertex_to v3 = boost::add_vertex(og);
+	vertex_to v4 = boost::add_vertex(og);
+	vertex_to v5 = boost::add_vertex(og);
+	vertex_to v6 = boost::add_vertex(og);
+	vertex_to v7 = boost::add_vertex(og);
+
+	add_edge(v0, v1, EdgeProperties(0.9), og);
+	add_edge(v0, v2, EdgeProperties(0.9), og);
+	add_edge(v0, v3, EdgeProperties(0.1), og);
+	add_edge(v1, v2, EdgeProperties(0.1), og);
+	add_edge(v1, v3, EdgeProperties(0.9), og);
+	add_edge(v2, v3, EdgeProperties(0.9), og);
+	add_edge(v2, v4, EdgeProperties(0.9), og);
+	add_edge(v2, v5, EdgeProperties(0.1), og);
+	add_edge(v3, v4, EdgeProperties(0.1), og);
+	add_edge(v3, v5, EdgeProperties(0.9), og);
+	add_edge(v4, v5, EdgeProperties(0.9), og);
+	add_edge(v4, v6, EdgeProperties(0.9), og);
+	add_edge(v4, v7, EdgeProperties(0.1), og);
+	add_edge(v5, v6, EdgeProperties(0.1), og);
+	add_edge(v5, v7, EdgeProperties(0.9), og);
+	add_edge(v6, v7, EdgeProperties(0.9), og);
+
+	og[v6] = VertexProperties(6, 1, NORMAL_PIXEL);
+	og[v0] = VertexProperties(0, 1, TOP_PIXEL);
+	og[v1] = VertexProperties(1, 1, NORMAL_PIXEL);
+	og[v2] = VertexProperties(2, 1, NORMAL_PIXEL);
+	og[v3] = VertexProperties(3, 1, NORMAL_PIXEL);
+	og[v4] = VertexProperties(4, 1, NORMAL_PIXEL);
+	og[v5] = VertexProperties(5, 1, NORMAL_PIXEL);
+	og[v7] = VertexProperties(7, 1, NORMAL_PIXEL);
+}	
+
+void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
+{
+	std::vector<std::pair<double,double> > point;
+	OrientedGraph::in_edge_iterator ei, edge_end;
+	double max_distance =  3000;//sqrt(2)*5*size_max/50;
+	double crit = sqrt(2)*5*size_max/1000;
+	
+	std::cout << "distance max : " << max_distance << std::endl;
+	std::cout << "crit : " << crit << std::endl;
+	for(uint i = 0; i < size_max; i++)
+	{	
+		std::pair<double,double> p;
+		p.first = rand()%(size_max*5-0) + 0;
+		p.second = rand()%(size_max*5-0) + 0;
+		point.push_back(p);
+	} 
+	
+	//std::cout << std::endl;
+	sort(point.begin(),point.end());
+	std::vector<std::vector<std::pair<double,uint> > > save_point_distance;
+	
+	for(uint id = 0 ; id < point.size() - 1; id++)
+	{
+		std::vector<std::pair<double,uint> > point_distance, point_distance_sort;
+		//if(name != "multi"){
+			for(uint i = id +1 ; i < point.size(); i++)
+			{
+				std::pair<double,uint> pd;
+				pd.first = distance_t(point.at(id),point.at(i));
+				pd.second = i;
+				point_distance.push_back(pd);
+			}
+		/*}else{
+			for(uint i = 0 ; i < point.size(); i++)
+			{
+				std::pair<double,uint> pd;
+				pd.first = distance_t(point.at(id),point.at(i));
+				pd.second = i;
+				point_distance.push_back(pd);
+			}
+		}*/
+		
+		point_distance_sort = point_distance;
+		
+		sort(point_distance_sort.begin(), point_distance_sort.end());
+		std::vector<uint> deleted;
+		uint t;
+		
+		
+		
+		if(point_distance_sort.size() > 50)
+			t = point_distance_sort.size()/2;
+		else
+			t = point_distance_sort.size();
+		
+		/*if(name != "multi"){*/
+			for(uint i = 0 ; i < t; i++)
+			{
+				if(point_distance_sort.at(i).first < crit)
+					deleted.push_back(point_distance_sort.at(i).second);
+				//std::cout << point_distance_sort.at(i).second << " " << point_distance_sort.at(i).first <<std::endl;
+			}
+		/*}else{
+			for(uint i = 0 ; i < t; i++)
+			{
+				if(point_distance_sort.at(i).first < crit & point_distance_sort.at(i).first != 0)
+					deleted.push_back(point_distance_sort.at(i).second);
+				//std::cout << point_distance_sort.at(i).second << " " << point_distance_sort.at(i).first <<std::endl;
+			}
+		}*/
+		//std::cout<<std::endl;
+		
+		sort(deleted.begin(), deleted.end());
+		std::reverse(deleted.begin(), deleted.end());
+		
+		/*for(uint k = 0 ; k < deleted.size(); k++)
+			std::cout << deleted.at(k) << " " ;
+		std::cout<< std::endl << std::endl;*/
+		
+		/*std::cout << "A : " << std::endl;
+		for(uint pp = 0; pp < point_distance.size(); pp++)
+			std::cout << point_distance.at(pp).second << " ";
+			
+		std::cout<< std::endl << std::endl;*/
+		
+		if(deleted.size() > 1)
+		{
+			//std::cout<<"Deleted"<<std::endl;
+			for(uint del = 0 ; del < deleted.size(); del++)
+			{
+				//std::cout << deleted.at(del) << " ";
+				for(uint idp = 0; idp < point_distance.size(); idp++)
+				{
+					if(point_distance.at(idp).second == deleted.at(del))
+					{
+						//std::cout << idp + id + 1 << std::endl;
+						/*if(name != "multi")
+						{*/
+							point.erase(point.begin() + idp + id + 1);
+							point_distance.erase(point_distance.begin() + idp);
+							for(uint pp = 0; pp < id ; pp++)
+							{
+								save_point_distance.at(pp).erase(save_point_distance.at(pp).begin() + idp);
+								for(uint j = idp; j < save_point_distance.at(pp).size(); j++)
+									save_point_distance.at(pp).at(j).second -=1;
+
+							}
+							for(uint j = idp; j < point_distance.size(); j++)
+								point_distance.at(j).second -= 1;
+						/*}else
+						{
+							point.erase(point.begin() + idp);
+							point_distance.erase(point_distance.begin() + idp);
+							for(uint pp = 0; pp < id ; pp++)
+							{
+								save_point_distance.at(pp).erase(save_point_distance.at(pp).begin() + idp);
+								for(uint j = idp; j < save_point_distance.at(pp).size(); j++)
+									save_point_distance.at(pp).at(j).second -=1;
+
+							}
+							for(uint j = idp; j < point_distance.size(); j++)
+								point_distance.at(j).second -= 1;
+						}*/
+						break;
+					}
+				}
+			}
+			//std::cout << std::endl;
+		}else if(deleted.size() == 1)
+		{
+			//std::cout<<"Deleted 2"<<std::endl;
+			//std::cout << deleted.at(0) << " ";
+			for(uint idp = 0; idp < point_distance.size(); idp++)
+			{
+				
+				if(point_distance.at(idp).second == deleted.at(0))
+				{
+					/*if(name != "multi")
+					{*/
+						//std::cout << idp + id + 1 << std::endl;
+						point.erase(point.begin() + idp + id + 1);
+						point_distance.erase(point_distance.begin() + idp);
+						for(uint pp = 0; pp < id ; pp++)
+							{
+								save_point_distance.at(pp).erase(save_point_distance.at(pp).begin() + idp);
+								for(uint j = idp; j < save_point_distance.at(pp).size(); j++)
+									save_point_distance.at(pp).at(j).second -=1;
+
+							}
+						for(uint j = idp; j < point_distance.size(); j++)
+							point_distance.at(j).second -= 1;
+						//std::cout << " toto " << std::endl;
+						
+					/*}else{
+						point.erase(point.begin() + idp);
+						point_distance.erase(point_distance.begin() + idp);
+						for(uint pp = 0; pp < id  ; pp++)
+						{
+							save_point_distance.at(pp).erase(save_point_distance.at(pp).begin() + idp);
+							for(uint j = idp; j < save_point_distance.at(pp).size(); j++)
+								save_point_distance.at(pp).at(j).second -=1;
+						}
+						for(uint j = idp; j < point_distance.size(); j++)
+							point_distance.at(j).second -= 1;
+					}*/
+					break;
+				}
+			}
+			//std::cout << std::endl;
+		}
+		/*std::cout << " B : " << std::endl;
+		for(uint pp = 0; pp < point_distance.size(); pp++)
+			std::cout << point_distance.at(pp).second << " ";
+			
+		std::cout << std::endl << std::endl;*/
+		
+		//sort(point_distance.begin(), point_distance.end());
+		save_point_distance.push_back(point_distance);
+		//std::cout << std::endl;
+	}
+	std::cout << "nombre de sommet" << point.size() << std::endl;
+	
+	
+	for(uint xt = 0; xt < save_point_distance.size(); xt++){
+		//std::cout << "** " << xt << " ** : ";
+		sort(save_point_distance.at(xt).begin(), save_point_distance.at(xt).end());
+		/*for(uint yt = 0; yt < save_point_distance.at(xt).size(); yt++){
+			std::cout << save_point_distance.at(xt).at(yt).first << " ";
+		}
+		std::cout << std::endl;*/
+	}
+	
+	
+	std::vector<vertex_to> Vertexs;
+	for(int i = 0; i < point.size(); i++){
+		vertex_to vo = boost::add_vertex(*go);
+		Vertexs.push_back(vo);
+	}
+	
+	//std::cout << point.size() << std::endl;
+	for(int i = 0; i < point.size() -1; i++){
+		//std::cout << i << std::endl;
+		double dist = 0.;
+		uint xi;
+		
+		//if(name != "multi")
+			xi = 0;
+		/*else
+			xi = 1;*/
+			
+		while(dist < max_distance & xi < save_point_distance.at(i).size())
+		{
+			dist = save_point_distance.at(i).at(xi).first;
+			if(name != "multi")
+				add_edge(Vertexs.at(i), Vertexs.at(save_point_distance.at(i).at(xi).second), EdgeProperties(1.), *go);
+			else{
+				add_edge(Vertexs.at(i), Vertexs.at(save_point_distance.at(i).at(xi).second), EdgeProperties(1.), *go);
+				add_edge(Vertexs.at(save_point_distance.at(i).at(xi).second),Vertexs.at(i), EdgeProperties(1.), *go);
+			}
+			xi++;
+		}
+		(*go)[Vertexs.at(i)] = VertexProperties(i, 1., NORMAL_PIXEL);
+	}
+	
+	(*go)[Vertexs.at(point.size()-1)] = VertexProperties(point.size()-1, 1., NORMAL_PIXEL);
+	
+	/*std::cout << "ok"<< point.size() << std::endl;
+	for(int i = 0; i < (point.size() - arcs_max); i++)
+	{
+		std::cout << "ok"<< i << " "<< point.size() <<std::endl;
+		Entiers tmp_vector = Random_Sort_Vector2(i+1, point.size());
+		int ac = rand_fini(arcs_min, arcs_max);
+		std::cout << "! " << ac <<std::endl;
+		Entiers arcs;
+		for(uint p = 0; p < ac; p++)
+			arcs.push_back(tmp_vector.at(p));
+		
+		//sort(arcs.begin(),arcs.end());
+		
+		for(uint j = 0; j < arcs.size(); j++)
+			add_edge(Vertexs.at(i), Vertexs.at(arcs.at(j)), EdgeProperties(1.), *go);
+		
+		(*go)[Vertexs.at(i)] = VertexProperties(i, 1., NORMAL_PIXEL);
+	}
+	
+	std::cout << "ok1"<<std::endl;
+	for(int i = point.size() - arcs_max; i < point.size() - 2; i++)
+	{
+		Entiers tmp_vector = Random_Sort_Vector2(i+1,point.size());
+		int ac = rand_fini(1, 2);
+		Entiers arcs;
+		for(uint p = 0; p < ac; p++)
+			arcs.push_back(tmp_vector.at(p));
+			
+		sort(arcs.begin(),arcs.end());
+		
+		for(uint j = 0; j < arcs.size(); j++)
+			add_edge(Vertexs.at(i), Vertexs.at(arcs.at(j)), EdgeProperties(1.), *go);
+		
+		(*go)[Vertexs.at(i)] = VertexProperties(i, 1., NORMAL_PIXEL);
+	}
+	std::cout << "ok2"<<std::endl;
+	
+	add_edge(Vertexs.at(point.size()-2), Vertexs.at(point.size()-1), EdgeProperties(1.), *go);
+	(*go)[Vertexs.at(point.size()-2)] = VertexProperties(point.size()-2, 1., NORMAL_PIXEL);
+	(*go)[Vertexs.at(point.size()-1)] = VertexProperties(point.size()-1, 1., NORMAL_PIXEL);*/
+	
+	for(uint i = 0; i< point.size(); i++){
+		bool indic = false;
+		for(tie(ei,edge_end) = in_edges(i,*go); ei != edge_end; ++ei){
+			indic = true;
+			break;
+		}
+		if(indic == false){
+			(*go)[i] = VertexProperties(i, 1, TOP_PIXEL);
+		}else{
+			(*go)[i] = VertexProperties(i, 1, NORMAL_PIXEL);
+		}
+		//std::cout<<(*go)[i]._index<<" "<<indic<<" -> "<<(*go)[i]._type<<std::endl;
+	}
+	
+	
+}
+
 /*void build_graph_grid_center(OrientedGraph *go, int side, const std::vector<std::pair<int,int>> &vertex_selection, const Entiers &weight_vertex,const char *edge_weight, bool rec){
 	int nbr_vertex = side*side;
 	std::vector<vertex_to> Vertexs;

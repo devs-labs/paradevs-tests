@@ -48,7 +48,7 @@ int main()
 	/*** Génération du graphe ***/
 	
     OrientedGraph *go = new OrientedGraph();
-    std::string type_graph = "linked";
+    std::string type_graph = "parcellaire";
     std::pair<bool,bool> Spectrale = {false,false};
     
     if(type_graph == "grid"){
@@ -81,8 +81,13 @@ int main()
 		//build_generator_graph_linked(go, nbr_sommets, nbr_couches , 2, 3);
 		//Text_generator_graph("file/data_base/linked/linked_50.txt",go);
 		Plot_OrientedGraph(go,"../../sortie_graphe/Tests/Graphes/Multiniveau/txt/grid_500.txt");
-	}else{
-		build_graph(*go, 38);
+	}else if(type_graph == "parcellaire")
+	{
+		build_parcellaire_graph(go, 10000, "mono");
+	}
+	else{
+		build_example_grid(*go);
+		//build_graph(*go, 11);
 	}
 	
 	/*** Comparaison des méthodes par étude du ratio de coupe ***/
@@ -102,11 +107,10 @@ int main()
 	}
 
 	/*** Paramétrage du Multiniveau ***/
-	std::vector<uint> numeric_parameters = {num_vertices(*go), 4, 10};
+	std::vector<uint> numeric_parameters = {num_vertices(*go)/50, 4, 10};
 	std::vector<std::string> parameters = {"HEM", "gggp", "diff", "ratio"};
 	
 	uint nbr_tirage = 1;
-
 	
 	for(uint i = 0 ; i < nbr_tirage ; i++){
 		Edges edge_partie;
@@ -126,7 +130,7 @@ int main()
 			OrientedGraphs graphs = Multiniveau(go, numeric_parameters,
 												parameters, edge_partie ,
 												outputedgeslist, inputedgelist,
-												connections,true, 2);  	
+												connections,false, 2);  	
 												std::cout<<std::endl;
 		}else{
 			OrientedGraphs graphs = Multiniveau(go, numeric_parameters,

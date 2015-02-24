@@ -3351,7 +3351,7 @@ Entiers Random_Sort_Vector(uint size){
 	Entiers random_order;
 	for (uint i = 0 ; i<  size ; i++)
 		random_order.push_back(i);
-	for (uint j=0 ; j < size-1 ; j++) {
+	for (uint j=0 ; j < random_order.size()-1 ; j++) {
 		int rand_pos = rand()%(size-j)+j;
 		int tmp      = random_order.at(j);
 		random_order.at(j) = random_order.at(rand_pos);
@@ -3359,6 +3359,30 @@ Entiers Random_Sort_Vector(uint size){
 	}
 	
 	return random_order;
+}
+
+Entiers Random_Sort_Vector2(uint min, uint size){
+	
+	Entiers random_order;
+	for (uint i = min ; i<  size ; i++)
+		random_order.push_back(i);
+	for (uint j = 0 ; j < random_order.size()-1 ; j++) {
+		int rand_pos = rand()%(random_order.size()-j)+j;
+		int tmp      = random_order.at(j);
+		random_order.at(j) = random_order.at(rand_pos);
+		random_order.at(rand_pos) = tmp;
+	}
+	
+	return random_order;
+}
+
+double distance_t(std::pair<double,double> x, std::pair<double,double> y)
+{	
+	double total = (x.first - y.first) * (x.first - y.first) ;
+	double diff2 = (x.second - y.second) * (x.second - y.second);
+	total +=  diff2;
+	
+	return sqrt(total);
 }
 
 } } } // namespace paradevs tests boost_graph
