@@ -419,8 +419,6 @@ public:
                             parent_connections);
 
         // build coordinators (graphs)
-        //boost::timer t;
-
         for (unsigned int i = 0; i < graphs.size(); ++i) {
             Coordinator* coordinator = 0;
             std::ostringstream ss;
@@ -428,15 +426,14 @@ public:
             ss << "S" << i;
             coordinator =
                 new Coordinator(ss.str(), paradevs::common::NoParameters(),
-                                GraphParameters(graphs[i], input_edges[i],
+                                GraphParameters(graphs[i],
+                                                input_edges[i],
                                                 output_edges[i]));
             _coordinators.push_back(coordinator);
             HeapHierarchicalGraphManager < GraphBuilder >::add_child(
                                                coordinator);
 
         }
-
-        // std::cout << "Root:" << std::endl;
 
         // builds internal connections (edges)
         for (Connections::const_iterator it = parent_connections.begin();
@@ -455,14 +452,6 @@ public:
                         _coordinators[connection.second.first - 1],
                         ss_in.str())) {
 
-                // std::cout << "link = "
-                //           << _coordinators[connection.first.first - 1]
-                //     ->get_name()
-                //           << "::" << ss_out.str() << " -> "
-                //           << _coordinators[connection.second.first - 1]
-                //     ->get_name()
-                //           << "::" << ss_in.str() << std::endl;
-
                 HeapHierarchicalGraphManager <
                     GraphBuilder >::add_link(
                         _coordinators[connection.first.first - 1],
@@ -471,8 +460,6 @@ public:
                         ss_in.str());
             }
         }
-        //double t3 = t.elapsed();
-        //std::cout << "tmp_constr = " << t3 << std::endl;
     }
 
     virtual ~HeapHierarchicalGraphManager()
@@ -488,7 +475,8 @@ private:
         common::DoubleTime,
         BuiltFlatGraphManager,
         common::NoParameters,
-        GraphParameters > Coordinator;
+        GraphParameters
+    > Coordinator;
     typedef std::vector < Coordinator* > Coordinators;
 
     Coordinators _coordinators;
@@ -535,7 +523,6 @@ public:
             _coordinators.push_back(coordinator);
             ParallelHeapHierarchicalGraphManager < GraphBuilder >::add_child(
                 coordinator);
-
         }
 
         // builds internal connections (edges)
@@ -601,28 +588,29 @@ public:
     void transition(const common::Models < common::DoubleTime >& receivers,
                     paradevs::common::DoubleTime::type t)
     {
-        typename Coordinators::const_iterator it = _coordinators.begin();
-        bool found = false;
+        common::Models < common::DoubleTime >::const_iterator it =
+            receivers.begin();
 
-        while (not found) {
-            if (std::find(receivers.begin(), receivers.end(),
-                          *it) != receivers.end()) {
-                (*it)->get_sender().send(
+        while (it != receivers.end()) {
+            if (not (*it)->is_atomic()) {
+                typename Coordinators::const_iterator itc =
+                    std::find(_coordinators.begin(), _coordinators.end(), *it);
+
+                (*itc)->get_sender().send(
                     paradevs::pdevs::multithreading::transition_message <
                         paradevs::common::DoubleTime >(t));
-                found = true;
-            } else {
-                ++it;
             }
+            ++it;
         }
     }
 
 private:
     typedef paradevs::pdevs::multithreading::Coordinator <
-    common::DoubleTime,
-    ParallelBuiltFlatGraphManager,
-    common::NoParameters,
-    GraphParameters > ParallelCoordinator;
+      common::DoubleTime,
+      ParallelBuiltFlatGraphManager,
+      common::NoParameters,
+      GraphParameters
+    > ParallelCoordinator;
 
     typedef std::vector < ParallelCoordinator* > Coordinators;
 

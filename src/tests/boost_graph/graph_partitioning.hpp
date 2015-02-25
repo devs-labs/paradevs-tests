@@ -52,16 +52,16 @@ public:
                OutputEdgeList& output_edges,
                Connections& parent_connections)
     {
-		std::cout<<"**"<<cluster_number<<"**"<<std::endl;
+		// std::cout<<"**"<<cluster_number<<"**"<<std::endl;
         OrientedGraph go;
-        
+
         /** Méthode de contraction possible :
-         *  HEM : hem standars amélioré en temps 
-         *  HEM_degree : hem aves suppression de l'aléatoire 
+         *  HEM : hem standars amélioré en temps
+         *  HEM_degree : hem aves suppression de l'aléatoire
          *  autre : random_matching
          *  **/
-        std::vector<std::string> parameters = {"HEM", 
-											  partitioning_method_name, 
+        std::vector<std::string> parameters = {"HEM",
+											  partitioning_method_name,
 											  "diff", "ratio"};
         generator.generate(go);
 
@@ -73,10 +73,10 @@ public:
         if (contraction_coef_flag) {
 			uint coars = num_vertices(go) / contraction_coef;
 			uint nbr_tirage = 10;
-			std::vector<uint> numeric_parameters = {coars, 
-													cluster_number, 
+			std::vector<uint> numeric_parameters = {coars,
+													cluster_number,
 													nbr_tirage};
-        
+
             graphs = Multiniveau(&go, numeric_parameters,
                                  parameters, edge_partie ,
                                  output_edges, input_edges,
@@ -84,9 +84,9 @@ public:
         } else {
 			uint nbr_tirage = 10;
 			std::vector<uint> numeric_parameters = {contraction_coef ,
-													cluster_number, 
+													cluster_number,
 													nbr_tirage};
-	        
+
             graphs = Multiniveau(&go, numeric_parameters,
                                  parameters, edge_partie ,
                                  output_edges, input_edges,
@@ -113,6 +113,7 @@ public:
         //         std::cout << "}" << std::endl;
         //     }
         // }
+
         // {
         //     unsigned int i = 0;
 

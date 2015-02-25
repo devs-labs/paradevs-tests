@@ -30,7 +30,21 @@
 #include <paradevs/common/time/DoubleTime.hpp>
 #include <paradevs/kernel/pdevs/Dynamics.hpp>
 
+#define DELAY 100
+
 namespace paradevs { namespace tests { namespace boost_graph {
+
+void delay()
+{
+    for (unsigned int i = 0; i < DELAY; ++i) {
+        std::vector < int > v;
+
+        for (unsigned int j = 1000; j > 0; --j) {
+            v.push_back(j);
+        }
+        std::sort(v.begin(), v.end());
+    }
+}
 
 struct TopPixelParameters
 { };
@@ -52,6 +66,8 @@ public:
     virtual void dint(typename common::DoubleTime::type /* t */)
     {
 
+        delay();
+
         // std::cout << TopPixel < SchedulerHandle >::get_name() << " at "
         //           << t << ": dint" << std::endl;
 
@@ -68,11 +84,10 @@ public:
     { return 1; }
 
     virtual common::Bag < common::DoubleTime > lambda(
-        typename common::DoubleTime::type /* t */) const
+        typename common::DoubleTime::type t) const
     {
 
-        // std::cout << TopPixel < SchedulerHandle >::get_name() << " at "
-        //           << t << ": lambda" << std::endl;
+        // std::cout << get_name() << " at " << t << ": lambda" << std::endl;
 
         common::Bag < common::DoubleTime > bag;
 
@@ -111,8 +126,7 @@ public:
     virtual void dint(typename common::DoubleTime::type t)
     {
 
-        // std::cout << NormalPixel < SchedulerHandle >::get_name() << " at "
-        //           << t << ": dint" << std::endl;
+        delay();
 
         if (_phase == SEND) {
             _phase = WAIT;
@@ -126,7 +140,7 @@ public:
                       const common::Bag < common::DoubleTime >& bag)
     {
 
-        // std::cout << NormalPixel < SchedulerHandle >::get_name() << " at "
+        // std::cout << get_name() << " at "
         //           << t << ": dext -> "
         //           << bag.to_string() << std::endl;
 
@@ -143,7 +157,7 @@ public:
             }
         }
 
-        // std::cout << NormalPixel < SchedulerHandle >::get_name() << " at "
+        // std::cout << get_name() << " at "
         //           << t << ": dext -> "
         //           << _received << "/" << _neighbour_number
         //           << std::endl;

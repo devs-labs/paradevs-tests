@@ -76,9 +76,9 @@ void build_graph(OrientedGraph& og, unsigned int edge_number)
 		og[v5] = VertexProperties(5, 1, NORMAL_PIXEL);
 		og[v7] = VertexProperties(7, 1., TOP_PIXEL);
 		og[v9] = VertexProperties(9, 1., TOP_PIXEL);
-		
+
 	} else if(edge_number == 38){
-		
+
 		vertex_to v0 = boost::add_vertex(og);
 		vertex_to v1 = boost::add_vertex(og);
 		vertex_to v2 = boost::add_vertex(og);
@@ -117,7 +117,7 @@ void build_graph(OrientedGraph& og, unsigned int edge_number)
 		vertex_to v35 = boost::add_vertex(og);
 		vertex_to v36 = boost::add_vertex(og);
 		vertex_to v37 = boost::add_vertex(og);
-		
+
 		add_edge(v1, v0, EdgeProperties(1.), og);
 		add_edge(v2, v0, EdgeProperties(1.), og);
 		add_edge(v3, v0, EdgeProperties(1.), og);
@@ -182,7 +182,7 @@ void build_graph(OrientedGraph& og, unsigned int edge_number)
 		add_edge(v36, v37, EdgeProperties(1.), og);
 		add_edge(v36, v33, EdgeProperties(1.), og);
 		add_edge(v37, v33, EdgeProperties(1.), og);
-		
+
 		add_edge(v4, v0, EdgeProperties(1.), og);
 		add_edge(v9, v2, EdgeProperties(1.), og);
 		add_edge(v28, v24, EdgeProperties(1.), og);
@@ -195,7 +195,7 @@ void build_graph(OrientedGraph& og, unsigned int edge_number)
 		add_edge(v21, v23, EdgeProperties(1.), og);
 		add_edge(v23, v20, EdgeProperties(1.), og);
 		add_edge(v26, v4, EdgeProperties(1.), og);
-		
+
 		og[v6] = VertexProperties(6, 1, NORMAL_PIXEL);
 		og[v8] = VertexProperties(8, 1, NORMAL_PIXEL);
 		og[v10] = VertexProperties(10, 1, NORMAL_PIXEL);
@@ -234,7 +234,7 @@ void build_graph(OrientedGraph& og, unsigned int edge_number)
 		og[v35] = VertexProperties(35, 1, NORMAL_PIXEL);
 		og[v36] = VertexProperties(36, 1, TOP_PIXEL);
 		og[v37] = VertexProperties(37, 1, NORMAL_PIXEL);
-		
+
 	}else{
 		std::cout<<"Le type de artificiel graphe choisi n'existe pas ! "<<std::endl;
 	}
@@ -313,7 +313,7 @@ void build_example_linked9(OrientedGraph& og)
 	vertex_to v7 = boost::add_vertex(og);
 	vertex_to v8 = boost::add_vertex(og);
 	vertex_to v9 = boost::add_vertex(og);
-	
+
 	add_edge(v1, v0, EdgeProperties(1.), og);
 	add_edge(v2, v0, EdgeProperties(1.), og);
 	add_edge(v3, v0, EdgeProperties(1.), og);
@@ -328,7 +328,7 @@ void build_example_linked9(OrientedGraph& og)
 	add_edge(v8, v2, EdgeProperties(1.), og);
 	add_edge(v9, v1, EdgeProperties(1.), og);
 	add_edge(v9, v3, EdgeProperties(1.), og);
-	
+
 	og[v6] = VertexProperties(6, 1, TOP_PIXEL);
 	og[v8] = VertexProperties(8, 1, TOP_PIXEL);
 	og[v0] = VertexProperties(0, 1, NORMAL_PIXEL);
@@ -750,11 +750,11 @@ void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source, in
 
 	brhtg_exutoire(go,nbr_vertex,nbr_v_min,nbr_v_max,
 				Ram,Vertexs,nbr_passe);
-				
+
 	} else {
 			brhtg_source(go,nbr_vertex,nbr_source,nbr_v_min,nbr_v_max,niveau,Ram,Exu,Vertexs,nbr_passe,nbr_npb);
 	}
-	
+
 	std::vector < int > dg_in_vertex_list;
 	std::vector <vertex_to> dg_vertex_list;
 	OrientedGraph::vertex_iterator it_dg, end_dg;
@@ -779,7 +779,7 @@ void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source, in
 			++dg_in_vertex_list[index];
 		}
 	}
-	
+
 	int compteur = 0;
 	for(uint i = 0; i<num_vertices(*go); i++){
 		bool indic = false;
@@ -795,19 +795,19 @@ void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source, in
 		}
 		//std::cout<<(*go)[i]._index<<" "<<indic<<" -> "<<(*go)[i]._type<<std::endl;
 	}
-	
+
 	std::cout<<"Compteur : "<<compteur<<std::endl;
 }
 
 void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_couche, int nbr_v_min, int nbr_v_max){
 	std::vector<vertex_to> Vertexs;
 	OrientedGraph::in_edge_iterator ei, edge_end;
-	
+
 	for(int i =0; i<nbr_vertex; i++){
 		vertex_to vo = boost::add_vertex(*go);
 		Vertexs.push_back(vo);
 	}
-	
+
 	/*Création du vecteur contenant le nombre de sommets par couche*/
 	int midel_couche = nbr_couche-2;
 	int top_couche;
@@ -820,35 +820,35 @@ void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_cou
 	int tmp = 0;
 	std::vector<int> nbr_som_couche;
 	nbr_som_couche.push_back(1);
-	
+
 	for(int i = 1; i <= midel_couche; i++){
 		tmp += i;
 	}
-	
+
 	for(int i = 0; i < midel_couche; i++){
 		nbr_som_couche.push_back(floor((i+1)*nbr_vertex_midel_couche/tmp));
 	}
-	
+
 	nbr_som_couche.push_back(top_couche);
-	
+
 	int sum = 0;
 	for(int i = 0; i < nbr_som_couche.size(); i++){
 		sum += nbr_som_couche.at(i);
 	}
 	int reste = nbr_vertex - sum;
-	
+
 	/*std::cout<<"sum : "<<sum<<std::endl;
 	std::cout<<"midel_couche : "<<midel_couche<<std::endl;
 	std::cout<<"top_couche : "<<top_couche<<std::endl;
 	std::cout<<"nbr_vertex_midel_couche : "<<nbr_vertex_midel_couche<<std::endl;
 	std::cout<<"tmp : "<<tmp<<std::endl;
 	std::cout<<"reste : "<<reste<<std::endl;
-	
+
 	for(int i =0; i < nbr_som_couche.size(); i++){
 		std::cout<<nbr_som_couche.at(i)<<" ";
 	}
 	std::cout<<std::endl;*/
-	
+
 	while(reste != 0){
 		for(int i = 1; i <nbr_som_couche.size(); i++){
 			nbr_som_couche.at(i) += 1;
@@ -858,26 +858,26 @@ void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_cou
 			}
 		}
 	}
-	
+
 	/*for(int i =0; i < nbr_som_couche.size(); i++){
 		std::cout<<nbr_som_couche.at(i)<<" ";
 	}
 	std::cout<<std::endl;*/
-	
+
 	/*Génération du graphe*/
 	std::vector<int> tab_couche_som;
 	tab_couche_som.push_back(0);
-	
+
 	for(int i =1; i<nbr_som_couche.size(); i++){
 		tab_couche_som.push_back(tab_couche_som.at(i-1)+nbr_som_couche.at(i));
 	}
-	
+
 	/*for(int i =0; i < tab_couche_som.size(); i++){
 		std::cout<<tab_couche_som.at(i)<<" ";
 	}
 	std::cout<<std::endl;*/
 	int nbr_vois = nbr_v_max+2;
-	
+
 	int cpt = 0;
 	for(int i = tab_couche_som.at(tab_couche_som.size()-2)+1; i <= tab_couche_som.at(tab_couche_som.size()-1); i++){
 		std::vector<int> vertex_tmp;
@@ -904,7 +904,7 @@ void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_cou
 		cpt ++;
 	}
 	//std::cout<<"Passage !"<<std::endl;
-	
+
 	for(int j = 2; j < tab_couche_som.size()-1; j++){
 		cpt = 0;
 		for(int i = tab_couche_som.at(tab_couche_som.size()-1-j)+1; i <= tab_couche_som.at(tab_couche_som.size()-1-(j-1)); i++){
@@ -936,14 +936,14 @@ void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_cou
 				if(In_tab(vertex_tmp,val) != 1){
 					boost::add_edge(Vertexs.at(i), Vertexs.at(val), EdgeProperties(1.), *go);
 					vertex_tmp.push_back(val);
-					neigh_cpt ++;	
+					neigh_cpt ++;
 				}
 			}
 			cpt ++;
 		}
 	}
 	//std::cout<<"Passage2 !"<<std::endl;
-	
+
 	for(int i = tab_couche_som.at(0)+1; i <= tab_couche_som.at(1); i++){
 		//int val = rand_fini(0,2);
 		//if(val == 0){
@@ -951,7 +951,7 @@ void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_cou
 		//}
 	}
 	//std::cout<<"Passage3 !"<<std::endl;
-	
+
 	std::vector < int > dg_in_vertex_list;
 	std::vector <vertex_to> dg_vertex_list;
 	OrientedGraph::vertex_iterator it_dg, end_dg;
@@ -976,7 +976,7 @@ void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_cou
 			++dg_in_vertex_list[index];
 		}
 	}
-	
+
 	for(uint i = 0; i<num_vertices(*go); i++){
 		bool indic = false;
 		for(tie(ei,edge_end) = in_edges(i,*go); ei != edge_end; ++ei){
@@ -998,7 +998,7 @@ void build_graph_grid(OrientedGraph *go, int side, const std::vector<std::pair<i
 		vertex_to vo = boost::add_vertex(*go);
 		Vertexs.push_back(vo);
 	}
-	
+
 	if(rec == true){
 		std::ofstream fichier (edge_weight, std::ios::out);
 		for(int i = 0; i<side; i++){
@@ -1007,7 +1007,7 @@ void build_graph_grid(OrientedGraph *go, int side, const std::vector<std::pair<i
 				fichier<<i*side+j<<" "<<i*side+j+1<<" "<<1<<" "<<std::endl;
 			}
 		}
-		
+
 		for(int i = 0; i<side-1; i++){
 			for(int j = 0; j<side; j++){
 				boost::add_edge(i*side+j, (i+1)*side+j,EdgeProperties(1), *go);
@@ -1021,19 +1021,19 @@ void build_graph_grid(OrientedGraph *go, int side, const std::vector<std::pair<i
 				boost::add_edge(i*side+j, i*side+j+1,EdgeProperties(1), *go);
 			}
 		}
-		
+
 		for(int i = 0; i<side-1; i++){
 			for(int j = 0; j<side; j++){
 				boost::add_edge(i*side+j, (i+1)*side+j,EdgeProperties(1), *go);
 			}
 		}
 	}
-		
+
 	(*go)[0] = VertexProperties(0, 1, TOP_PIXEL);
 	for(uint i = 1; i<num_vertices(*go); i++){
 			(*go)[i] = VertexProperties(i, 1, NORMAL_PIXEL);
 	}
-	
+
 	for(int ind=0; ind<vertex_selection.size(); ind++){
 		for(int ind_i = vertex_selection.at(ind).first; ind_i<vertex_selection.at(ind).second+1; ind_i++){
 			if(ind_i != 0)
@@ -1042,10 +1042,10 @@ void build_graph_grid(OrientedGraph *go, int side, const std::vector<std::pair<i
 				(*go)[ind_i] = VertexProperties(ind_i, weight_vertex.at(ind), TOP_PIXEL);
 		}
 	}
-	
+
 	if(rec == false){
 		std::ifstream fichier (edge_weight, std::ios::in);
-		
+
 		if(fichier){
 			bool found;
 			edge_to e1;
@@ -1065,13 +1065,13 @@ void build_graph_grid(OrientedGraph *go, int side, const std::vector<std::pair<i
 			fichier.seekg(length+1, std::ios::beg);
 			cpt++;
 			}
-			
+
 		}else{
-			std::cerr<<"Bugggggg du fichier txt !!!! "<<std::endl;
+			// std::cerr<<"Bugggggg du fichier txt !!!! "<<std::endl;
 		}
 		fichier.close();
 	}
-	
+
 }
 
 void build_example_ligne(OrientedGraph& og)
@@ -1100,7 +1100,7 @@ void build_example_ligne(OrientedGraph& og)
 	og[v3] = VertexProperties(3, 1, NORMAL_PIXEL);
 	og[v4] = VertexProperties(4, 1, NORMAL_PIXEL);
 	og[v5] = VertexProperties(5, 1, NORMAL_PIXEL);
-	og[v7] = VertexProperties(7, 1, NORMAL_PIXEL);	
+	og[v7] = VertexProperties(7, 1, NORMAL_PIXEL);
 }
 
 void build_example_grid(OrientedGraph& og)
@@ -1139,7 +1139,7 @@ void build_example_grid(OrientedGraph& og)
 	og[v4] = VertexProperties(4, 1, NORMAL_PIXEL);
 	og[v5] = VertexProperties(5, 1, NORMAL_PIXEL);
 	og[v7] = VertexProperties(7, 1, NORMAL_PIXEL);
-}	
+}
 
 void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
 {
@@ -1147,21 +1147,21 @@ void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
 	OrientedGraph::in_edge_iterator ei, edge_end;
 	double max_distance =  3000;//sqrt(2)*5*size_max/50;
 	double crit = sqrt(2)*5*size_max/1000;
-	
+
 	std::cout << "distance max : " << max_distance << std::endl;
 	std::cout << "crit : " << crit << std::endl;
 	for(uint i = 0; i < size_max; i++)
-	{	
+	{
 		std::pair<double,double> p;
 		p.first = rand()%(size_max*5-0) + 0;
 		p.second = rand()%(size_max*5-0) + 0;
 		point.push_back(p);
-	} 
-	
+	}
+
 	//std::cout << std::endl;
 	sort(point.begin(),point.end());
 	std::vector<std::vector<std::pair<double,uint> > > save_point_distance;
-	
+
 	for(uint id = 0 ; id < point.size() - 1; id++)
 	{
 		std::vector<std::pair<double,uint> > point_distance, point_distance_sort;
@@ -1182,20 +1182,20 @@ void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
 				point_distance.push_back(pd);
 			}
 		}*/
-		
+
 		point_distance_sort = point_distance;
-		
+
 		sort(point_distance_sort.begin(), point_distance_sort.end());
 		std::vector<uint> deleted;
 		uint t;
-		
-		
-		
+
+
+
 		if(point_distance_sort.size() > 50)
 			t = point_distance_sort.size()/2;
 		else
 			t = point_distance_sort.size();
-		
+
 		/*if(name != "multi"){*/
 			for(uint i = 0 ; i < t; i++)
 			{
@@ -1212,20 +1212,20 @@ void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
 			}
 		}*/
 		//std::cout<<std::endl;
-		
+
 		sort(deleted.begin(), deleted.end());
 		std::reverse(deleted.begin(), deleted.end());
-		
+
 		/*for(uint k = 0 ; k < deleted.size(); k++)
 			std::cout << deleted.at(k) << " " ;
 		std::cout<< std::endl << std::endl;*/
-		
+
 		/*std::cout << "A : " << std::endl;
 		for(uint pp = 0; pp < point_distance.size(); pp++)
 			std::cout << point_distance.at(pp).second << " ";
-			
+
 		std::cout<< std::endl << std::endl;*/
-		
+
 		if(deleted.size() > 1)
 		{
 			//std::cout<<"Deleted"<<std::endl;
@@ -1275,7 +1275,7 @@ void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
 			//std::cout << deleted.at(0) << " ";
 			for(uint idp = 0; idp < point_distance.size(); idp++)
 			{
-				
+
 				if(point_distance.at(idp).second == deleted.at(0))
 				{
 					/*if(name != "multi")
@@ -1293,7 +1293,7 @@ void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
 						for(uint j = idp; j < point_distance.size(); j++)
 							point_distance.at(j).second -= 1;
 						//std::cout << " toto " << std::endl;
-						
+
 					/*}else{
 						point.erase(point.begin() + idp);
 						point_distance.erase(point_distance.begin() + idp);
@@ -1314,16 +1314,16 @@ void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
 		/*std::cout << " B : " << std::endl;
 		for(uint pp = 0; pp < point_distance.size(); pp++)
 			std::cout << point_distance.at(pp).second << " ";
-			
+
 		std::cout << std::endl << std::endl;*/
-		
+
 		//sort(point_distance.begin(), point_distance.end());
 		save_point_distance.push_back(point_distance);
 		//std::cout << std::endl;
 	}
 	std::cout << "nombre de sommet" << point.size() << std::endl;
-	
-	
+
+
 	for(uint xt = 0; xt < save_point_distance.size(); xt++){
 		//std::cout << "** " << xt << " ** : ";
 		sort(save_point_distance.at(xt).begin(), save_point_distance.at(xt).end());
@@ -1332,25 +1332,25 @@ void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
 		}
 		std::cout << std::endl;*/
 	}
-	
-	
+
+
 	std::vector<vertex_to> Vertexs;
 	for(int i = 0; i < point.size(); i++){
 		vertex_to vo = boost::add_vertex(*go);
 		Vertexs.push_back(vo);
 	}
-	
+
 	//std::cout << point.size() << std::endl;
 	for(int i = 0; i < point.size() -1; i++){
 		//std::cout << i << std::endl;
 		double dist = 0.;
 		uint xi;
-		
+
 		//if(name != "multi")
 			xi = 0;
 		/*else
 			xi = 1;*/
-			
+
 		while(dist < max_distance & xi < save_point_distance.at(i).size())
 		{
 			dist = save_point_distance.at(i).at(xi).first;
@@ -1364,9 +1364,9 @@ void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
 		}
 		(*go)[Vertexs.at(i)] = VertexProperties(i, 1., NORMAL_PIXEL);
 	}
-	
+
 	(*go)[Vertexs.at(point.size()-1)] = VertexProperties(point.size()-1, 1., NORMAL_PIXEL);
-	
+
 	/*std::cout << "ok"<< point.size() << std::endl;
 	for(int i = 0; i < (point.size() - arcs_max); i++)
 	{
@@ -1377,15 +1377,15 @@ void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
 		Entiers arcs;
 		for(uint p = 0; p < ac; p++)
 			arcs.push_back(tmp_vector.at(p));
-		
+
 		//sort(arcs.begin(),arcs.end());
-		
+
 		for(uint j = 0; j < arcs.size(); j++)
 			add_edge(Vertexs.at(i), Vertexs.at(arcs.at(j)), EdgeProperties(1.), *go);
-		
+
 		(*go)[Vertexs.at(i)] = VertexProperties(i, 1., NORMAL_PIXEL);
 	}
-	
+
 	std::cout << "ok1"<<std::endl;
 	for(int i = point.size() - arcs_max; i < point.size() - 2; i++)
 	{
@@ -1394,20 +1394,20 @@ void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
 		Entiers arcs;
 		for(uint p = 0; p < ac; p++)
 			arcs.push_back(tmp_vector.at(p));
-			
+
 		sort(arcs.begin(),arcs.end());
-		
+
 		for(uint j = 0; j < arcs.size(); j++)
 			add_edge(Vertexs.at(i), Vertexs.at(arcs.at(j)), EdgeProperties(1.), *go);
-		
+
 		(*go)[Vertexs.at(i)] = VertexProperties(i, 1., NORMAL_PIXEL);
 	}
 	std::cout << "ok2"<<std::endl;
-	
+
 	add_edge(Vertexs.at(point.size()-2), Vertexs.at(point.size()-1), EdgeProperties(1.), *go);
 	(*go)[Vertexs.at(point.size()-2)] = VertexProperties(point.size()-2, 1., NORMAL_PIXEL);
 	(*go)[Vertexs.at(point.size()-1)] = VertexProperties(point.size()-1, 1., NORMAL_PIXEL);*/
-	
+
 	for(uint i = 0; i< point.size(); i++){
 		bool indic = false;
 		for(tie(ei,edge_end) = in_edges(i,*go); ei != edge_end; ++ei){
@@ -1421,8 +1421,8 @@ void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
 		}
 		//std::cout<<(*go)[i]._index<<" "<<indic<<" -> "<<(*go)[i]._type<<std::endl;
 	}
-	
-	
+
+
 }
 
 /*void build_graph_grid_center(OrientedGraph *go, int side, const std::vector<std::pair<int,int>> &vertex_selection, const Entiers &weight_vertex,const char *edge_weight, bool rec){
@@ -1432,20 +1432,20 @@ void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
 		vertex_to vo = boost::add_vertex(*go);
 		Vertexs.push_back(vo);
 	}
-	
+
 	// Ité 0
 	for(uint i = 0; i < 4; i++){
 		boost::add_edge(0, 2 + 2*i ,EdgeProperties(1) , *go);
 	}
-	
-	// Ité 1 
-	
+
+	// Ité 1
+
 	for(uint i = 1; i < 9; i++){
-		
+
 	}
-	
-	
-	
+
+
+
 }*/
 
 /*Vérification de la pondération + vérification des poids de la contraction + vérification de la structure de contraction*/
