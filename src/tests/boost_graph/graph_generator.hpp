@@ -57,13 +57,13 @@ public:
 
     virtual void generate(OrientedGraph& go)
     {
-        const char *texte = new const char();
-        texte = "file/data_base/tree/tree_20000.txt";
-        Graph_constructor_txt(texte,&go);
-       //boost::timer t; 
-	   
-       /* build_generator_graph(&go, edge_number, source_number, min_neigh,
-                              max_neigh, levels);*/
+        // const char *texte = new const char();
+        // texte = "file/data_base/tree/tree_20000.txt";
+        // Graph_constructor_txt(texte,&go);
+       //boost::timer t;
+
+       build_generator_graph(&go, edge_number, source_number, min_neigh,
+                              max_neigh, levels);
        //double t3 = t.elapsed();
 	   //std::cout << "tmp_gen = " << t3 << std::endl;
     }
@@ -90,8 +90,8 @@ public:
         /*const char *texte = new const char();
         texte = "enregistrement.txt";
         Graph_constructor_txt(texte,&go);*/
-       //boost::timer t; 
-	   
+       //boost::timer t;
+
        build_graph_grid(&go, side, vertex_selection,  weight_vertex, edge_weight, rec);
        //double t3 = t.elapsed();
 	   //std::cout << "tmp_gen = " << t3 << std::endl;
@@ -119,13 +119,13 @@ public:
 
     virtual void generate(OrientedGraph& go)
     {
-		const char *texte = new const char();
+		// const char *texte = new const char();
         //texte = "file/data_base/HO_models.txt";
-        texte = "file/data_base/linked/linked10000.txt";
-        Graph_constructor_txt(texte,&go);
-        
-      //build_generator_graph_linked(&go, edge_number, levels , min_neigh,
-                            //  max_neigh);
+        // texte = "file/data_base/linked/linked10000.txt";
+        // Graph_constructor_txt(texte,&go);
+
+        build_generator_graph_linked(&go, edge_number, levels , min_neigh,
+                                     max_neigh);
     }
 
 private:
@@ -163,7 +163,7 @@ public:
         //texte = "file/data_base/HO_models.txt";
         //texte = "file/data_base/linked/linked10000.txt";
         //Graph_constructor_txt(texte,&go);
-        
+
 		build_parcellaire_graph(&go, size_max, name);
     }
 
@@ -181,7 +181,7 @@ public:
     virtual void generate(OrientedGraph& go)
     {
         //build_corsen_graph(go);
-        
+
     }
 };
 

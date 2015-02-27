@@ -723,7 +723,7 @@ void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source, in
 		}
 		nbr_branche += nbr_tmp;
 	}
-	std::cout<<nbr_branche<<std::endl;
+	// std::cout<<nbr_branche<<std::endl;
 
 	nbr_npb = nbr_vertex/(nbr_branche);
 
@@ -796,7 +796,7 @@ void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source, in
 		//std::cout<<(*go)[i]._index<<" "<<indic<<" -> "<<(*go)[i]._type<<std::endl;
 	}
 
-	std::cout<<"Compteur : "<<compteur<<std::endl;
+	// std::cout<<"Compteur : "<<compteur<<std::endl;
 }
 
 void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex, int nbr_couche, int nbr_v_min, int nbr_v_max){

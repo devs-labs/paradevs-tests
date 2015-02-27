@@ -37,9 +37,9 @@
 using namespace paradevs::common;
 using namespace std::chrono;
 
-void monothreading()
+double grid_monothreading()
 {
-    unsigned int side = 100;
+    unsigned int side = 40;
     std::vector<std::pair<int,int>> vertex_selection;
     std::pair<int,int> tmp;
     tmp.first = 0;
@@ -77,12 +77,12 @@ void monothreading()
     duration < double > time_span = duration_cast <
         duration < double > >(t2 - t1);
 
-    std::cout << "MONO = " << time_span.count() << std::endl;
+    return time_span.count();
 }
 
-void multithreading(int cluster_number)
+double grid_multithreading(int cluster_number)
 {
-    unsigned int side = 100;
+    unsigned int side = 40;
     std::vector<std::pair<int,int>> vertex_selection;
     std::pair<int,int> tmp;
     tmp.first = 0;
@@ -117,14 +117,97 @@ void multithreading(int cluster_number)
     duration < double > time_span = duration_cast <
         duration < double > >(t2 - t1);
 
-    std::cout << "MULTI = " << time_span.count() << std::endl;
+    return time_span.count();
 }
 
-int main()
+double tree_monothreading()
 {
-    monothreading();
-    for (int i = 2; i <= 8; ++i) {
-        multithreading(i);
+    std::vector < int > levels = { 4, 3, 2 };
+    int nbr_sommets = 1000;
+    int sources = nbr_sommets/100*1;
+    paradevs::tests::boost_graph::RandomGraphGenerator generator(nbr_sommets,
+                                                                 levels,
+                                                                 sources, 2, 3);
+
+    paradevs::common::RootCoordinator <
+        DoubleTime, paradevs::pdevs::Coordinator <
+            DoubleTime,
+            paradevs::tests::boost_graph::HeapHierarchicalGraphManager <
+                paradevs::tests::boost_graph::PartitioningGraphBuilder >,
+            paradevs::common::NoParameters,
+            paradevs::tests::boost_graph::PartitioningParameters >
+        > rc(0, 10, "root", paradevs::common::NoParameters(),
+             paradevs::tests::boost_graph::PartitioningParameters(
+                 4, "gggp", 200, false, generator));
+
+    steady_clock::time_point t1 = steady_clock::now();
+
+    rc.run();
+
+    steady_clock::time_point t2 = steady_clock::now();
+
+    duration < double > time_span = duration_cast <
+        duration < double > >(t2 - t1);
+
+    return time_span.count();
+}
+
+double tree_multithreading(int cluster_number)
+{
+    std::vector < int > levels = { 4, 3, 2 };
+    int nbr_sommets = 1000;
+    int sources = nbr_sommets/100*1;
+    paradevs::tests::boost_graph::RandomGraphGenerator generator(nbr_sommets,
+                                                                 levels,
+                                                                 sources, 2, 3);
+
+    paradevs::common::RootCoordinator <
+        DoubleTime, paradevs::pdevs::multithreading::Coordinator <
+            DoubleTime,
+            paradevs::tests::boost_graph::ParallelHeapHierarchicalGraphManager <
+                paradevs::tests::boost_graph::PartitioningGraphBuilder >,
+            paradevs::common::NoParameters,
+            paradevs::tests::boost_graph::PartitioningParameters >
+        > rc(0, 10, "root", paradevs::common::NoParameters(),
+             paradevs::tests::boost_graph::PartitioningParameters(
+                 cluster_number, "gggp", 200, false, generator));
+
+    steady_clock::time_point t1 = steady_clock::now();
+
+    rc.run();
+
+    steady_clock::time_point t2 = steady_clock::now();
+
+    duration < double > time_span = duration_cast <
+        duration < double > >(t2 - t1);
+
+    return time_span.count();
+}
+
+void grid(int n)
+{
+    if (n == 1) {
+        std::cout << grid_monothreading() << std::endl;
+    } else {
+        std::cout << grid_multithreading(n) << std::endl;
+    }
+}
+
+void tree(int n)
+{
+    if (n == 1) {
+        std::cout << tree_monothreading() << std::endl;
+    } else {
+        std::cout << tree_multithreading(n) << std::endl;
+    }
+}
+
+
+int main(int argc, char** argv)
+{
+    if (argc > 1) {
+        // grid(atoi(argv[1]));
+        tree(atoi(argv[1]));
     }
     return 0;
 }

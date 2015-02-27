@@ -35,6 +35,8 @@
 #include <paradevs/kernel/pdevs/mpi/GraphManager.hpp>
 #include <paradevs/kernel/pdevs/Simulator.hpp>
 
+#include <tests/boost_graph/graph_defs.hpp>
+
 namespace paradevs { namespace tests { namespace mpi {
 
 class S1GraphManager :
@@ -155,154 +157,79 @@ private:
     paradevs::pdevs::mpi::ModelProxy < common::DoubleTime > S2;
 };
 
-// class S3GraphManager :
-//         public paradevs::pdevs::GraphManager < common::DoubleTime >
-// {
-// public:
-//     S3GraphManager(common::Coordinator < common::DoubleTime >* coordinator,
-//                    const paradevs::common::NoParameters& parameters) :
-//         paradevs::pdevs::GraphManager < common::DoubleTime >(coordinator,
-//                                                              parameters)
-//     {
-//         coordinator->add_out_port("out");
-//         for (unsigned int i = 0; i < 10; ++i) {
-//             std::ostringstream ss;
-//             simulator_type* s = new simulator_type(ss.str(),
-//                                                    common::NoParameters());
+struct MPIHierarchicalGraphManagerParameters
+{
+    paradevs::tests::boost_graph::OrientedGraphs graphs;
+    paradevs::tests::boost_graph::InputEdgeList input_edges;
+    paradevs::tests::boost_graph::OutputEdgeList output_edges;
+    paradevs::tests::boost_graph::Connections parent_connections;
+    std::vector < int > ranks;
+};
 
-//             ss << "a" << (i + 1);
-//             _simulators.push_back(s);
-//             add_child(s);
-//             s->add_out_port("out");
-//         }
-//     }
+class MPIHierarchicalGraphManager :
+        public paradevs::pdevs::GraphManager <
+    common::DoubleTime, MPIHierarchicalGraphManagerParameters >
+{
+public:
+    MPIHierarchicalGraphManager(
+        common::Coordinator < common::DoubleTime >* coordinator,
+        const MPIHierarchicalGraphManagerParameters& parameters) :
+        paradevs::pdevs::GraphManager <
+            common::DoubleTime,
+            MPIHierarchicalGraphManagerParameters >
+        (coordinator, parameters)
+    {
+        // build model proxies (graphs)
+        for (unsigned int i = 0; i < parameters.graphs.size(); ++i) {
+            ModelProxy* model = 0;
+            std::ostringstream ss;
 
-//     void init()
-//     { }
+            ss << "S" << i;
+            model = new ModelProxy(ss.str(), parameters.ranks[i], false);
+            _models.push_back(model);
+            add_child(model);
+        }
 
-//     void start(common::DoubleTime::type /* t */)
-//     { }
+        // // builds internal connections (edges)
+        // for (Connections::const_iterator it = parent_connections.begin();
+        //      it != parent_connections.end(); ++it) {
+        //     const Connection& connection = *it;
+        //     std::ostringstream ss_out;
+        //     std::ostringstream ss_in;
 
-//     void transition(
-//         const common::Models < common::DoubleTime >& /* receivers */,
-//         common::DoubleTime::type /* t */)
-//     { }
+        //     ss_out << "out_" << connection.first.second;
+        //     ss_in << "in_" << connection.first.second;
 
-//     virtual ~S3GraphManager()
-//     {
-//         for (typename std::vector < simulator_type* >::const_iterator it =
-//                  _simulators.begin(); it != _simulators.end(); ++it) {
-//             delete *it;
-//         }
-//     }
+        //     if (not ParallelHeapHierarchicalGraphManager <
+        //             GraphBuilder >::exist_link(
+        //                 _coordinators[connection.first.first - 1],
+        //                 ss_out.str(),
+        //                 _coordinators[connection.second.first - 1],
+        //                 ss_in.str())) {
+        //         ParallelHeapHierarchicalGraphManager <
+        //             GraphBuilder >::add_link(
+        //                 _coordinators[connection.first.first - 1],
+        //                 ss_out.str(),
+        //                 _coordinators[connection.second.first - 1],
+        //                 ss_in.str());
+        //     }
+        // }
+    }
 
-// private:
-//     typedef paradevs::pdevs::Simulator < common::DoubleTime,
-//                                          pdevs::A > simulator_type;
+    virtual ~MPIHierarchicalGraphManager()
+    {
+        for (typename ModelProxies::const_iterator it = _models.begin();
+             it != _models.end(); ++it) {
+            delete *it;
+        }
+    }
 
-//     std::vector < simulator_type* > _simulators;
-// };
+private:
+    typedef paradevs::pdevs::mpi::ModelProxy < common::DoubleTime > ModelProxy;
+    typedef std::vector < ModelProxy* > ModelProxies;
 
-// class Root2GraphManager :
-//         public paradevs::pdevs::GraphManager < common::DoubleTime >
-// {
-// public:
-//     Root2GraphManager(
-//         common::Coordinator < common::DoubleTime >* coordinator,
-//         const paradevs::common::NoParameters& parameters) :
-//         paradevs::pdevs::GraphManager < common::DoubleTime >(
-//                                             coordinator, parameters),
-//         S1("S1", paradevs::common::NoParameters(),
-//            paradevs::common::NoParameters()),
-//         S2("S2", paradevs::common::NoParameters(),
-//            paradevs::common::NoParameters())
-//     {
-//         add_child(&S1);
-//         add_child(&S2);
-//     }
-
-//     void init()
-//     {
-//         S1.set_sender(
-//             dynamic_cast < paradevs::pdevs::mpi::Coordinator <
-//                 common::DoubleTime,
-//                 paradevs::tests::mpi::Root2GraphManager >*
-//             >(get_coordinator())->get_sender());
-//         S2.set_sender(
-//             dynamic_cast < paradevs::pdevs::mpi::Coordinator <
-//                 common::DoubleTime,
-//                 paradevs::tests::mpi::Root2GraphManager >*
-//             >(get_coordinator())->get_sender());
-//     }
-
-//     void start(common::DoubleTime::type t)
-//     {
-//         S1.get_sender().send(
-//             paradevs::pdevs::mpi::start_message <
-//                 common::DoubleTime >(t));
-//         S2.get_sender().send(
-//             paradevs::pdevs::mpi::start_message <
-//                 common::DoubleTime >(t));
-//     }
-
-//     void transition(const common::Models < common::DoubleTime >& receivers,
-//                     common::DoubleTime::type t)
-//     {
-//         if (std::find(receivers.begin(), receivers.end(),
-//                       &S1) != receivers.end()) {
-//             S1.get_sender().send(
-//                 paradevs::pdevs::mpi::transition_message <
-//                     common::DoubleTime >(t));
-//         }
-//         if (std::find(receivers.begin(), receivers.end(),
-//                       &S2) != receivers.end()) {
-//             S2.get_sender().send(
-//                 paradevs::pdevs::mpi::transition_message <
-//                     common::DoubleTime >(t));
-//         }
-//     }
-
-//     virtual ~Root2GraphManager()
-//     { }
-
-// private:
-//     paradevs::pdevs::mpi::Coordinator <
-//         common::DoubleTime,
-//         S3GraphManager > S1;
-//     paradevs::pdevs::mpi::Coordinator <
-//         common::DoubleTime,
-//         S3GraphManager > S2;
-// };
-
-// class Root3GraphManager :
-//         public paradevs::pdevs::GraphManager < common::DoubleTime >
-// {
-// public:
-//     Root3GraphManager(
-//         common::Coordinator < common::DoubleTime >* coordinator,
-//         const paradevs::common::NoParameters& parameters) :
-//         paradevs::pdevs::GraphManager < common::DoubleTime >(
-//                                             coordinator, parameters),
-//         S1("S1", paradevs::common::NoParameters(),
-//            paradevs::common::NoParameters()),
-//         S2("S2", paradevs::common::NoParameters(),
-//            paradevs::common::NoParameters())
-//     {
-//         add_child(&S1);
-//         add_child(&S2);
-//     }
-
-//     virtual ~Root3GraphManager()
-//     { }
-
-// private:
-//     paradevs::pdevs::Coordinator <
-//         common::DoubleTime,
-//         S3GraphManager > S1;
-//     paradevs::pdevs::Coordinator <
-//         common::DoubleTime,
-//         S3GraphManager > S2;
-// };
+    ModelProxies _models;
+};
 
 } } } // namespace paradevs tests mpi
 

@@ -20,7 +20,7 @@ LINK_DIRECTORIES(
 
 ADD_EXECUTABLE(pdevs-mpi-main graph_manager.hpp main.cpp)
 
-TARGET_LINK_LIBRARIES(pdevs-mpi-main
+TARGET_LINK_LIBRARIES(pdevs-mpi-main partitioning
   ${Boost_SERIALIZATION_LIBRARY}
   ${Boost_MPI_LIBRARY}
   ${MPI_CXX_LIBRARIES})
