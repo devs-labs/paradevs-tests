@@ -39,7 +39,7 @@ using namespace std::chrono;
 
 double grid_monothreading()
 {
-    unsigned int side = 40;
+    unsigned int side = 20;
     std::vector<std::pair<int,int>> vertex_selection;
     std::pair<int,int> tmp;
     tmp.first = 0;
@@ -82,7 +82,7 @@ double grid_monothreading()
 
 double grid_multithreading(int cluster_number)
 {
-    unsigned int side = 40;
+    unsigned int side = 20;
     std::vector<std::pair<int,int>> vertex_selection;
     std::pair<int,int> tmp;
     tmp.first = 0;
@@ -206,8 +206,8 @@ void tree(int n)
 int main(int argc, char** argv)
 {
     if (argc > 1) {
-        grid(atoi(argv[1]));
-        // tree(atoi(argv[1]));
+        // grid(atoi(argv[1]));
+        tree(atoi(argv[1]));
     }
     return 0;
 }
