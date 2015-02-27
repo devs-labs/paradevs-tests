@@ -12,6 +12,7 @@ LINK_DIRECTORIES(
 ADD_EXECUTABLE(pdevs-multithreading-tests graph_manager.hpp tests.cpp)
 
 TARGET_LINK_LIBRARIES(pdevs-multithreading-tests
+  ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_TIMER_LIBRARY})
 

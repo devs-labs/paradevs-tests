@@ -2,7 +2,7 @@
 
 use List::Util qw(sum);
 
-for ($n = 1; $n < 9; $n++) {
+for ($n = 1; $n < 13; $n++) {
     @values = ();
     for ($i = 0; $i < 20; $i++)  {
 	push @values, `../build/src/tests/multithreading/pdevs-multithreading-main $n`;
