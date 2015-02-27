@@ -21,5 +21,6 @@ ADD_EXECUTABLE(pdevs-multithreading-main graph_manager.hpp main.cpp
   ../boost_graph/graph_partitioning.hpp ../boost_graph/models.hpp)
 
 TARGET_LINK_LIBRARIES(pdevs-multithreading-main partitioning
+  ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_TIMER_LIBRARY})
