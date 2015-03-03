@@ -34,60 +34,137 @@
 namespace paradevs { namespace tests {
         namespace multithreading { namespace lifegame {
 
+struct CellParameters
+{
+    CellParameters(int n) : neighbour_number(n)
+    { }
 
-template < class SchedulerHandle>
-class Cell :
-        public paradevs::pdevs::Dynamics < common::DoubleTime, SchedulerHandle >
+    int neighbour_number;
+};
+
+class Cell : public paradevs::pdevs::Dynamics < common::DoubleTime,
+                                                CellParameters >
 {
 public:
-    Cell(const std::string& name, const common::NoParameters& parameters) :
-        paradevs::pdevs::Dynamics < common::DoubleTime,
-                                    SchedulerHandle >(name, parameters)
+    Cell(const std::string& name, const CellParameters& parameters) :
+        paradevs::pdevs::Dynamics < common::DoubleTime, CellParameters >(
+            name, parameters),
+        _neighbour_number(parameters.neighbour_number)
     { }
     virtual ~Cell()
     { }
 
     void dint(typename common::DoubleTime::type t)
     {
+
+        // std::cout << t << " [" << get_name() << "] -> dint: "
+        //           << _phase << " => ";
+
+        if (_phase == SEND) {
+            _phase = WAIT;
+            _sigma = common::DoubleTime::infinity;
+        } else if (_phase == NEWSTATE) {
+            if (_state && (_true_neighbour_number < 2 ||
+                           _true_neighbour_number > 3)) {
+                _state = false;
+            } else if (not _state && (_true_neighbour_number == 3)) {
+                _state = true;
+            }
+            _phase  = SEND;
+            _sigma = 1;
+            _true_neighbour_number = 0;
+            _received = 0;
+        }
+
+        // std::cout << _phase << std::endl;
+
     }
 
     void dext(typename common::DoubleTime::type t,
               typename common::DoubleTime::type /* e */,
-              const common::Bag < common::DoubleTime, SchedulerHandle >& msgs)
+              const common::Bag < common::DoubleTime >& bag)
     {
+
+        // std::cout << t << " [" << get_name() << "] -> dext => "
+        //           << _received << " " << _phase << std::endl;
+
+        for (common::Bag < common::DoubleTime >::const_iterator it =
+                 bag.begin(); it != bag.end(); ++it) {
+            if (*(bool*)(it->get_content())) {
+                ++_true_neighbour_number;
+            }
+            ++_received;
+        }
+
+        if (_received == _neighbour_number) {
+            _phase = NEWSTATE;
+            _sigma = 0;
+        } else {
+            _phase = WAIT;
+            _sigma = common::DoubleTime::infinity;
+        }
+
+        // std::cout << t << " [" << get_name() << "] -> dext (AFTER) => "
+        //           << _received << " " << _phase << std::endl;
+
     }
 
     void dconf(typename common::DoubleTime::type t,
-               typename common::DoubleTime::type /* e */,
-               const common::Bag < common::DoubleTime, SchedulerHandle >& msgs)
+               typename common::DoubleTime::type e,
+               const common::Bag < common::DoubleTime >& bag)
     {
+
+        // std::cout << t << " [" << get_name() << "] -> dconf" << std::endl;
+
+        dext(t, e, bag);
     }
 
     typename common::DoubleTime::type start(typename common::DoubleTime::type t)
     {
+
+        // std::cout << t << " [" << get_name() << "] -> START" << std::endl;
+
+        _phase = SEND;
+        _sigma = 0;
+        _state = false;
+        _true_neighbour_number = 0;
+        _received = 0;
         return 0;
     }
 
     typename common::DoubleTime::type ta(
         typename common::DoubleTime::type t) const
-    {
-    }
+    { return _sigma; }
 
-    common::Bag < common::DoubleTime, SchedulerHandle > lambda(
+    common::Bag < common::DoubleTime > lambda(
         typename common::DoubleTime::type t) const
     {
-        common::Bag < common::DoubleTime, SchedulerHandle > msgs;
+        common::Bag < common::DoubleTime > bag;
 
-        return msgs;
+        if (_phase == SEND) {
+
+            // std::cout << t << " [" << get_name() << "] -> lambda"
+            //           << std::endl;
+
+            bag.push_back(common::ExternalEvent < common::DoubleTime >(
+                              "out", (void*)(&_state)));
+        }
+        return bag;
     }
 
     void observation(std::ostream& /* file */) const
     { }
 
 private:
-    enum Phase { INIT, IDLE, NEWSTATE };
+    enum Phase { SEND, WAIT, NEWSTATE };
+
+    unsigned int _neighbour_number;
 
     Phase _phase;
+    common::DoubleTime::type _sigma;
+    bool _state;
+    unsigned int _received;
+    unsigned int _true_neighbour_number;
 };
 
 } } } } // namespace paradevs tests multithreading lifegame

@@ -28,7 +28,6 @@
 #include <fstream>
 #include <boost/timer.hpp>
 
-//#include <tests/boost_graph/partitioning/graph_build.hpp>
 #include <tests/boost_graph/graph_generator.hpp>
 #include <tests/boost_graph/graph_partitioning.hpp>
 
@@ -48,16 +47,16 @@ int main()
     Entiers weight_vertex;
     weight_vertex.push_back(1);
     const char *texte = "../../sortie_graphe/tests_grid.txt";
-    RandomGridGraphGenerator generator(side, vertex_selection, 
+    RandomGridGraphGenerator generator(side, vertex_selection,
 									weight_vertex, texte, true);*/
-									
+
 	/** Tree **/
 	/*int nbr_sommets = 20000;
-	int sources = nbr_sommets/100*1; 
+	int sources = nbr_sommets/100*1;
 	Entiers levels = {5,4,3,2};
 	//Text_generator_graph("file/data_base/linked/linked_10000.txt", &gtmp);
 	RandomGraphGenerator generator(nbr_sommets, levels, sources, 2, 3);*/
-	
+
 	/** Linked **/
 	//OrientedGraph gtmp;
 	//int nbr_sommets = 10000;
@@ -65,14 +64,14 @@ int main()
 	//RandomLinkedGraphGenerator generator(nbr_sommets, nbr_couches, 2, 3);
 	//generator.generate(gtmp);
 	//Text_generator_graph("file/data_base/linked/linked_10000.txt", &gtmp);
-	
+
 	//ArtificialGraphGenerator generator(38);
-	
+
 	ParcelGraphGenerator generator(10000, "mono");
 	std::cout << "Duration : " << t.elapsed() << " seconds" << std::endl;
-	
+
 	OrientedGraph::vertex_iterator vertexIt, vertexEnd;
-	
+
 	/*UnorientedGraph gi;
 	OrientedGraph go;
 	generator.generate(go);
@@ -108,14 +107,14 @@ int main()
 		}
 	}*/
 
-	/**Liste des méthodes possible : 
+	/**Liste des méthodes possible :
 	 * gggp
 	 * ggp
 	 * rand
 	 **/
     PartitioningGraphBuilder graph_builder(4, "gggp", 200,
                                            false, generator);
-                                           
+
     OrientedGraphs graphs;
     InputEdgeList  input_edges;
     OutputEdgeList output_edges;
@@ -123,9 +122,9 @@ int main()
 
     graph_builder.build(graphs, input_edges, output_edges,
                         parent_connections);
-                        
+
     std::cout << "Duration : " << t.elapsed() << " seconds" << std::endl;
-    
+
     /*std::vector<const char*> name;
     name.push_back("../../sortie_graphe/Tests/Graphes/Multiniveau/txt/partie_0.txt");
     name.push_back("../../sortie_graphe/Tests/Graphes/Multiniveau/txt/partie_1.txt");
@@ -144,7 +143,7 @@ int main()
         Edges& inputs = input_edges[i];
         Edges& outputs = output_edges[i];
         std::map < int, int > indexes;
-        
+
         //std::cout<<num_vertices(graphs[i])<<std::endl;
         //Plot_OrientedGraph(&graphs[i],name.at(i));
         std::ofstream f((boost::format("file/data_base/linked/rand/S%1%.tgf") % i).str());
@@ -157,10 +156,10 @@ int main()
         for (; vertexIt != vertexEnd; ++vertexIt) {
             indexes[g[*vertexIt]._index] = k;
             switch (g[*vertexIt]._type) {
-            case TOP_PIXEL:
+            case 0 /*TOP_PIXEL*/:
                 f << "top " << std::endl;
                 break;
-            case NORMAL_PIXEL:
+            case 1 /*NORMAL_PIXEL*/:
                 f << "normal " << std::endl;
                 break;
             };
@@ -191,7 +190,7 @@ int main()
 
         // output
         std::vector < int > outs;
-		
+
         for (Edges::const_iterator it = outputs.begin(); it != outputs.end(); ++it) {
             if (std::find(outs.begin(), outs.end(), it->first) == outs.end()) {
                 f << indexes[it->first] << " 0 0 " << it->first << std::endl;
@@ -214,9 +213,9 @@ int main()
     for (Connections::const_iterator it = parent_connections.begin();
          it != parent_connections.end(); ++it) {
        const Connection& connection = *it;
-	   std::pair<int, int> tmp_outs; 
+	   std::pair<int, int> tmp_outs;
 	   tmp_outs.first = connection.first.second;
-	   tmp_outs.second = connection.second.first;		
+	   tmp_outs.second = connection.second.first;
        //if (std::find(outs.begin(), outs.end(), connection.) == outs.end()) {
        if(std::find(Outs.begin(), Outs.end(), tmp_outs) == Outs.end()){
 	   //} else{
