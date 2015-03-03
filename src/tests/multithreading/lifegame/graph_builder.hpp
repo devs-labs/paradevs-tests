@@ -51,7 +51,7 @@ public:
                Connections& parent_connections)
     {
         std::vector < std::string > parameters = {
-            "HEM", "rand", "diff", "ratio"
+            "HEM", "rande", "diff", "ratio"
         };
         // std::vector < std::string > parameters = {
         //     "HEM", "gggp", "diff", "ratio"
