@@ -122,8 +122,8 @@ double grid_multithreading(int cluster_number)
 
 double tree_monothreading()
 {
-    std::vector < int > levels = { 5,4, 3, 2 };
-    int nbr_sommets = 10000;
+    std::vector < int > levels = { 4, 3, 2 };
+    int nbr_sommets = 1000;
     int sources = nbr_sommets/100*1;
     paradevs::tests::boost_graph::RandomGraphGenerator generator(nbr_sommets,
                                                                  levels,
@@ -154,8 +154,8 @@ double tree_monothreading()
 
 double tree_multithreading(int cluster_number)
 {
-    std::vector < int > levels = { 5,4, 3, 2 };
-    int nbr_sommets = 10000;
+    std::vector < int > levels = { 4, 3, 2 };
+    int nbr_sommets = 1000;
     int sources = nbr_sommets/100*1;
     paradevs::tests::boost_graph::RandomGraphGenerator generator(nbr_sommets,
                                                                  levels,

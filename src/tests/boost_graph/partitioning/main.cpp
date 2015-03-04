@@ -48,11 +48,11 @@ int main()
 	/*** Génération du graphe ***/
 
     OrientedGraph *go = new OrientedGraph();
-    std::string type_graph = "parcellaire";
+    std::string type_graph = "tree";//"parcellaire";
     std::pair<bool,bool> Spectrale = {false,false};
 
     if(type_graph == "grid"){
-		int side = floor(sqrt(100));
+		int side = floor(5);
 		std::vector<std::pair<int,int>> vertex_selection;
 	    std::pair<int,int> tmp;
 	    tmp.first = 0;
@@ -64,7 +64,7 @@ int main()
 	    build_graph_grid(go, side, vertex_selection, weight_vertex,texte,true);
 	    Plot_OrientedGraph(go,"../../sortie_graphe/Tests/Graphes/Multiniveau/txt/grid_500.txt");
 	}else if (type_graph == "tree"){
-		int nbr_sommets = 70;
+		int nbr_sommets = 80;
 		int nbr_sources = 2;
 		Entiers niveau = {2,2};
 		const char *texte;
@@ -107,7 +107,7 @@ int main()
 	}
 
 	/*** Paramétrage du Multiniveau ***/
-	std::vector<uint> numeric_parameters = {(uint)(num_vertices(*go)/50), 4, 10};
+	std::vector<uint> numeric_parameters = {(uint)(num_vertices(*go)), 4, 10};
 	std::vector<std::string> parameters = {"HEM", "gggp", "diff", "ratio"};
 
 	uint nbr_tirage = 1;
