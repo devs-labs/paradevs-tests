@@ -41,29 +41,6 @@
 
 namespace paradevs { namespace tests { namespace boost_graph {
 
-// struct SchedulerHandle;
-
-// typedef typename paradevs::common::scheduler::HeapScheduler <
-//     common::DoubleTime, SchedulerHandle >::type SchedulerType;
-
-// struct SchedulerHandle
-// {
-//     SchedulerHandle()
-//     { }
-
-//     SchedulerHandle(const SchedulerType::handle_type& handle)
-//         : _handle(handle)
-//     { }
-
-//     const SchedulerHandle& handle() const
-//     { return *this; }
-
-//     void handle(const SchedulerHandle& handle)
-//     { _handle = handle._handle; }
-
-//     SchedulerType::handle_type _handle;
-// };
-
 struct GraphParameters
 {
     OrientedGraph _graph;
@@ -113,7 +90,7 @@ public:
 
             ss << "a" << g[*vertexIt]._index;
             switch (g[*vertexIt]._type) {
-            case TOP_PIXEL:
+            case 0 /*TOP_PIXEL*/:
                 _top_simulators[g[*vertexIt]._index] =
                     new pdevs::Simulator <
                         common::DoubleTime, TopPixel,
@@ -122,7 +99,7 @@ public:
                 FlatGraphManager < Parameters >::add_child(
                     _top_simulators[g[*vertexIt]._index]);
                 break;
-            case NORMAL_PIXEL:
+            case 1 /*NORMAL_PIXEL*/:
                 unsigned int n = 0;
                 OrientedGraph::vertex_iterator vertexIt2, vertexEnd2;
 
@@ -169,12 +146,12 @@ public:
                 paradevs::common::Model < common::DoubleTime >* a = 0;
                 paradevs::common::Model < common::DoubleTime >* b = 0;
 
-                if (g[*vertexIt]._type == TOP_PIXEL) {
+                if (g[*vertexIt]._type == 0 /*TOP_PIXEL*/) {
                     a = _top_simulators[g[*vertexIt]._index];
                 } else {
                     a = _normal_simulators[g[*vertexIt]._index];
                 }
-                if (g[*neighbourIt]._type == TOP_PIXEL) {
+                if (g[*neighbourIt]._type == 0 /*TOP_PIXEL*/) {
                     b = _top_simulators[g[*neighbourIt]._index];
                 } else {
                     b = _normal_simulators[g[*neighbourIt]._index];

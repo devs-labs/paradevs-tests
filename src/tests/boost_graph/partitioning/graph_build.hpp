@@ -33,22 +33,26 @@
 
 namespace paradevs { namespace tests { namespace boost_graph {
 
+enum DynamicsType {
+	TOP_PIXEL = 0, NORMAL_PIXEL
+};
+
 void build_graph(OrientedGraph& og, unsigned int edge_number);
 
-void build_generator_graph(OrientedGraph *go, int nbr_vertex, 
-				int nbr_source, int nbr_v_min, int nbr_v_max, 
+void build_generator_graph(OrientedGraph *go, int nbr_vertex,
+				int nbr_source, int nbr_v_min, int nbr_v_max,
 				const std::vector<int> &niveau);
 
 void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex,
 				int nbr_couche, int nbr_v_min, int nbr_v_max);
-				
+
 void build_graph_cyclique(OrientedGraph& og);
 
-void build_graph_grid(OrientedGraph *go, int side, 
+void build_graph_grid(OrientedGraph *go, int side,
 				const std::vector<std::pair<int,int>> &vertex_selection,
-				const Entiers &weight_vertex, const char *edge_weight, 
+				const Entiers &weight_vertex, const char *edge_weight,
 				bool rec);
-				
+
 void build_example_linked9(OrientedGraph& og);
 
 void build_example_ligne(OrientedGraph& og);
@@ -56,7 +60,7 @@ void build_example_ligne(OrientedGraph& og);
 void build_example_grid(OrientedGraph& og);
 
 void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name);
-				
+
 //void build_corsen_graph(OrientedGraph& graph);
 
 } } } // namespace paradevs tests boost_graph;

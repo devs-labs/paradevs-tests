@@ -334,9 +334,9 @@ public:
                Connections& )
     {
 		/*
-		 * *** Graphe créé différent du graphe obtenu dans graph_partitioning ! Solution ? *** 
+		 * *** Graphe créé différent du graphe obtenu dans graph_partitioning ! Solution ? ***
 		 */
-		
+
         /*
         const char *texte = new const char();
         texte = "enregistrement.txt";
@@ -344,7 +344,7 @@ public:
         OrientedGraph graph;
         unsigned int edge_number = 200;
         std::vector<int> levels = {/*5,4,*/ 3, 2 };
-        
+
         unsigned int source_number = edge_number/100*1;
         unsigned int min_neigh = 2;
         unsigned int max_neigh = 3;
@@ -367,18 +367,18 @@ public:
                Connections& )
     {
 		/*
-		 * *** Graphe créé différent du graphe obtenu dans graph_partitioning ! Solution ? *** 
+		 * *** Graphe créé différent du graphe obtenu dans graph_partitioning ! Solution ? ***
 		 */
-		
+
         /*
         const char *texte = new const char();
         texte = "enregistrement.txt";
         Graph_constructor_txt(texte, &graph);*/
-        
+
         OrientedGraph graph;
         unsigned int edge_number = 5000;
         unsigned int levels = 60;
-        
+
         unsigned int min_neigh = 2;
         unsigned int max_neigh = 3;
 
@@ -398,25 +398,25 @@ public:
                OutputEdgeList& ,
                Connections& )
     {
-        
+
         OrientedGraph graph;
-        unsigned int side = 90;
+        unsigned int side = 20;
         std::vector<std::pair<int,int>> vertex_selection;
         std::pair<int,int> tmp;
         tmp.first = 0;
-		tmp.second = 3;
+        tmp.second = 3;
         vertex_selection.push_back(tmp);
         Entiers weight_vertex;
         weight_vertex.push_back(1);
         const char *edge_weight;
         edge_weight = "../../sortie_graphe/tests_grid.txt";
         bool rec = false;
-        
-		
-		build_graph_grid(&graph, side, vertex_selection,  weight_vertex, edge_weight, rec);;
+
+
+        build_graph_grid(&graph, side, vertex_selection, weight_vertex,
+                         edge_weight, rec);
         graphs.push_back(graph);
     }
-
 };
 
 //créationd de la classe ParcelFlatGraphBuilder
@@ -430,11 +430,11 @@ public:
                OutputEdgeList& ,
                Connections& )
     {
-        
+
         OrientedGraph graph;
         uint size_max = 1000;
         std::string name = "mono";
-        
+
 		build_parcellaire_graph(&graph, size_max, name);
         graphs.push_back(graph);
     }

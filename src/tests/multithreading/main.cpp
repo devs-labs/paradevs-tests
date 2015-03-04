@@ -106,7 +106,7 @@ double grid_multithreading(int cluster_number)
             paradevs::tests::boost_graph::PartitioningParameters >
         > rc(0, 10, "root", paradevs::common::NoParameters(),
              paradevs::tests::boost_graph::PartitioningParameters(
-                 cluster_number, "gggp", 20, false, generator));
+                 cluster_number, "rand", 20, false, generator));
 
     steady_clock::time_point t1 = steady_clock::now();
 
@@ -190,6 +190,7 @@ void grid(int n)
         std::cout << grid_monothreading() << std::endl;
     } else {
         std::cout << grid_multithreading(n) << std::endl;
+        // grid_multithreading(n);
     }
 }
 
@@ -199,6 +200,7 @@ void tree(int n)
         std::cout << tree_monothreading() << std::endl;
     } else {
         std::cout << tree_multithreading(n) << std::endl;
+        // tree_multithreading(n);
     }
 }
 

@@ -499,7 +499,7 @@ double Modif_Cut_one_cluster(Entiers &cluster, UnorientedGraph &g, double &vol, 
 	edge_t e1;
 	bool found;
 	double cpt= 0.;
-	
+
 	if(name == "norm"){
 		for(uint i=0;i<cluster.size();i++){
 			tie(neighbourIt, neighbourEnd) = adjacent_vertices(cluster.at(i), g);
@@ -695,13 +695,13 @@ bool contraction_HEM(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &
 	 * Création d'un vecteur contenant l'ensemble des sommets du graphe. Ces sommets sont rangés
 	 * aléatoirement afin de simuler un tirage aléatoire
 	 */
-	 
+
 	Entiers Random_list_vertices = Random_Sort_Vector(nbr_vertex);
-	
+
 	/*
 	 * Pour chaque sommet non verrouiller faire ....
 	 */
-	 
+
 	//std::cout<<"Nouvelle contraction !!!"<<std::endl;
 	//std::cout<<std::endl;
 	for(uint i=0; i<nbr_vertex; i++){
@@ -861,7 +861,7 @@ bool contraction_HEM_tests(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEnt
 	/*
 	 * Pour chaque sommet non verrouiller faire ....
 	 */
-	 
+
 	//std::cout<<"Nouvelle contraction !!!"<<std::endl;
 	//std::cout<<std::endl;
 	for(uint i=0; i<nbr_vertex; i++){
@@ -922,7 +922,7 @@ bool contraction_HEM_tests(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEnt
 					//std::cout<<(*gtmp)[*neighbourIt]._index<<" ";
 				}
 				//std::cout<<std::endl;
-				
+
 				sort(neigh_vertex_save.begin(),neigh_vertex_save.end());
 				sort(neigh_vertex_delete.begin(),neigh_vertex_delete.end());
 				/*
@@ -930,7 +930,7 @@ bool contraction_HEM_tests(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEnt
 				 * S'il existe un tel sommet "v" alors on ajoute le poids de l'arcs (vertex_delet,v)
 				 * à celui de l'arcs (vertex_save,v) et on détruit l'arcs reliant "v" au "sommet à détruire"
 				 */
-				 
+
 				for(uint j=0;j<neigh_vertex_delete.size();j++){
 					//std::cout<<"* "<<neigh_vertex_delete.size()<<" "<<(*gtmp)[neigh_vertex_delete[j]]._index<<std::endl;
 					if(neigh_vertex_save.size() != 0){
@@ -1031,12 +1031,12 @@ bool contraction_HEM_max_degree_selection(UnorientedGraph *g, Base_Graph &baseg,
 	 */
 	for (uint i=0 ; i<nbr_vertex ; i++)
 		Index_Vertex.push_back(i);
-	
+
 	Entiers Random_list_vertices = Random_Sort_Vector(nbr_vertex);
 	/*
 	 * Pour chaque sommet non verrouiller faire ....
 	 */
-	 
+
 	//std::cout<<"Nouvelle contraction !!!"<<std::endl;
 	for(uint i=0; i<nbr_vertex; i++){
 		int vertexs = Index_Vertex.at(Random_list_vertices.at(i));
@@ -1060,7 +1060,7 @@ bool contraction_HEM_max_degree_selection(UnorientedGraph *g, Base_Graph &baseg,
 				}
 
 				Entiers *couple = new Entiers(); // Initialisation du vecteur contenant le couple de sommet fusionné
-				
+
 				/* Sélection  du sommet possedant un degrès maximum */
 				std::pair<double,int> couple1, couple2, best_min, best_max;
 				couple1.first = Degree(*gtmp,vertexs);
@@ -1083,10 +1083,10 @@ bool contraction_HEM_max_degree_selection(UnorientedGraph *g, Base_Graph &baseg,
 				tableau_de_correspondance->push_back(couple); // Ajout du "couple" à la liste de correspondance
 
 				remove_edge(vertex_save,vertex_delete,*gtmp); // Suppression de l'arc reliant le couple de sommets
-				
+
 				Entiers neigh_vertex_save; // Initialisation du vecteur contenant les sommets adjacents au "sommet sauvegardé"
 				Entiers neigh_vertex_delete; // Initialisation du vecteur contenant les somemts adjacents au "sommet à détruire"
-				
+
 				/*
 				 * Remplissage de ces deux tableaux à l'aide de la fonction adjacent_vertices de boost graph
 				 * [La création de ces tableaux est nécéssaire du fait que certains arcs sont détruit au cours
@@ -1098,14 +1098,14 @@ bool contraction_HEM_max_degree_selection(UnorientedGraph *g, Base_Graph &baseg,
 				}
 
 				tie(neighbourIt, neighbourEnd) = adjacent_vertices(vertex_delete,*gtmp);
-				
+
 				for (; neighbourIt != neighbourEnd; ++neighbourIt){
 						neigh_vertex_delete.push_back(*neighbourIt);
 				}
-				
+
 				sort(neigh_vertex_save.begin(),neigh_vertex_save.end());
 				sort(neigh_vertex_delete.begin(),neigh_vertex_delete.end());
-				
+
 				/*
 				 * Recherche de sommets communs entre le "sommet sauvegardé" et le "sommet à détruire"
 				 * S'il existe un tel sommet "v" alors on ajoute le poids de l'arcs (vertex_delet,v)
@@ -1165,7 +1165,7 @@ bool contraction_HEM_max_degree_selection(UnorientedGraph *g, Base_Graph &baseg,
 	 * effectuée dans l'ordre décroissant afin à maintenir à jour la renumérotation
 	 * des sommets
 	 */
-	 
+
 	for(int j=(sommets_a_detruire.size()-1);j>-1;j--){
 		remove_vertex(sommets_a_detruire[j],*gtmp);
 	}
@@ -1173,12 +1173,12 @@ bool contraction_HEM_max_degree_selection(UnorientedGraph *g, Base_Graph &baseg,
 	std::sort(tableau_de_correspondance->begin(),tableau_de_correspondance->end(),myobject); // Trie dans l'ordre croissant des couples de sommets de la liste de correspondance
 	liste_corr.push_back(tableau_de_correspondance);
 	baseg.push_back(gtmp); // Ajout du graphe modifié à la "base des graphe"
-	
+
 	if(val_cpt == val_reduc)
 		return true;
 	else
 		return false;
-		
+
 }
 
 bool contraction_HEM_degree(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEntiers &liste_corr, int val_reduc, int &val_cpt){
@@ -1196,12 +1196,12 @@ bool contraction_HEM_degree(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEn
 	 * Création d'un vecteur contenant l'ensemble des sommets du graphe. Ces sommets sont rangés
 	 * aléatoirement afin de simuler un tirage aléatoire
 	 */
-	
+
 	for (uint i=0 ; i<nbr_vertex ; i++){
 		Index_Vertex.push_back(i);
 		vertex_degree.push_back(Degree(*g,i));
 	}
-	
+
 	while(cpt != 0){
 		double max_weight = *std::max_element(vertex_degree.begin(),vertex_degree.end());
 		int vertexs, compteur;
@@ -1212,10 +1212,10 @@ bool contraction_HEM_degree(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEn
 				compteur = id;
 				vertexs = Index_Vertex.at(id);
 				break;
-			}	
+			}
 		}
 		//std::cout<<"min : "<<max_weight<<" - compteur : "<<(*gtmp)[compteur]._index;
-		
+
 		//std::cout<<"Le sommet tiré est : "<<(*gtmp)[vertexs]._index<<" ça place est : "<<compteur<<std::endl;
 		Entiers liste_voisin = Liste_adjacence_tests(*gtmp,vertexs,Index_Vertex); // Recherche des sommets adjacents au sommets  tiré
 		if(liste_voisin.size() != 0){
@@ -1230,13 +1230,13 @@ bool contraction_HEM_degree(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEn
 				tie(e1,found)=edge(vertex(vertexs,*gtmp),vertex(liste_voisin[j],*gtmp),*gtmp);
 				Neight_weight.push_back((*gtmp)[e1]._weight);
 			}
-			
+
 			max_weight = *std::max_element(Neight_weight.begin(),Neight_weight.end());
 			for(uint j=0;j<liste_voisin.size();j++){
 				if(Neight_weight.at(j) == max_weight)
 					Best_neight.push_back(liste_voisin.at(j));
 			}
-			
+
 			if(Best_neight.size() > 1){
 				int ind;
 				double deg =1000000000;
@@ -1252,10 +1252,10 @@ bool contraction_HEM_degree(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEn
 			}else{
 				best_vertexs = Best_neight.at(0);
 			}
-			
+
 			//std::cout<<" -> "<<(*gtmp)[best_vertexs]._index;
 			Entiers *couple = new Entiers(); // Initialisation du vecteur contenant le couple de sommet fusionné
-			
+
 			/* Sélection  du sommet possedant un degrès maximum */
 			std::pair<double,int> couple1, couple2, best_min, best_max;
 			couple1.first = Degree(*gtmp,vertexs);
@@ -1278,10 +1278,10 @@ bool contraction_HEM_degree(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEn
 			tableau_de_correspondance->push_back(couple); // Ajout du "couple" à la liste de correspondance
 
 			remove_edge(vertex_save,vertex_delete,*gtmp); // Suppression de l'arc reliant le couple de sommets
-			
+
 			Entiers neigh_vertex_save; // Initialisation du vecteur contenant les sommets adjacents au "sommet sauvegardé"
 			Entiers neigh_vertex_delete; // Initialisation du vecteur contenant les somemts adjacents au "sommet à détruire"
-			
+
 			/*
 			 * Remplissage de ces deux tableaux à l'aide de la fonction adjacent_vertices de boost graph
 			 * [La création de ces tableaux est nécéssaire du fait que certains arcs sont détruit au cours
@@ -1293,14 +1293,14 @@ bool contraction_HEM_degree(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEn
 			}
 
 			tie(neighbourIt, neighbourEnd) = adjacent_vertices(vertex_delete,*gtmp);
-			
+
 			for (; neighbourIt != neighbourEnd; ++neighbourIt){
 					neigh_vertex_delete.push_back(*neighbourIt);
 			}
-			
+
 			sort(neigh_vertex_save.begin(),neigh_vertex_save.end());
 			sort(neigh_vertex_delete.begin(),neigh_vertex_delete.end());
-			
+
 			/*
 			 * Recherche de sommets communs entre le "sommet sauvegardé" et le "sommet à détruire"
 			 * S'il existe un tel sommet "v" alors on ajoute le poids de l'arcs (vertex_delet,v)
@@ -1374,7 +1374,7 @@ bool contraction_HEM_degree(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEn
 	 * effectuée dans l'ordre décroissant afin à maintenir à jour la renumérotation
 	 * des sommets
 	 */
-	 
+
 	for(int j=(sommets_a_detruire.size()-1);j>-1;j--){
 		remove_vertex(sommets_a_detruire[j],*gtmp);
 	}
@@ -1382,7 +1382,7 @@ bool contraction_HEM_degree(UnorientedGraph *g, Base_Graph &baseg, ListEntiersEn
 	std::sort(tableau_de_correspondance->begin(),tableau_de_correspondance->end(),myobject); // Trie dans l'ordre croissant des couples de sommets de la liste de correspondance
 	liste_corr.push_back(tableau_de_correspondance);
 	baseg.push_back(gtmp); // Ajout du graphe modifié à la "base des graphe"
-	
+
 	if(val_cpt == val_reduc)
 		return true;
 	else
@@ -1405,13 +1405,13 @@ bool contraction_HEM_mds_ameliore_KK(UnorientedGraph *g, Base_Graph &baseg, List
 	 */
 	for (uint i=0 ; i<nbr_vertex ; i++)
 		Index_Vertex.push_back(i);
-	
+
 	Entiers Random_list_vertices = Random_Sort_Vector(nbr_vertex);
 
 	/*
 	 * Pour chaque sommet non verrouiller faire ....
 	 */
-	 
+
 	//std::cout<<"Nouvelle contraction !!!"<<std::endl;
 	for(uint i=0; i<nbr_vertex; i++){
 		int vertexs = Index_Vertex.at(Random_list_vertices.at(i));
@@ -1425,9 +1425,9 @@ bool contraction_HEM_mds_ameliore_KK(UnorientedGraph *g, Base_Graph &baseg, List
 				 * choisi celui dont l'arc les reliants est le plus fort. Dans le cas où les arcs ont tous
 				 * le même poids, on selectionne le sommet d'index le plus petit
 				 */
-				/*std::cout<<"Le sommet tiré a des voisins "<<std::endl; 
+				/*std::cout<<"Le sommet tiré a des voisins "<<std::endl;
 				for(uint id = 0; id<liste_voisin.size(); id++){
-					std::cout<<(*gtmp)[liste_voisin.at(id)]._index<<" "; 
+					std::cout<<(*gtmp)[liste_voisin.at(id)]._index<<" ";
 				}
 				std::cout<<std::endl;*/
 				double poids_a = -1.;
@@ -1447,14 +1447,14 @@ bool contraction_HEM_mds_ameliore_KK(UnorientedGraph *g, Base_Graph &baseg, List
 					if(adjacent_weight.at(id) == max_weight)
 						Vertex_select.push_back(liste_voisin.at(id));
 				}
-				
+
 				int index = 0;
 				if(Vertex_select.size()>1){
 					//std::cout<<"Top **"<<std::endl;
 					for(uint id = 0; id<Vertex_select.size(); id++){
 						suprim_val(liste_voisin,Vertex_select.at(id)); /*** modification possible ***/
 					}
-					
+
 					//std::cout<<"Top ***"<<std::endl;
 					adjacent_weight.clear();
 					for(uint id_Vs = 0; id_Vs<Vertex_select.size(); id_Vs++){
@@ -1473,12 +1473,12 @@ bool contraction_HEM_mds_ameliore_KK(UnorientedGraph *g, Base_Graph &baseg, List
 						}
 						adjacent_weight.push_back(neigh_weight);
 					}
-					
+
 					//std::cout<<"Top ****"<<std::endl;
 					max_weight = *std::max_element(adjacent_weight.begin(),adjacent_weight.end());
 					for(uint id = 0; id <adjacent_weight.size(); id++){
 						if(adjacent_weight.at(id) == max_weight){
-							index = id;	
+							index = id;
 							break;
 						}
 					}
@@ -1489,7 +1489,7 @@ bool contraction_HEM_mds_ameliore_KK(UnorientedGraph *g, Base_Graph &baseg, List
 				int best_vertexs = Vertex_select.at(index);
 				//std::cout<<"Index "<<best_vertexs<<std::endl;
 				Entiers *couple = new Entiers(); // Initialisation du vecteur contenant le couple de sommet fusionné
-				
+
 				/* Sélection  du sommet possedant un degrès maximum */
 				std::pair<double,int> couple1, couple2, best_min, best_max;
 				couple1.first = Degree(*gtmp,vertexs);
@@ -1512,10 +1512,10 @@ bool contraction_HEM_mds_ameliore_KK(UnorientedGraph *g, Base_Graph &baseg, List
 				tableau_de_correspondance->push_back(couple); // Ajout du "couple" à la liste de correspondance
 
 				remove_edge(vertex_save,vertex_delete,*gtmp); // Suppression de l'arc reliant le couple de sommets
-				
+
 				Entiers neigh_vertex_save; // Initialisation du vecteur contenant les sommets adjacents au "sommet sauvegardé"
 				Entiers neigh_vertex_delete; // Initialisation du vecteur contenant les somemts adjacents au "sommet à détruire"
-				
+
 				/*
 				 * Remplissage de ces deux tableaux à l'aide de la fonction adjacent_vertices de boost graph
 				 * [La création de ces tableaux est nécéssaire du fait que certains arcs sont détruit au cours
@@ -1530,10 +1530,10 @@ bool contraction_HEM_mds_ameliore_KK(UnorientedGraph *g, Base_Graph &baseg, List
 				for (; neighbourIt != neighbourEnd; ++neighbourIt){
 						neigh_vertex_delete.push_back(*neighbourIt);
 				}
-				
+
 				sort(neigh_vertex_save.begin(),neigh_vertex_save.end());
 				sort(neigh_vertex_delete.begin(),neigh_vertex_delete.end());
-				
+
 				/*
 				 * Recherche de sommets communs entre le "sommet sauvegardé" et le "sommet à détruire"
 				 * S'il existe un tel sommet "v" alors on ajoute le poids de l'arcs (vertex_delet,v)
@@ -1568,7 +1568,7 @@ bool contraction_HEM_mds_ameliore_KK(UnorientedGraph *g, Base_Graph &baseg, List
 				 * alors on l'ajoute à la liste de correspondance des sommets et on
 				 * le verrouille
 				 */
-				//std::cout<<"Le sommet tiré est isolé "<<std::endl; 
+				//std::cout<<"Le sommet tiré est isolé "<<std::endl;
 				Entiers *couple = new Entiers();
 				couple->push_back(vertexs);
 				tableau_de_correspondance->push_back(couple);
@@ -1598,7 +1598,7 @@ bool contraction_HEM_mds_ameliore_KK(UnorientedGraph *g, Base_Graph &baseg, List
 	 * effectuée dans l'ordre décroissant afin à maintenir à jour la renumérotation
 	 * des sommets
 	 */
-	 
+
 	for(int j=(sommets_a_detruire.size()-1);j>-1;j--){
 		remove_vertex(sommets_a_detruire[j],*gtmp);
 	}
@@ -1606,7 +1606,7 @@ bool contraction_HEM_mds_ameliore_KK(UnorientedGraph *g, Base_Graph &baseg, List
 	std::sort(tableau_de_correspondance->begin(),tableau_de_correspondance->end(),myobject); // Trie dans l'ordre croissant des couples de sommets de la liste de correspondance
 	liste_corr.push_back(tableau_de_correspondance);
 	baseg.push_back(gtmp); // Ajout du graphe modifié à la "base des graphe"
-	
+
 	if(val_cpt == val_reduc)
 		return true;
 	else
@@ -1616,7 +1616,7 @@ bool contraction_HEM_mds_ameliore_KK(UnorientedGraph *g, Base_Graph &baseg, List
 
 bool Est_voisin(UnorientedGraph *g, int vertex, int vertex_select){
 	bool reponse = false;
-	
+
 	tie(neighbourIt, neighbourEnd) = adjacent_vertices(vertex, *g);
 	for (; neighbourIt != neighbourEnd; ++neighbourIt){
 		if(*neighbourIt == vertex_select)
@@ -1633,7 +1633,7 @@ bool contraction_Random_Maching(UnorientedGraph *g, Base_Graph &baseg, ListEntie
 	bool found;
 	uint nbr_vertex = num_vertices(*gtmp);
 	Entiers sommets_a_detruire; // Initialisation d'un tableau pret à recevoir les "sommets à détruire"
-	
+
 	/*
 	 * Création d'un vecteur contenant l'ensemble des sommets du graphe. Ces sommets sont rangés
 	 * aléatoirement afin de simuler un tirage aléatoire
@@ -1761,7 +1761,7 @@ bool contraction_Random_Maching(UnorientedGraph *g, Base_Graph &baseg, ListEntie
 	liste_corr.push_back(tableau_de_correspondance);
 	baseg.push_back(gtmp); // Ajout du graphe modifié à la "base des graphe"
 
-	
+
 	if(val_cpt == val_reduc)
 		return true;
 	else
@@ -1954,7 +1954,7 @@ double Cut_one_cluster(const Entiers &cluster, UnorientedGraph &g, std::string n
 		double vol = Cluster_Weight(g,cluster);
 		return (cpt/2.)/vol;
 	}
-	
+
 	/*Vérification de la formule : doute sur le /2.*/
 }
 
@@ -2163,7 +2163,7 @@ OrientedGraphs Graph_Partition(const EntiersEntiers& Partition,
 double Best_Cut_cluster(EntiersEntiers &tab_cluster,Entiers *cluster1, Entiers *cluster2, int index_cluster1, UnorientedGraph &g,std::string name)
 {
 	tab_cluster.push_back(cluster2);
-	
+
 	double cpt=0.;
 	for(int i=0;i<tab_cluster.size();i++){
 		if(i!=index_cluster1){
@@ -2412,7 +2412,7 @@ int decimal(int valeur){
 		break;
 		case 100000000 ... 999999999 : res = 8;
 		break;
-	default : 
+	default :
 		std::cout<<"L'interval n'est pas de taille suffisante"<<std::endl;
 		break;
 	}
@@ -2420,44 +2420,44 @@ int decimal(int valeur){
 }
 
 void Graph_constructor_txt(const char* text, OrientedGraph * Og){
-	
+
 	//Traitement initial
 	std::ifstream fichier (text, std::ios::in);
 	int lines = std::count(std::istreambuf_iterator<char>( fichier ),
 	std::istreambuf_iterator<char>(),'\n' );
 	//std::cout<<"Nombre de ligne : "<<lines<<std::endl;
-	
+
 	fichier.seekg(0, std::ios::beg);
 	std::string caractere;
 	getline(fichier, caractere);
 	int caractere_size = caractere.size()+1;
-	
+
 	fichier.seekg(0, std::ios::beg);
 	int nbr_vertices;
 	fichier >> nbr_vertices;
 	//std::cout << "Nombre de sommets : "<< nbr_vertices<< std::endl;
-	
+
 	//Création des sommets
-	
+
 	std::vector<vertex_to> vect_vertex;
 	for(int i =0; i<nbr_vertices; i++){
 		vertex_to v0 = boost::add_vertex(*Og);
 		vect_vertex.push_back(v0);
 	}
-	
+
 	//Création des arcs
 	int deplacement_sup = 0;
 	for(int i = 0; i <(lines-nbr_vertices-1); i++){
 	fichier.seekg((8)*i+caractere_size+deplacement_sup, std::ios::beg);
 	int vertex_in, vertex_out;
 	double weight;
-	fichier >> vertex_in >> vertex_out >> weight ; 
-	add_edge(vect_vertex.at(vertex_in), vect_vertex.at(vertex_out), EdgeProperties(weight), *Og); 
-	//std::cout << vertex_in << " " << vertex_out << " " << weight << std::endl; 
+	fichier >> vertex_in >> vertex_out >> weight ;
+	add_edge(vect_vertex.at(vertex_in), vect_vertex.at(vertex_out), EdgeProperties(weight), *Og);
+	//std::cout << vertex_in << " " << vertex_out << " " << weight << std::endl;
 	int tmp = decimal(vertex_in) + decimal(vertex_out) + decimal(floor(weight));
 	deplacement_sup += tmp;
 	}
-	
+
 	//Pondération des sommets
 	int cpt =0;
 	for(int i = lines-nbr_vertices-1; i <lines-1; i++){
@@ -2465,14 +2465,16 @@ void Graph_constructor_txt(const char* text, OrientedGraph * Og){
 	double poids;
 	std::string txt;
 	fichier >> poids >> txt ;
-	DynamicsType type;
+	int type;
 	if(txt == "NORMAL_PIXEL"){
-		type = NORMAL_PIXEL; 
+		type = 1;
+		// type = NORMAL_PIXEL;
 	}else{
-		type = TOP_PIXEL;
+		type = 0;
+		// type = TOP_PIXEL;
 	}
 	(*Og)[vect_vertex.at(cpt)] = VertexProperties(cpt, poids, type);
-	//std::cout << poids << std::endl; 
+	//std::cout << poids << std::endl;
 	int tmp = decimal(floor(poids)) + 17;
 	deplacement_sup += tmp;
 	cpt++;
@@ -2482,7 +2484,7 @@ void Graph_constructor_txt(const char* text, OrientedGraph * Og){
 }
 
 void Text_generator_graph(const char *texte, OrientedGraph *go){
-	
+
 	bool found;
 	edge_to e1;
 	std::ofstream fichier (texte, std::ios::out);
@@ -2502,17 +2504,17 @@ void Text_generator_graph(const char *texte, OrientedGraph *go){
     }
     tie(vertexIto, vertexEndo) = vertices(*go);
     for (; vertexIto != vertexEndo; ++vertexIto) {
-		if(((*go)[*vertexIto]._weight - floor((*go)[*vertexIto]._weight)) == 0 && (*go)[*vertexIto]._type == TOP_PIXEL){
+        if(((*go)[*vertexIto]._weight - floor((*go)[*vertexIto]._weight)) == 0 && (*go)[*vertexIto]._type == 0 /*TOP_PIXEL*/){
 			fichier<<(*go)[*vertexIto]._weight<<".0"<<" "<<"TOP_PIXEL"<<"   "<<std::endl;
-		}else if(((*go)[*vertexIto]._weight - floor((*go)[*vertexIto]._weight)) == 0 && (*go)[*vertexIto]._type == NORMAL_PIXEL){
+		}else if(((*go)[*vertexIto]._weight - floor((*go)[*vertexIto]._weight)) == 0 && (*go)[*vertexIto]._type == 1 /*NORMAL_PIXEL*/){
 			fichier<<(*go)[*vertexIto]._weight<<".0"<<" "<<"NORMAL_PIXEL"<<std::endl;
-		}else if(((*go)[*vertexIto]._weight - floor((*go)[*vertexIto]._weight)) != 0 && (*go)[*vertexIto]._type == TOP_PIXEL){
+		}else if(((*go)[*vertexIto]._weight - floor((*go)[*vertexIto]._weight)) != 0 && (*go)[*vertexIto]._type == 0 /*TOP_PIXEL*/){
 			fichier<<(*go)[*vertexIto]._weight<<" "<<"TOP_PIXEL"<<std::endl;
 		}else{
 			fichier<<(*go)[*vertexIto]._weight<<" "<<"NORMAL_PIXEL"<<std::endl;
 		}
     }
-    
+
 	fichier.close();
 }
 
@@ -2520,7 +2522,7 @@ double Diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Partition, int p
 	double Dif;
 	double Int = 0.;
 	double Ext = 0.;
-	
+
 	edge_t e1;
     bool found;
 
@@ -2533,19 +2535,19 @@ double Diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Partition, int p
 			Ext+= (*g)[e1]._weight;
 		}
     }
-    
+
 	if(name == "ratio"){
 	    Int/=Cluster_Weight(*g,*Partition.at(partie));
 	    Ext/=Cluster_Weight(*g,*Partition.at(partie));
 	}
-	
+
 	Dif = Ext - Int;
 	return Dif;
 }
 
 double Diff_cut_ratio_bissection(UnorientedGraph *g, Entiers *part, int node, std::string name){
 	double Ext = 0.;
-	
+
 	edge_t e1;
     bool found;
 
@@ -2556,13 +2558,13 @@ double Diff_cut_ratio_bissection(UnorientedGraph *g, Entiers *part, int node, st
 			Ext+= (*g)[e1]._weight;
 		}
     }
-	
+
 	return Ext;
 }
 
 std::vector<std::vector<int>> Vector_diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Partition, std::string name){
 	std::vector<std::vector<int>> Diff_vector;
-	
+
 	for(uint i = 0; i < Partition.size(); i++){
 		std::vector<std::pair<double,int>> D_vector;
 		for(uint j = 0; j < Partition.at(i)->size(); j++){
@@ -2572,8 +2574,8 @@ std::vector<std::vector<int>> Vector_diff_cut_ratio(UnorientedGraph *g, const En
 				std::pair<double, int> D;
 				D.first =  gain_d;
 				D.second = Partition.at(i)->at(j);
-				D_vector.push_back(D);		
-			}	
+				D_vector.push_back(D);
+			}
 		}
 		sort(D_vector.begin(),D_vector.end());
 		std::reverse(D_vector.begin(),D_vector.end());
@@ -2583,7 +2585,7 @@ std::vector<std::vector<int>> Vector_diff_cut_ratio(UnorientedGraph *g, const En
 		}
 		Diff_vector.push_back(index_vector);
 	}
-	
+
 	/*std::cout<<"Tableau des différences "<<std::endl;
 	for(uint i = 0; i<Diff_vector.size(); i++){
 		std::cout<<"*"<<i<<"* ";
@@ -2592,7 +2594,7 @@ std::vector<std::vector<int>> Vector_diff_cut_ratio(UnorientedGraph *g, const En
 		}
 		std::cout<<std::endl;
 	}*/
-	
+
 	return Diff_vector;
 
 }
@@ -2608,15 +2610,15 @@ std::vector<int> Vector_diff_cut_ratio_2(UnorientedGraph *g, const EntiersEntier
 				std::pair<double, int> D;
 				D.first =  gain_d;
 				D.second = Partition.at(i)->at(j);
-				D_vector.push_back(D);		
-			}	
+				D_vector.push_back(D);
+			}
 		}
 	}
 	sort(D_vector.begin(),D_vector.end());
 	for(uint id = 0; id < D_vector.size(); id++){
 		Diff_vector.push_back(D_vector.at(id).second);
 	}
-	
+
 	/*std::cout<<"Tableau des différences "<<std::endl;
 	for(uint i = 0; i<Diff_vector.size(); i++){
 		std::cout<<"*"<<i<<"* ";
@@ -2629,14 +2631,14 @@ std::vector<int> Vector_diff_cut_ratio_2(UnorientedGraph *g, const EntiersEntier
 		std::cout<<Diff_vector.at(j)<<" ";
 	}
 	std::cout<<std::endl;*/
-	
+
 	return Diff_vector;
 
 }
 
 void Modif_vector_diff_cut_ratio_2(UnorientedGraph *g, const EntiersEntiers &Partition, std::vector<int> &Diff_vector, int node, std::string name){
 	std::vector<std::pair<double,int>> D_vector;
-	
+
 	tie(neighbourIt, neighbourEnd) = adjacent_vertices(node, *g);
 	for (; neighbourIt != neighbourEnd; ++neighbourIt){
 		//std::cout<<"node : "<<node<<std::endl;
@@ -2649,16 +2651,16 @@ void Modif_vector_diff_cut_ratio_2(UnorientedGraph *g, const EntiersEntiers &Par
 			std::pair<double, int> D;
 			D.first =  gain_d;
 			D.second = *neighbourIt;
-			D_vector.push_back(D);		
+			D_vector.push_back(D);
 		}
 		//suprim_val(Diff_vector,*neighbourIt);
 	}
-	
+
 	if(D_vector.size() == 0){
 		Diff_vector.erase(Diff_vector.begin());
 		return;
 	}
-	
+
 	//std::cout<<"**"<<std::endl;
 	sort(D_vector.begin(),D_vector.end());
 	for(uint id = 0; id < D_vector.size(); id++){
@@ -2668,9 +2670,9 @@ void Modif_vector_diff_cut_ratio_2(UnorientedGraph *g, const EntiersEntiers &Par
 	//std::cout<<"***"<<std::endl;
 	Diff_vector.erase(Diff_vector.begin());
 	//std::cout<<"**!**"<<std::endl;
-	
+
 	sort(Diff_vector.begin(),Diff_vector.end());
-	
+
 	for(uint j = 0; j<Diff_vector.size(); j++){
 		std::cout<<Diff_vector.at(j)<<" ";
 	}
@@ -2678,7 +2680,7 @@ void Modif_vector_diff_cut_ratio_2(UnorientedGraph *g, const EntiersEntiers &Par
 }
 
 void Modif_vector_diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Partition, std::vector<std::vector<int>> &Diff_vector, int recalcul1, int recalcul2, std::string name){
-	
+
 	std::vector<std::pair<double,int>> D_vector;
 	for(uint j = 0; j < Partition.at(recalcul1)->size(); j++){
 		double gain_d = Diff_cut_ratio(g, Partition, recalcul1, Partition.at(recalcul1)->at(j), name);
@@ -2687,8 +2689,8 @@ void Modif_vector_diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Parti
 			std::pair<double, int> D;
 			D.first =  gain_d;
 			D.second = Partition.at(recalcul1)->at(j);
-			D_vector.push_back(D);		
-		}	
+			D_vector.push_back(D);
+		}
 	}
 	sort(D_vector.begin(),D_vector.end());
 	std::reverse(D_vector.begin(),D_vector.end());
@@ -2697,7 +2699,7 @@ void Modif_vector_diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Parti
 		index_vector.push_back(D_vector.at(id).second);
 	}
 	Diff_vector.at(recalcul1) = index_vector;
-	
+
 	std::vector<std::pair<double,int>> D_vector2;
 	for(uint j = 0; j < Partition.at(recalcul2)->size(); j++){
 		double gain_d = Diff_cut_ratio(g, Partition, recalcul2, Partition.at(recalcul2)->at(j), name);
@@ -2706,8 +2708,8 @@ void Modif_vector_diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Parti
 			std::pair<double, int> D;
 			D.first =  gain_d;
 			D.second = Partition.at(recalcul2)->at(j);
-			D_vector2.push_back(D);		
-		}	
+			D_vector2.push_back(D);
+		}
 	}
 	sort(D_vector2.begin(),D_vector2.end());
 	std::reverse(D_vector2.begin(),D_vector2.end());
@@ -2716,7 +2718,7 @@ void Modif_vector_diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Parti
 		index_vector2.push_back(D_vector2.at(id).second);
 	}
 	Diff_vector.at(recalcul2) = index_vector2;
-	
+
 	/*std::cout<<"Tableau des différences modifié "<<std::endl;
 	for(uint i = 0; i<Diff_vector.size(); i++){
 		std::cout<<"*"<<i<<"* ";
@@ -2725,12 +2727,12 @@ void Modif_vector_diff_cut_ratio(UnorientedGraph *g, const EntiersEntiers &Parti
 		}
 		std::cout<<std::endl;
 	}*/
-		
+
 }
 
 void Affinache_gain_diff(UnorientedGraph *g, EntiersEntiers &Partition, double &cut, std::string name, double poids_moy){
 	double old_cut = -1.;
-	
+
 	while(old_cut != cut){
 		//std::cout<<"Boucle d'ammélioration "<<std::endl;
 		old_cut = cut;
@@ -2740,16 +2742,16 @@ void Affinache_gain_diff(UnorientedGraph *g, EntiersEntiers &Partition, double &
 		}*/
 		std::vector<std::vector<int>> diff_vector;
 		diff_vector = Vector_diff_cut_ratio(g, Partition, name);
-		
+
 		/*for(uint i = 0; i<diff_vector.size(); i++){
 			std::cout<<diff_vector.at(i)<<std::endl;
 		}*/
-		
+
 		for(uint indice = 0; indice < diff_vector.size(); indice ++){
 			if(diff_vector.at(indice).size() != 0 && Partition.at(indice)->size() >1){
 				//for(uint i = 0; i < diff_vector.at(indice).size(); i++){
 				int i =0;
-				while(diff_vector.at(indice).size() != 0 && Partition.at(indice)->size() >1 && i < diff_vector.at(indice).size() && 
+				while(diff_vector.at(indice).size() != 0 && Partition.at(indice)->size() >1 && i < diff_vector.at(indice).size() &&
 				Cluster_Weight(*g,*Partition.at(indice)) > (poids_moy-poids_moy/Partition.size())){
 					//std::cout<<"Sommet de départ : "<< (*g)[diff_vector.at(indice).at(i)]._index <<" dans "<<indice<<std::endl;
 					Entiers neigh_part;
@@ -2765,7 +2767,7 @@ void Affinache_gain_diff(UnorientedGraph *g, EntiersEntiers &Partition, double &
 							double Ext = 0.;
 							edge_t e1;
 						    bool found;
-						
+
 						    tie(neighbourIt, neighbourEnd) = adjacent_vertices(diff_vector.at(indice).at(i), *g);
 						    for (; neighbourIt != neighbourEnd; ++neighbourIt){
 								tie(e1, found) = edge(vertex(diff_vector.at(indice).at(i), *g), vertex(*neighbourIt, *g), *g);
@@ -2777,13 +2779,13 @@ void Affinache_gain_diff(UnorientedGraph *g, EntiersEntiers &Partition, double &
 						    }
 								tmp_gain = Ext - Int;
 						}
-						
+
 					    if(tmp_gain > gain & tmp_gain > 0){
 							gain = tmp_gain;
 							best_neigh_part = neigh_part.at(ind_neigh);
 						}
 					}
-					
+
 					//std::cout<<" Ensemble de déstination "<<best_neigh_part<<" gain de  : "<<gain<<std::endl;
 					if(gain > 0){
 						//std::cout<<"Modification"<<std::endl;
@@ -2798,7 +2800,7 @@ void Affinache_gain_diff(UnorientedGraph *g, EntiersEntiers &Partition, double &
 						i = 0;
 					}else{
 						i++;
-					}			
+					}
 				}
 			}
 		}
@@ -2808,14 +2810,14 @@ void Affinache_gain_diff(UnorientedGraph *g, EntiersEntiers &Partition, double &
 
 void Affinache_gain_diff_2(UnorientedGraph *g, EntiersEntiers &Partition, double &cut, std::string name, double poids_moy){
 	double old_cut = -1.;
-	
+
 	//while(old_cut != cut){
 		//std::cout<<"Boucle d'ammélioration "<<std::endl;
 		//old_cut = cut;
 		sort(Partition.begin(), Partition.end(), myobject_taille);
 		std::vector<int> diff_vector;
 		diff_vector = Vector_diff_cut_ratio_2(g, Partition, name);
-		
+
 		//for(uint indice = 0; indice < diff_vector.size(); indice ++){
 		int indice = 0;
 		while(/*indice < diff_vector.size() &&*/ diff_vector.size() != 0){
@@ -2835,7 +2837,7 @@ void Affinache_gain_diff_2(UnorientedGraph *g, EntiersEntiers &Partition, double
 						double Ext = 0.;
 						edge_t e1;
 					    bool found;
-					
+
 					    tie(neighbourIt, neighbourEnd) = adjacent_vertices(diff_vector.at(indice), *g);
 					    for (; neighbourIt != neighbourEnd; ++neighbourIt){
 							tie(e1, found) = edge(vertex(diff_vector.at(indice), *g), vertex(*neighbourIt, *g), *g);
@@ -2847,13 +2849,13 @@ void Affinache_gain_diff_2(UnorientedGraph *g, EntiersEntiers &Partition, double
 					    }
 							tmp_gain = Ext - Int;
 					}
-					
+
 				    if(tmp_gain > gain & tmp_gain > 0){
 						gain = tmp_gain;
 						best_neigh_part = neigh_part.at(ind_neigh);
 					}
 				}
-				
+
 				std::cout<<" Ensemble de déstination "<<best_neigh_part<<" gain de  : "<<gain<<std::endl;
 				if(gain > 0){
 					std::cout<<"Modification"<<std::endl;
@@ -2884,15 +2886,15 @@ double Gain_ratio(UnorientedGraph *g,const EntiersEntiers &Partition, int in, in
 	double tmp_poids_out = poids_out + (*g)[node]._weight;
 	//std::cout<<"tmp_poids_in "<< tmp_poids_in <<std::endl;
 	//std::cout<<"tmp_poids_out "<< tmp_poids_out <<std::endl;
-	
+
 	double cut_in = 0.;
 	double cut_out = 0.;
 	double tmp_cut_in = 0.;
 	double tmp_cut_out = 0.;
-	
+
 	edge_t e1;
 	bool found;
-	
+
 	for(uint i = 0; i < Partition.at(in)->size(); i++){
 		tie(neighbourIt, neighbourEnd) = adjacent_vertices(Partition.at(in)->at(i), *g);
 		for (; neighbourIt != neighbourEnd; ++neighbourIt){
@@ -2907,7 +2909,7 @@ double Gain_ratio(UnorientedGraph *g,const EntiersEntiers &Partition, int in, in
 			}
 		}
 	}
-	
+
 	for(uint i = 0; i < Partition.at(out)->size(); i++){
 		tie(neighbourIt, neighbourEnd) = adjacent_vertices(Partition.at(out)->at(i), *g);
 		for (; neighbourIt != neighbourEnd; ++neighbourIt){
@@ -2927,17 +2929,17 @@ double Gain_ratio(UnorientedGraph *g,const EntiersEntiers &Partition, int in, in
 			tmp_cut_out += (*g)[e1]._weight;
 		}
 	}
-	
+
 	//std::cout<<"tmp_cut_in "<< tmp_cut_in/2. <<std::endl;
 	//std::cout<<"tmp_cut_out "<< tmp_cut_out/2. <<std::endl;
 	new_ratio -= cut_in/2./poids_in;
 	new_ratio -= cut_out/2./poids_out;
 	new_ratio += tmp_cut_in/2./tmp_poids_in;
 	new_ratio += tmp_cut_out/2./tmp_poids_out;
-	
+
 	//std::cout<<"Nouveau ratio : " <<new_ratio<<std::endl;
 	return ratio - new_ratio;
-	
+
 }
 
 double Modif_ratio_cut(UnorientedGraph *g,Entiers *Ss, Entiers *Sd, int node, double ratio){/*Revoir cette fonction, modification psa forcement nécéssaire, plus simple !!!*/
@@ -2948,15 +2950,15 @@ double Modif_ratio_cut(UnorientedGraph *g,Entiers *Ss, Entiers *Sd, int node, do
 	double tmp_poids_out = poids_out + (*g)[node]._weight;
 	//std::cout<<"tmp_poids_in "<< tmp_poids_in <<std::endl;
 	//std::cout<<"tmp_poids_out "<< tmp_poids_out <<std::endl;
-	
+
 	double new_cut = 0.;
 	//double new_cut_out = 0.;
 	//double tmp_cut_in = 0.;
 	//double tmp_cut_out = 0.;
-	
+
 	edge_t e1;
 	bool found;
-	
+
 	for(uint i = 0; i < Ss->size(); i++){
 		if(Ss->at(i) != node){
 			tie(neighbourIt, neighbourEnd) = adjacent_vertices(Ss->at(i), *g);
@@ -2970,7 +2972,7 @@ double Modif_ratio_cut(UnorientedGraph *g,Entiers *Ss, Entiers *Sd, int node, do
 			}
 		}
 	}
-	
+
 	/*for(uint i = 0; i < Sd->size(); i++){
 		tie(neighbourIt, neighbourEnd) = adjacent_vertices(Sd->at(i), *g);
 		for (; neighbourIt != neighbourEnd; ++neighbourIt){
@@ -2990,14 +2992,14 @@ double Modif_ratio_cut(UnorientedGraph *g,Entiers *Ss, Entiers *Sd, int node, do
 			tmp_cut_out += (*g)[e1]._weight;
 		}
 	}*/
-	
+
 	//std::cout<<"tmp_cut_in "<< tmp_cut_in/2. <<std::endl;
 	//std::cout<<"tmp_cut_out "<< tmp_cut_out/2. <<std::endl;
 	new_ratio = new_cut/2./tmp_poids_in + new_cut/2./tmp_poids_out;
 	/*new_ratio -= cut_out/2./poids_out;
 	new_ratio += tmp_cut_in/2./tmp_poids_in;
 	new_ratio += tmp_cut_out/2./tmp_poids_out;*/
-	
+
 	//std::cout<<"Nouveau ratio : " <<new_ratio<<std::endl;
 	return new_ratio;
 }
@@ -3011,15 +3013,15 @@ EntiersEntiers Spectral_Partition(const char* text){
 		std::istreambuf_iterator<char>(),'\n' );
 		std::cout<<"Nombre de ligne : "<<lines<<std::endl;
 		/*** Récupération du dernier caractère ***/
-		
+
 		/*** Création des paramétres contenant les informations ***/
-		 
+
 		int nmax_vertex;
 		fichier.seekg(0, std::ios::beg);
 		fichier >> nmax_vertex;
 		std::cout<<"nmax_vertex : "<<nmax_vertex<<std::endl;
 		int nmax_size = decimal(nmax_vertex) + 1;
-		
+
 		/*** Récupération des informations ***/
 		int cpt = 1;
 		int length;
@@ -3040,7 +3042,7 @@ EntiersEntiers Spectral_Partition(const char* text){
 	}else{
 		std::cerr << "Impossible d'ouvrir le fichier dans Spectral_Partition !" << std::endl;
 	}
-	
+
 	return(Partition);
 }
 
@@ -3050,7 +3052,7 @@ void Adjacent_Matrix_Txt(UnorientedGraph *g, const char* text){
 		tie(vertexIt, vertexEnd) = vertices(*g);
 		edge_t e1;
 		bool found;
-		
+
 		for (; vertexIt != vertexEnd; ++vertexIt) {
 			int cpt = 0;
 			tie(neighbourIt, neighbourEnd) = adjacent_vertices(*vertexIt,
@@ -3071,20 +3073,20 @@ void Adjacent_Matrix_Txt(UnorientedGraph *g, const char* text){
 				}
 			}
 			GRAPH4<<std::endl;
-		}   
-			
+		}
+
 		GRAPH4.close();
 	}else
 		 std::cerr << "Impossible d'ouvrir le fichier dans Adjacent_Matrix_Txt !" << std::endl;
 }
 
 void Weight_Matrix_Txt(UnorientedGraph *g, const char* text){
-	std::ofstream GRAPH4 (text, std::ios::out);  
+	std::ofstream GRAPH4 (text, std::ios::out);
 	if(GRAPH4){
 		for (int i =0 ; i<num_vertices(*g); i++) {
 			GRAPH4<<(*g)[i]._weight<<" ";
-		}   
-			
+		}
+
 		GRAPH4.close();
 	}else
 		 std::cerr << "Impossible d'ouvrir le fichier dans Weight_Matrix_Txt !" << std::endl;
@@ -3093,9 +3095,9 @@ void Weight_Matrix_Txt(UnorientedGraph *g, const char* text){
 void Plot_OrientedGraph(OrientedGraph *go, const char* text){
 	edge_to e1;
 	bool found;
-		
+
 	std::ofstream fichier2 (text, std::ios::out);
-    fichier2<<"digraph G {"<<std::endl;   
+    fichier2<<"digraph G {"<<std::endl;
     tie(vertexIto, vertexEndo) = vertices(*go);
     for (; vertexIto != vertexEndo; ++vertexIto) {
     	tie(neighbourIto, neighbourEndo) = adjacent_vertices(*vertexIto,
@@ -3108,19 +3110,19 @@ void Plot_OrientedGraph(OrientedGraph *go, const char* text){
 					<<(*go)[e1]._weight
 					<<", fontsize=10, fontcolor= blue];"<<std::endl;
     	}
-	} 
-    
-	fichier2<<"}";	
+	}
+
+	fichier2<<"}";
 	fichier2.close();
-	
+
 }
 
-void Plot_UnorientedGraph(UnorientedGraph *g, const char* text){	
+void Plot_UnorientedGraph(UnorientedGraph *g, const char* text){
 	edge_t e1;
 	bool found;
-	
+
 	std::ofstream GRAPH2 (text, std::ios::out);
-	GRAPH2<<"graph G {"<<std::endl;   
+	GRAPH2<<"graph G {"<<std::endl;
 	tie(vertexIt, vertexEnd) = vertices(*g);
 	for (; vertexIt != vertexEnd; ++vertexIt) {
 		tie(neighbourIt, neighbourEnd) = adjacent_vertices(*vertexIt,*g);
@@ -3130,19 +3132,19 @@ void Plot_UnorientedGraph(UnorientedGraph *g, const char* text){
 				GRAPH2<<(*g)[*vertexIt]._index<<" -- "<<(*g)[*neighbourIt]._index<<" [label="<<(*g)[e1]._weight<<", fontsize=10, fontcolor= blue];"<<std::endl;
 			}
 		}
-	}  
+	}
 
-	GRAPH2<<"}";	
+	GRAPH2<<"}";
 	GRAPH2.close();
 }
 
 void Plot_UnorientedGraph_All(UnorientedGraph *g, const EntiersEntiers &Partition, const char* text, bool Color){
 	edge_t e1;
 	bool found;
-	
+
 	if(Partition.size()<17){
 		std::ofstream GRAPH2 (text, std::ios::out);
-		GRAPH2<<"graph G {"<<std::endl;   
+		GRAPH2<<"graph G {"<<std::endl;
 		tie(vertexIt, vertexEnd) = vertices(*g);
 		for (; vertexIt != vertexEnd; ++vertexIt) {
 			tie(neighbourIt, neighbourEnd) = adjacent_vertices(*vertexIt,*g);
@@ -3151,8 +3153,8 @@ void Plot_UnorientedGraph_All(UnorientedGraph *g, const EntiersEntiers &Partitio
 					tie(e1,found)=edge(vertex(*vertexIt,*g),vertex(*neighbourIt,*g),*g);
 					GRAPH2<<(*g)[*vertexIt]._index<<" -- "<<(*g)[*neighbourIt]._index<<" [label="<<(*g)[e1]._weight<<", fontsize=10, fontcolor= blue];"<<std::endl;}
 			}
-		}   
-		
+		}
+
 		if(Color == true){
 			std::vector<std::string> color;
 			color.push_back(", color=blue2, fontcolor=blue2];");
@@ -3183,7 +3185,7 @@ void Plot_UnorientedGraph_All(UnorientedGraph *g, const EntiersEntiers &Partitio
 			}
 		}
 
-		GRAPH2<<"}";	
+		GRAPH2<<"}";
 		GRAPH2.close();
 	}else{
 		std::cout<<"Error : Le nombre de couleur est insuffisant pour réaliser l'affichange"<<std::endl;
@@ -3193,7 +3195,7 @@ void Plot_UnorientedGraph_All(UnorientedGraph *g, const EntiersEntiers &Partitio
 void Plot_OrientedGraph_All(OrientedGraph *go, const EntiersEntiers &Partition, const char* text, bool Color){
 	edge_to e1;
 	bool found;
-	
+
 	if(Partition.size()<17){
 		std::vector<std::string> color;
 		color.push_back("[color=blue2, fontcolor=blue2];");
@@ -3212,9 +3214,9 @@ void Plot_OrientedGraph_All(OrientedGraph *go, const EntiersEntiers &Partition, 
 		color.push_back("[color=purple1, fontcolor=purpule1];");
 		color.push_back("[color=crimson, fontcolor=crimson];");
 		color.push_back("[color=black, fontcolor=black];");
-		
+
 		std::ofstream fichier2 (text, std::ios::out);
-	    fichier2<<"digraph G {"<<std::endl;   
+	    fichier2<<"digraph G {"<<std::endl;
 	    tie(vertexIto, vertexEndo) = vertices(*go);
 	    for (; vertexIto != vertexEndo; ++vertexIto) {
 	    	tie(neighbourIto, neighbourEndo) = adjacent_vertices(*vertexIto,
@@ -3224,19 +3226,19 @@ void Plot_OrientedGraph_All(OrientedGraph *go, const EntiersEntiers &Partition, 
 					fichier2<<(*go)[*vertexIto]._index<<" -> "<<(*go)[*neighbourIto]._index<<" [label="<<(*go)[e1]._weight<<", fontsize=10, fontcolor= blue];"<<std::endl;
 	    	}
 		}
-	    
+
 	    if(Color == true){
 			for(uint k=0; k<Partition.size(); k++){
 				for(uint j=0; j<Partition.at(k)->size(); j++)
 				{
 					fichier2<<Partition.at(k)->at(j)<<color.at(k)<<std::endl;
 				}
-			}  
-		} 
-	    
-		fichier2<<"}";	
+			}
+		}
+
+		fichier2<<"}";
 		fichier2.close();
-		
+
 	}else{
 		std::cout<<"Error : Le nombre de couleur est insuffisant pour réaliser l'affichange"<<std::endl;
 	}
@@ -3250,7 +3252,7 @@ void Affichage_OrientedGraph(OrientedGraph *go){
     	tie(neighbourIto, neighbourEndo) = adjacent_vertices(*vertexIto,
     			*go);
     	for (; neighbourIto != neighbourEndo; ++neighbourIto){
-    		std::cout<<(*go)[*neighbourIto]._index<<" ";	
+    		std::cout<<(*go)[*neighbourIto]._index<<" ";
     	}
     	std::cout<<std::endl;
     }
@@ -3264,7 +3266,7 @@ void Affichage_UnorientedGraph(UnorientedGraph *g){
     	tie(neighbourIt, neighbourEnd) = adjacent_vertices(*vertexIt,
     			*g);
     	for (; neighbourIt != neighbourEnd; ++neighbourIt){
-    		std::cout<<(*g)[*neighbourIt]._index<<" ";	
+    		std::cout<<(*g)[*neighbourIt]._index<<" ";
     	}
     	std::cout<<std::endl;
     }
@@ -3275,7 +3277,7 @@ double Total_weight_edges(UnorientedGraph *g){
 	double Sum_weight_edges = 0.;
 	edge_t e1;
 	bool found;
-	
+
 	tie(vertexIt, vertexEnd) = vertices(*g);
 	for (; vertexIt != vertexEnd; ++vertexIt) {
 		tie(neighbourIt, neighbourEnd) = adjacent_vertices(*vertexIt,*g);
@@ -3286,25 +3288,25 @@ double Total_weight_edges(UnorientedGraph *g){
 				}
 		}
 	}
-	
+
 	return Sum_weight_edges;
 }
 
 void Merge_Boost_Graph(OrientedGraph *go1, OrientedGraph *go2, std::vector<std::pair<int,int>> &connection, std::vector<double> &connection_weight){
 	edge_to e1;
 	bool found;
-	
+
 	int nbr_go1 = num_vertices(*go1);
 	int nbr_go2 = num_vertices(*go2);
-	
+
 	/*** Fusion ***/
 	if(nbr_go1 >= nbr_go2){
 		tie(vertexIto, vertexEndo) = vertices(*go2);
 		for (; vertexIto != vertexEndo; ++vertexIto){
 			vertex_to v0 = boost::add_vertex(*go1);
-			(*go1)[v0] = VertexProperties((*go2)[*vertexIto]._index, (*go2)[*vertexIto]._weight, NORMAL_PIXEL);
-		}	
-		
+			(*go1)[v0] = VertexProperties((*go2)[*vertexIto]._index, (*go2)[*vertexIto]._weight, 1 /*NORMAL_PIXEL*/);
+		}
+
 		tie(vertexIto, vertexEndo) = vertices(*go2);
 		for (; vertexIto != vertexEndo; ++vertexIto){
 			tie(neighbourIto, neighbourEndo) = adjacent_vertices(*vertexIto,*go2);
@@ -3313,20 +3315,20 @@ void Merge_Boost_Graph(OrientedGraph *go1, OrientedGraph *go2, std::vector<std::
 				add_edge(*vertexIto + nbr_go1, *neighbourIto + nbr_go1, (*go2)[e1]._weight, *go1);
 			}
 		}
-		
+
 		/*** Connection ***/
 		/* Fonctionne si l'ordre de nomation respecte l'ordre boost sinon possibilité d'identification par nom*/
 		for(uint i = 0; i < connection.size(); i++){
 			add_edge(connection.at(i).first, connection.at(i).second, connection_weight.at(i) , *go1);
-		} 
-		
+		}
+
 	}else{
 		tie(vertexIto, vertexEndo) = vertices(*go1);
 		for (; vertexIto != vertexEndo; ++vertexIto){
 			vertex_to v0 = boost::add_vertex(*go2);
-			(*go2)[v0] = VertexProperties((*go1)[*vertexIto]._index, (*go1)[*vertexIto]._weight, NORMAL_PIXEL);
-		}	
-		
+			(*go2)[v0] = VertexProperties((*go1)[*vertexIto]._index, (*go1)[*vertexIto]._weight, 1 /*NORMAL_PIXEL*/);
+		}
+
 		tie(vertexIto, vertexEndo) = vertices(*go1);
 		for (; vertexIto != vertexEndo; ++vertexIto){
 			tie(neighbourIto, neighbourEndo) = adjacent_vertices(*vertexIto,*go1);
@@ -3335,19 +3337,19 @@ void Merge_Boost_Graph(OrientedGraph *go1, OrientedGraph *go2, std::vector<std::
 				add_edge(*vertexIto + nbr_go2, *neighbourIto + nbr_go2, (*go1)[e1]._weight, *go2);
 			}
 		}
-		
+
 		/*** Connection ***/
 		/* Fonctionne si l'ordre de nomation respecte l'ordre boost sinon possibilité d'identification par nom*/
 		for(uint i = 0; i < connection.size(); i++){
 			add_edge(connection.at(i).first, connection.at(i).second, connection_weight.at(i) , *go2);
 		}
-		 
-	}	
-	
+
+	}
+
 }
 
 Entiers Random_Sort_Vector(uint size){
-	
+
 	Entiers random_order;
 	for (uint i = 0 ; i<  size ; i++)
 		random_order.push_back(i);
@@ -3357,12 +3359,12 @@ Entiers Random_Sort_Vector(uint size){
 		random_order.at(j) = random_order.at(rand_pos);
 		random_order.at(rand_pos) = tmp;
 	}
-	
+
 	return random_order;
 }
 
 Entiers Random_Sort_Vector2(uint min, uint size){
-	
+
 	Entiers random_order;
 	for (uint i = min ; i<  size ; i++)
 		random_order.push_back(i);
@@ -3372,16 +3374,16 @@ Entiers Random_Sort_Vector2(uint min, uint size){
 		random_order.at(j) = random_order.at(rand_pos);
 		random_order.at(rand_pos) = tmp;
 	}
-	
+
 	return random_order;
 }
 
 double distance_t(std::pair<double,double> x, std::pair<double,double> y)
-{	
+{
 	double total = (x.first - y.first) * (x.first - y.first) ;
 	double diff2 = (x.second - y.second) * (x.second - y.second);
 	total +=  diff2;
-	
+
 	return sqrt(total);
 }
 

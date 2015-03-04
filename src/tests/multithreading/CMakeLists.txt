@@ -25,3 +25,5 @@ TARGET_LINK_LIBRARIES(pdevs-multithreading-main partitioning
   ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_TIMER_LIBRARY})
+
+ADD_SUBDIRECTORY(lifegame)
