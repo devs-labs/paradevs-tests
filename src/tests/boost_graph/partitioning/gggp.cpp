@@ -825,18 +825,25 @@ OrientedGraphs Multiniveau(OrientedGraph *go,
     double t1, t2, t3, t4;
     UnorientedGraph *g = new UnorientedGraph();
 	make_unoriented_graph(*go, *g);
+	UnorientedGraph *copie = new UnorientedGraph();
+	boost::copy_graph(*g,*copie);
+	//Plot_UnorientedGraph(copie,"lifegame.txt");
     Base_Graph baseg;
-    baseg.push_back(g);
+    //baseg.push_back(g);
     ListEntiersEntiers liste_corr;
     OrientedGraphs Graphes;
     int val_cpt = num_vertices(*g);
     bool time = true;
+    
 
     /*Eigen::MatrixXd Madj = adjacence_matrix(g);
 	std::cout << Madj << std::endl << std::endl;*/
 
     if(numeric_parameters.at(0) != val_cpt && parameters.at(1) != "rand" && parameters.at(1) != "rande"){
-
+		
+		simple_graph(copie);
+		baseg.push_back(copie);
+		//Plot_UnorientedGraph(copie,"lifegame2.txt");
 		Coarsening_Phase(baseg, liste_corr, numeric_parameters.at(0), val_cpt, parameters.at(0));
 
 	    if(rec){
@@ -898,7 +905,8 @@ OrientedGraphs Multiniveau(OrientedGraph *go,
 	                              inputedgelist, connections);
 	    if(rec)
 			Plot_OrientedGraph_All(go,Partition,"../../sortie_graphe/Tests/Graphes/Multiniveau/txt/résultat_partitionnement.txt", true);
-
+		
+		delete g;
 		for(uint it = 0 ; it < Partition.size(); it++ )
 		{
 			delete Partition.at(it);

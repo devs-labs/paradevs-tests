@@ -234,6 +234,8 @@ Entiers Random_Sort_Vector2(uint min, uint size);
 
 double distance_t(std::pair<double,double> x, std::pair<double,double> y);
 
+void simple_graph(UnorientedGraph *g);
+
 } } } // namespace paradevs tests boost_graph
 
 #endif

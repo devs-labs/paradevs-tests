@@ -3387,4 +3387,60 @@ double distance_t(std::pair<double,double> x, std::pair<double,double> y)
 	return sqrt(total);
 }
 
+void simple_graph(UnorientedGraph *g)
+{
+	edge_t e1;
+    bool found;
+
+	tie(vertexIt, vertexEnd) = vertices(*g);
+	for (; vertexIt != vertexEnd; ++vertexIt) {
+		tie(neighbourIt, neighbourEnd) = adjacent_vertices(*vertexIt,*g);
+		
+		std::vector<uint> neight;
+		for (; neighbourIt != neighbourEnd; ++neighbourIt)
+			neight.push_back(*neighbourIt);
+		neight.push_back(-2);
+		sort(neight.begin(), neight.end());
+		
+		int tmp = -1;
+		uint cpt = 1;
+		double wi = 0.;
+		
+		for (uint i = 0; i < neight.size(); i++)
+		{
+			if(neight.at(i) > *vertexIt && *vertexIt != num_vertices(*g) - 1)
+			{
+				if(i != neight.size()-1)
+				{
+					tie(e1, found) = edge(vertex(*vertexIt, *g), vertex(neight.at(i), *g), *g);
+					if(tmp == neight.at(i))
+					{
+						wi += (*g)[e1]._weight;
+						cpt++;
+					}
+					else if(tmp != neight.at(i) & cpt != 1.)
+					{
+						remove_edge(*vertexIt,neight.at(i-1),*g);
+						add_edge(*vertexIt, neight.at(i-1), wi, *g);
+						wi = (*g)[e1]._weight;
+						cpt = 1;
+						tmp = neight.at(i);
+					}
+					else
+					{
+						wi = (*g)[e1]._weight;
+						cpt = 1.;
+						tmp = neight.at(i);
+					}
+				}
+				else
+				{
+					remove_edge(*vertexIt,neight.at(i-1),*g);
+					add_edge(*vertexIt, neight.at(i-1), wi, *g);
+				}
+			}
+		}
+	}
+}
+
 } } } // namespace paradevs tests boost_graph
