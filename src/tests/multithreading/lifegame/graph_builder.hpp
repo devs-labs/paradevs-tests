@@ -35,8 +35,8 @@ using namespace paradevs::tests::boost_graph;
 namespace paradevs { namespace tests {
         namespace multithreading { namespace lifegame {
 
-const int NCOLUMNS = 10;
-const int NLINES = 10;
+const int NCOLUMNS = 25;
+const int NLINES = 25;
 
 class GraphBuilder
 {
