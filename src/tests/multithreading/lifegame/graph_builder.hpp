@@ -35,8 +35,8 @@ using namespace paradevs::tests::boost_graph;
 namespace paradevs { namespace tests {
         namespace multithreading { namespace lifegame {
 
-const int NCOLUMNS = 5;
-const int NLINES = 5;
+const int NCOLUMNS = 50;
+const int NLINES = 50;
 
 class GraphBuilder
 {
@@ -50,9 +50,9 @@ public:
                OutputEdgeList& output_edges,
                Connections& parent_connections)
     {
-        //std::vector < std::string > parameters = {
-        //    "HEM", "rande", "diff", "ratio"
-        //};
+        /*std::vector < std::string > parameters = {
+            "HEM", "rande", "diff", "ratio"
+        };*/
         std::vector < std::string > parameters = {
              "HEM", "gggp", "diff", "ratio"
         };
@@ -65,7 +65,7 @@ public:
 
         generate(go);
         std::cout << "Nbrs models : " << num_vertices(go) << std::endl;
-        uint contraction_coef = 20;//num_vertices(go);
+        uint contraction_coef = 200;//num_vertices(go);
         output_edges = OutputEdgeList(cluster_number);
         if (contraction_coef_flag) {
             uint coars = num_vertices(go) / contraction_coef;

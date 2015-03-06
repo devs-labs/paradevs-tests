@@ -914,6 +914,7 @@ OrientedGraphs Multiniveau(OrientedGraph *go,
 	}else{
 		UnorientedGraph *copie_g = new UnorientedGraph();
 		boost::copy_graph(*g,*copie_g);
+		baseg.push_back(g);
 
 		EntiersEntiers Partition = Partitioning_Phase(baseg,
 								   numeric_parameters, parameters,
