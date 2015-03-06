@@ -103,6 +103,7 @@ public:
                 CellParameters >(ss.str(),
                                  CellParameters(neighbour_number));
             _simulators[g[*vertexIt]._index]->add_out_port("out");
+            _simulators[g[*vertexIt]._index]->add_in_port("in");
             FlatGraphManager < Parameters >::add_child(
                 _simulators[g[*vertexIt]._index]);
         }
