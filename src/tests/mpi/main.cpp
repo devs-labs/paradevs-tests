@@ -24,17 +24,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <tests/mpi/graph_manager.hpp>
-
 #include <paradevs/common/RootCoordinator.hpp>
-#include <paradevs/kernel/pdevs/mpi/LogicalProcessor.hpp>
 
 #include <boost/mpi/environment.hpp>
 #include <boost/mpi/communicator.hpp>
 
+#include <tests/boost_graph/graph_defs.hpp>
 #include <tests/boost_graph/graph_builder.hpp>
 #include <tests/boost_graph/graph_generator.hpp>
 #include <tests/boost_graph/graph_partitioning.hpp>
+
+#include <paradevs/common/time/DoubleTime.hpp>
+#include <paradevs/kernel/pdevs/mpi/LogicalProcessor.hpp>
+#include <tests/mpi/graph_manager.hpp>
 
 #include <chrono>
 

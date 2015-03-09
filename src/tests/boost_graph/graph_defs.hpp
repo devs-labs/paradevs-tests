@@ -60,34 +60,17 @@ struct EdgeProperties
     { }
 };
 
-typedef boost::adjacency_list < boost::vecS, boost::vecS,
+typedef boost::adjacency_list < boost::vecS,
+                                boost::vecS,
                                 boost::bidirectionalS,
                                 VertexProperties,
                                 EdgeProperties > OrientedGraph;
-typedef std::vector < OrientedGraph > OrientedGraphs;
 
-typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
+typedef boost::adjacency_list < boost::vecS,
+                                boost::vecS,
+                                boost::undirectedS,
                                 VertexProperties,
-                                EdgeProperties> UnorientedGraph;
-
-typedef std::vector < UnorientedGraph* > Base_Graph;
-
-typedef boost::graph_traits < UnorientedGraph >::vertex_descriptor vertex_t;
-typedef boost::graph_traits < UnorientedGraph >::edge_descriptor edge_t;
-
-typedef OrientedGraph::vertex_descriptor vertex_to;
-typedef OrientedGraph::edge_descriptor edge_to;
-
-typedef std::pair < int, int > Edge;
-typedef std::vector < Edge > Edges;
-typedef Edges OutputEdges;
-typedef Edges InputEdges;
-typedef std::vector < OutputEdges > OutputEdgeList;
-typedef std::vector < InputEdges > InputEdgeList;
-
-typedef std::pair < int, int > Port;
-typedef std::pair < Port, Port > Connection;
-typedef std::vector < Connection > Connections;
+                                EdgeProperties > UnorientedGraph;
 
 } } } // namespace paradevs tests boost_graph
 

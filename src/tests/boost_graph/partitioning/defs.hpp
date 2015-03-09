@@ -34,6 +34,26 @@
 
 namespace paradevs { namespace tests { namespace boost_graph {
 
+typedef std::vector < OrientedGraph > OrientedGraphs;
+typedef std::vector < UnorientedGraph* > Base_Graph;
+
+typedef boost::graph_traits < UnorientedGraph >::vertex_descriptor vertex_t;
+typedef boost::graph_traits < UnorientedGraph >::edge_descriptor edge_t;
+
+typedef OrientedGraph::vertex_descriptor vertex_to;
+typedef OrientedGraph::edge_descriptor edge_to;
+
+typedef std::pair < int, int > Edge;
+typedef std::vector < Edge > Edges;
+typedef Edges OutputEdges;
+typedef Edges InputEdges;
+typedef std::vector < OutputEdges > OutputEdgeList;
+typedef std::vector < InputEdges > InputEdgeList;
+
+typedef std::pair < int, int > Port;
+typedef std::pair < Port, Port > Connection;
+typedef std::vector < Connection > Connections;
+
 typedef unsigned int uint;
 
 typedef std::vector < int > Entiers;
