@@ -27,6 +27,7 @@
 #include <paradevs/common/RootCoordinator.hpp>
 
 #include <tests/boost_graph/models.hpp>
+#include <tests/boost_graph/graph_defs.hpp>
 #include <tests/boost_graph/graph_builder.hpp>
 #include <tests/boost_graph/graph_generator.hpp>
 #include <tests/boost_graph/graph_manager.hpp>

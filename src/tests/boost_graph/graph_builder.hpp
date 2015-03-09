@@ -27,7 +27,6 @@
 #ifndef __TESTS_BOOST_GRAPH_GRAPH_BUILDER_HPP
 #define __TESTS_BOOST_GRAPH_GRAPH_BUILDER_HPP 1
 
-#include <tests/boost_graph/graph_defs.hpp>
 #include <tests/boost_graph/partitioning/graph_build.hpp>
 
 namespace paradevs { namespace tests { namespace boost_graph {

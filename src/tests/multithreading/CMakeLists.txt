@@ -19,9 +19,11 @@ TARGET_LINK_LIBRARIES(pdevs-multithreading-tests
 ADD_EXECUTABLE(pdevs-multithreading-main graph_manager.hpp main.cpp
   ../boost_graph/graph_builder.hpp ../boost_graph/graph_generator.hpp
   ../boost_graph/graph_defs.hpp ../boost_graph/graph_manager.hpp
-  ../boost_graph/graph_partitioning.hpp ../boost_graph/models.hpp)
+  ../boost_graph/graph_partitioning.hpp ../boost_graph/models.hpp
+  ../boost_graph/partitioning/utils.hpp ../boost_graph/partitioning/gggp.hpp
+  ../boost_graph/partitioning/graph_build.hpp)
 
-TARGET_LINK_LIBRARIES(pdevs-multithreading-main partitioning
+TARGET_LINK_LIBRARIES(pdevs-multithreading-main
   ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_TIMER_LIBRARY})

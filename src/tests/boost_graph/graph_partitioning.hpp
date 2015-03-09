@@ -27,14 +27,11 @@
 #ifndef __TESTS_BOOST_GRAPH_GRAPH_PARTITIONING_HPP
 #define __TESTS_BOOST_GRAPH_GRAPH_PARTITIONING_HPP 1
 
-#include <tests/boost_graph/graph_defs.hpp>
 #include <tests/boost_graph/graph_generator.hpp>
 #include <tests/boost_graph/partitioning/graph_build.hpp>
 #include <tests/boost_graph/partitioning/gggp.hpp>
 
 #include <boost/graph/copy.hpp>
-
-#include <iostream>
 
 namespace paradevs { namespace tests { namespace boost_graph {
 

@@ -24,6 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <tests/boost_graph/graph_defs.hpp>
 #include <tests/boost_graph/partitioning/gggp.hpp>
 #include <tests/boost_graph/partitioning/graph_build.hpp>
 #include <boost/graph/copy.hpp>
@@ -34,11 +35,11 @@
 
 using namespace paradevs::tests::boost_graph;
 
-UnorientedGraph::vertex_iterator vertexIt, vertexEnd;
-UnorientedGraph::adjacency_iterator neighbourIt, neighbourEnd;
+// UnorientedGraph::vertex_iterator vertexIt, vertexEnd;
+// UnorientedGraph::adjacency_iterator neighbourIt, neighbourEnd;
 
-OrientedGraph::vertex_iterator vertexIto, vertexEndo;
-OrientedGraph::adjacency_iterator neighbourIto, neighbourEndo;
+// OrientedGraph::vertex_iterator vertexIto, vertexEndo;
+// OrientedGraph::adjacency_iterator neighbourIto, neighbourEndo;
 
 int main()
 {

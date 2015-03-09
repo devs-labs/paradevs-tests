@@ -28,6 +28,7 @@
 #include <fstream>
 #include <boost/timer.hpp>
 
+#include <tests/boost_graph/graph_defs.hpp>
 #include <tests/boost_graph/graph_generator.hpp>
 #include <tests/boost_graph/graph_partitioning.hpp>
 
@@ -68,7 +69,7 @@ int main()
 	//ArtificialGraphGenerator generator(38);
 
 	ParcelGraphGenerator generator(10000, "mono");
-	std::cout << "Duration : " << t.elapsed() << " seconds" << std::endl;
+	// std::cout << "Duration : " << t.elapsed() << " seconds" << std::endl;
 
 	OrientedGraph::vertex_iterator vertexIt, vertexEnd;
 
@@ -123,7 +124,7 @@ int main()
     graph_builder.build(graphs, input_edges, output_edges,
                         parent_connections);
 
-    std::cout << "Duration : " << t.elapsed() << " seconds" << std::endl;
+    // std::cout << "Duration : " << t.elapsed() << " seconds" << std::endl;
 
     /*std::vector<const char*> name;
     name.push_back("../../sortie_graphe/Tests/Graphes/Multiniveau/txt/partie_0.txt");

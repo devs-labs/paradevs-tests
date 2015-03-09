@@ -32,8 +32,6 @@
 
 #include <boost/graph/adjacency_list.hpp>
 
-#include <tests/boost_graph/graph_defs.hpp>
-
 namespace paradevs { namespace tests { namespace boost_graph {
 
 typedef unsigned int uint;
@@ -44,18 +42,6 @@ typedef std::vector < Entiers* > EntiersEntiers;
 typedef std::vector < EntiersEntiers > EntiersEntiersEntiers;
 typedef std::list < int > List;
 typedef std::list < EntiersEntiers* > ListEntiersEntiers;
-
-typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
-                                VertexProperties,
-                                EdgeProperties> UnorientedGraph;
-
-typedef std::vector < UnorientedGraph* > Base_Graph;
-
-typedef boost::graph_traits < UnorientedGraph >::vertex_descriptor vertex_t;
-typedef boost::graph_traits < UnorientedGraph >::edge_descriptor edge_t;
-
-typedef OrientedGraph::vertex_descriptor vertex_to;
-typedef OrientedGraph::edge_descriptor edge_to;
 
 template < class G >
 struct VertexAndEdgeListGraphConcept

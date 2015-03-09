@@ -27,7 +27,6 @@
 #ifndef __TESTS_BOOST_GRAPH_GRAPH_GENERATOR_HPP
 #define __TESTS_BOOST_GRAPH_GRAPH_GENERATOR_HPP 1
 
-#include <tests/boost_graph/graph_defs.hpp>
 #include <tests/boost_graph/partitioning/defs.hpp>
 #include <tests/boost_graph/partitioning/utils.hpp>
 #include <tests/boost_graph/partitioning/graph_build.hpp>

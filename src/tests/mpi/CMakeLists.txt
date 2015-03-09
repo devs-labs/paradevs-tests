@@ -18,9 +18,11 @@ LINK_DIRECTORIES(
 #  ${Boost_TIMER_LIBRARY}
 #  ${MPI_CXX_LIBRARIES})
 
-ADD_EXECUTABLE(pdevs-mpi-main graph_manager.hpp main.cpp)
+ADD_EXECUTABLE(pdevs-mpi-main graph_manager.hpp main.cpp
+  ../boost_graph/partitioning/utils.hpp ../boost_graph/partitioning/gggp.hpp
+  ../boost_graph/partitioning/graph_build.hpp)
 
-TARGET_LINK_LIBRARIES(pdevs-mpi-main partitioning
+TARGET_LINK_LIBRARIES(pdevs-mpi-main
   ${Boost_SERIALIZATION_LIBRARY}
   ${Boost_MPI_LIBRARY}
   ${MPI_CXX_LIBRARIES})

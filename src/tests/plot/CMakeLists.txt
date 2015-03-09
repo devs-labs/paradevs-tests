@@ -9,13 +9,13 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXML_LIBRARY_DIR})
 
-ADD_EXECUTABLE(pdevs-multithreading-lifegame-main graph_manager.hpp main.cpp
-  models.hpp
-  ../../boost_graph/partitioning/utils.hpp
-  ../../boost_graph/partitioning/gggp.hpp
-  ../../boost_graph/partitioning/graph_build.hpp)
+ADD_EXECUTABLE(pdevs-plot-main graph_builder.hpp graph_defs.hpp
+  graph_manager.hpp main.cpp models.hpp
+  ../boost_graph/partitioning/utils.hpp
+  ../boost_graph/partitioning/defs.hpp
+  ../boost_graph/partitioning/gggp.hpp)
 
-TARGET_LINK_LIBRARIES(pdevs-multithreading-lifegame-main
+TARGET_LINK_LIBRARIES(pdevs-plot-main shp geos
   ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_TIMER_LIBRARY})

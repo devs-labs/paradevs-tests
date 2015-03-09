@@ -24,8 +24,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TESTS_BOOST_GRAPH_GRAPH_DEFS_HPP
-#define __TESTS_BOOST_GRAPH_GRAPH_DEFS_HPP 1
+#ifndef __TESTS_PLOT_GRAPH_DEFS_HPP
+#define __TESTS_PLOT_GRAPH_DEFS_HPP 1
 
 #include <boost/graph/adjacency_list.hpp>
 
@@ -35,17 +35,18 @@ struct VertexProperties
 {
     int    _index;
     double _weight;
-    int    _type;
+    double _x;
+    double _y;
 
-    VertexProperties() : _index(0), _weight(0), _type(0)
+    VertexProperties() : _index(0), _weight(0), _x(0.), _y(0)
     { }
 
-    VertexProperties(int index, double weight, int type) :
-        _index(index), _weight(weight), _type(type)
+    VertexProperties(int index, double weight, double x, double y) :
+        _index(index), _weight(weight), _x(x), _y(y)
     { }
 
     VertexProperties(const VertexProperties& vp) :
-        _index(vp._index), _weight(vp._weight), _type(vp._type)
+        _index(vp._index), _weight(vp._weight), _x(vp._x), _y(vp._y)
     { }
 };
 

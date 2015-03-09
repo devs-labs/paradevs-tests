@@ -28,7 +28,6 @@
 #define __TESTS_BOOST_GRAPH_GRAPH_MANAGER_HPP 1
 
 #include <paradevs/common/scheduler/HeapScheduler.hpp>
-// #include <paradevs/common/scheduler/VectorScheduler.hpp>
 
 #include <paradevs/kernel/pdevs/Coordinator.hpp>
 #include <paradevs/kernel/pdevs/GraphManager.hpp>
