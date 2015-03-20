@@ -107,7 +107,7 @@ double grid_multithreading(int cluster_number)
             paradevs::tests::boost_graph::PartitioningParameters >
         > rc(0, 10, "root", paradevs::common::NoParameters(),
              paradevs::tests::boost_graph::PartitioningParameters(
-                 cluster_number, "rand", 20, false, generator));
+                 cluster_number, "gggp", 20, false, generator));
 
     steady_clock::time_point t1 = steady_clock::now();
 
@@ -209,8 +209,8 @@ void tree(int n)
 int main(int argc, char** argv)
 {
     if (argc > 1) {
-        // grid(atoi(argv[1]));
-        tree(atoi(argv[1]));
+        grid(atoi(argv[1]));
+        // tree(atoi(argv[1]));
     }
     return 0;
 }

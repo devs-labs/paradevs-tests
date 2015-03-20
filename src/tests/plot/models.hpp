@@ -28,33 +28,44 @@
 #define TESTS_PLOT_MODELS_HPP 1
 
 #include <paradevs/common/time/DoubleTime.hpp>
-
 #include <paradevs/kernel/pdevs/Dynamics.hpp>
+
+#include <tests/plot/graph_defs.hpp>
+#include <tests/plot/dispersion.hpp>
+#include <tests/plot/milsol.hpp>
+
+#include <shapefil.h>
 
 namespace paradevs { namespace tests { namespace plot {
 
 struct PlotParameters
 {
-    PlotParameters(double x, double y, int n) : x(x), y(y), neighbour_number(n)
+    PlotParameters(int index,
+                   const paradevs::tests::boost_graph::Point& centroid,
+                   const paradevs::tests::boost_graph::Points&
+                   neighbour_centroids)
+        : _index(index), _centroid(centroid),
+          _neighbour_centroids(neighbour_centroids)
     { }
 
-    double x;
-    double y;
-    int neighbour_number;
+    int _index;
+    paradevs::tests::boost_graph::Point _centroid;
+    paradevs::tests::boost_graph::Points _neighbour_centroids;
 };
 
 struct PlotData
 {
-    PlotData() : x(-1), y(-1), quantity(0)
+    PlotData() : index(-1), x(-1), y(-1), ready_spore_number(0)
     { }
 
-    PlotData(double x, double y, double quantity) : x(x), y(y),
-                                                    quantity(quantity)
+    PlotData(int index, double x, double y, double ready_spore_number) :
+        index(index), x(x), y(y), ready_spore_number(ready_spore_number)
     { }
 
+    int index;
     double x;
     double y;
-    double quantity;
+    double ready_spore_number;
 };
 
 class Plot : public paradevs::pdevs::Dynamics < common::DoubleTime,
@@ -64,50 +75,173 @@ public:
     Plot(const std::string& name, const PlotParameters& parameters) :
         paradevs::pdevs::Dynamics < common::DoubleTime, PlotParameters >(
             name, parameters),
-        _neighbour_number(parameters.neighbour_number)
+        _index(parameters._index),
+        _centroid(parameters._centroid),
+        _neighbour_centroids(parameters._neighbour_centroids)
     {
-        _data.x = parameters.x;
-        _data.y = parameters.y;
+        _data.index = _index;
+        _data.x = parameters._centroid._x;
+        _data.y = parameters._centroid._y;
+
+        // std::cout << "(" << _centroid._x << "," << _centroid._y << "): ";
+        // for (Points::const_iterator it = _neighbour_centroids.begin();
+        //      it != _neighbour_centroids.end(); ++it) {
+        //     double distance = std::sqrt(
+        //         (_centroid._x - it->_x) * (_centroid._x - it->_x) +
+        //         (_centroid._y - it->_y) * (_centroid._y - it->_y));
+
+        //     std::cout << "(" << it->_x << "," << it->_y << ") -> " << distance
+        //               << " ";
+        // }
+        // std::cout << std::endl;
+
+        _handle = DBFOpen("/home/eric/tmp/parcelle/test/parcellaire.dbf",
+                          "rb+");
+
+        if (!_handle) {
+            std::cout << "Error" << std::endl;
+        }
+
     }
 
     virtual ~Plot()
-    { }
-
-    void dint(typename common::DoubleTime::type /* t */)
     {
+        DBFClose(_handle);
     }
 
-    void dext(typename common::DoubleTime::type /* t */,
+    void dint(typename common::DoubleTime::type t)
+    {
+        // std::cout << _index << " " << t << ": dint - BEFORE - "
+        //           << _phase << std::endl;
+
+        if (_phase == SEND) {
+            if (_neighbour_centroids.size() > 0) {
+                _phase = WAIT;
+                _sigma = common::DoubleTime::infinity;
+            } else {
+                _phase  = NEWSTATE;
+                _sigma = 0;
+            }
+        } else if (_phase == NEWSTATE) {
+            // cohorte update
+            _milsol(t);
+            _data.ready_spore_number = _milsol.get_ready_spore_number();
+
+            // compute
+            double sum = 0;
+
+            for (std::vector < PlotData >::const_iterator it =
+                     _neighbour_data.begin(); it != _neighbour_data.end();
+                 ++it) {
+                if (it->ready_spore_number > 0) {
+                    sum += _dispersion_function(
+                        t,
+                        paradevs::tests::boost_graph::Point(it->x, it->y),
+                        _centroid, 0., 0.) * it->ready_spore_number;
+
+                    // std::cout << (_index + 1) << " " << (it->index + 1) << " " << it->concentration << std::endl;
+
+                }
+            }
+            sum += _dispersion_function(t, _centroid, _centroid, 0., 0.) *
+                _data.ready_spore_number;
+            _milsol.add_zoospore_number(sum);
+
+            double p = 0;
+
+            if (_milsol.get_zoospore_number() > 0) {
+                p =  std::log10(_milsol.get_zoospore_number());
+            }
+
+            // std::cout << t << "\t" << get_name() << "\t"
+            //           << _data.ready_spore_number << "\t"
+            //           << _milsol.get_zoospore_number() << "\t"
+            //           << p << std::endl;
+
+            DBFWriteDoubleAttribute(_handle, _index, 0, p);
+
+            // std::cout << (_index + 1) << " " << _data.concentration << std::endl;
+
+            _phase  = SEND;
+            _sigma = 1;
+            _received = 0;
+            _neighbour_data.clear();
+        }
+
+        // std::cout << _index << " " << t << ": dint - AFTER - "
+        //           << _phase << std::endl;
+
+    }
+
+    void dext(typename common::DoubleTime::type t,
               typename common::DoubleTime::type /* e */,
-              const common::Bag < common::DoubleTime >& /* bag */)
+              const common::Bag < common::DoubleTime >& bag)
     {
+        for (common::Bag < common::DoubleTime >::const_iterator it =
+                 bag.begin(); it != bag.end(); ++it) {
+            _neighbour_data.push_back(*(PlotData*)(it->get_content()));
+            ++_received;
+        }
+
+        if (_received == _neighbour_centroids.size()) {
+            _phase = NEWSTATE;
+            _sigma = 0;
+        } else {
+            _phase = WAIT;
+            _sigma = common::DoubleTime::infinity;
+        }
+
+        // std::cout << _index << " " << t << ": dext - "
+        //           << _received << "/"
+        //           << _neighbour_centroids.size()
+        //           << " " << _phase << std::endl;
     }
 
-    void dconf(typename common::DoubleTime::type /* t */,
-               typename common::DoubleTime::type /* e */,
-               const common::Bag < common::DoubleTime >& /* bag */)
+    void dconf(typename common::DoubleTime::type t,
+               typename common::DoubleTime::type e,
+               const common::Bag < common::DoubleTime >& bag)
     {
-        // dext(t, e, bag);
+
+        // std::cout << t << "[" << get_name() << "]: dconf" << std::endl;
+
+        dext(t, e, bag);
     }
 
     typename common::DoubleTime::type start(
         typename common::DoubleTime::type /* t */)
     {
-        _data.quantity = 0;
+        if (_index == 210) {
+            _milsol.set_inoculum_primaire_number(10);
+        } else {
+            _milsol.set_inoculum_primaire_number(0);
+        }
+        _phase = SEND;
+        if (_neighbour_centroids.size() > 0) {
+            _sigma = 0;
+        } else {
+            _sigma = 1;
+        }
+        _received = 0;
         return 0;
     }
 
     typename common::DoubleTime::type ta(
         typename common::DoubleTime::type /* t */) const
-    { return common::DoubleTime::infinity; }
+    { return _sigma; }
 
     common::Bag < common::DoubleTime > lambda(
-        typename common::DoubleTime::type /* t */) const
+        typename common::DoubleTime::type t) const
     {
         common::Bag < common::DoubleTime > bag;
 
-        bag.push_back(common::ExternalEvent < common::DoubleTime >(
-                          "out", (void*)(&_data)));
+        if (_phase == SEND) {
+            bag.push_back(common::ExternalEvent < common::DoubleTime >(
+                              "out", (void*)(&_data)));
+
+            // std::cout << t << "[" << get_name() << "]: lambda - "
+            //           << _phase << std::endl;
+
+        }
         return bag;
     }
 
@@ -115,11 +249,28 @@ public:
     { }
 
 private:
+    enum Phase { WAIT, SEND, NEWSTATE, NEXT };
+
     // parameters
-    unsigned int _neighbour_number;
+    int _index;
+    paradevs::tests::boost_graph::Point _centroid;
+    std::vector < paradevs::tests::boost_graph::Point > _neighbour_centroids;
+
+    DBFHandle _handle;
 
     // data
     PlotData _data;
+    std::vector < PlotData > _neighbour_data;
+
+    // submodels
+    KleinDispersionFunction _dispersion_function;
+    Milsol                  _milsol;
+    Climate                 _climate;
+
+    // state
+    Phase _phase;
+    common::DoubleTime::type _sigma;
+    int _received;
 };
 
 } } } // namespace paradevs tests plot

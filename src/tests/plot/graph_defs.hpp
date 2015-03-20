@@ -1,5 +1,5 @@
 /**
- * @file tests/boost_graph/graph_defs.hpp
+ * @file tests/plot/graph_defs.hpp
  * @author The PARADEVS Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -28,25 +28,44 @@
 #define __TESTS_PLOT_GRAPH_DEFS_HPP 1
 
 #include <boost/graph/adjacency_list.hpp>
+#include <vector>
 
 namespace paradevs { namespace tests { namespace boost_graph {
+
+struct Point
+{
+    double _x;
+    double _y;
+
+    Point() : _x(0), _y(0)
+    { }
+
+    Point(double x, double y) : _x(x), _y(y)
+    { }
+
+    Point(const Point& pt) : _x(pt._x), _y(pt._y)
+    { }
+};
+
+typedef std::vector < Point > Points;
 
 struct VertexProperties
 {
     int    _index;
     double _weight;
-    double _x;
-    double _y;
+    Point  _centroid;
+    Points _neighbour_centroids;
 
-    VertexProperties() : _index(0), _weight(0), _x(0.), _y(0)
+    VertexProperties() : _index(0), _weight(0)
     { }
 
     VertexProperties(int index, double weight, double x, double y) :
-        _index(index), _weight(weight), _x(x), _y(y)
+        _index(index), _weight(weight), _centroid(x, y)
     { }
 
     VertexProperties(const VertexProperties& vp) :
-        _index(vp._index), _weight(vp._weight), _x(vp._x), _y(vp._y)
+        _index(vp._index), _weight(vp._weight), _centroid(vp._centroid),
+        _neighbour_centroids(vp._neighbour_centroids)
     { }
 };
 

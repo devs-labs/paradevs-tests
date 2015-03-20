@@ -75,35 +75,17 @@ public:
     void build_flat_graph(const OrientedGraph& g, const InputEdges& inputs)
     {
         OrientedGraph::vertex_iterator vertexIt, vertexEnd;
-        std::map < int, int > neighbour_numbers;
-
-        boost::tie(vertexIt, vertexEnd) = boost::vertices(g);
-        for (; vertexIt != vertexEnd; ++vertexIt)
-        {
-            OrientedGraph::adjacency_iterator neighbourIt, neighbourEnd;
-
-            neighbour_numbers[g[*vertexIt]._index] = 0;
-            boost::tie(neighbourIt, neighbourEnd) =
-                boost::adjacent_vertices(*vertexIt, g);
-            for (; neighbourIt != neighbourEnd; ++neighbourIt) {
-                ++neighbour_numbers[g[*vertexIt]._index];
-            }
-        }
-
-        for (Edges::const_iterator it = inputs.begin(); it != inputs.end();
-             ++it) {
-            ++neighbour_numbers[it->second];
-        }
 
         boost::tie(vertexIt, vertexEnd) = boost::vertices(g);
         for (; vertexIt != vertexEnd; ++vertexIt) {
             std::ostringstream ss;
+            PlotParameters parameters(g[*vertexIt]._index,
+                                      g[*vertexIt]._centroid,
+                                      g[*vertexIt]._neighbour_centroids);
 
-            ss << "a" << g[*vertexIt]._index;
-            _simulators[g[*vertexIt]._index] =
-                new Simulator(ss.str(),
-                              PlotParameters(g[*vertexIt]._x, g[*vertexIt]._y,
-                                  neighbour_numbers[g[*vertexIt]._index]));
+            ss << "" << g[*vertexIt]._index;
+            _simulators[g[*vertexIt]._index] = new Simulator(ss.str(),
+                                                             parameters);
             _simulators[g[*vertexIt]._index]->add_out_port("out");
             _simulators[g[*vertexIt]._index]->add_in_port("in");
             FlatGraphManager < Parameters >::add_child(

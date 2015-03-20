@@ -44,7 +44,7 @@ double plot_monothreading()
             HierarchicalGraphManager,
             paradevs::common::NoParameters,
             GraphManagerParameters >
-        > rc(0, 10, "root", paradevs::common::NoParameters(),
+        > rc(0, 60, "root", paradevs::common::NoParameters(),
              GraphManagerParameters("/home/eric/tmp/parcelle/oye_plage.shp",
                                     4));
 

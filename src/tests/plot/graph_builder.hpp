@@ -110,6 +110,15 @@ private:
 
         SHPGetInfo(hSHP, &nEntities, &nShapeType, adfMinBound, adfMaxBound);
 
+        // for (int i = 0; i < 4; ++i) {
+        //     std::cout << adfMinBound[i] << " ";
+        // }
+        // std::cout << std::endl;
+        // for (int i = 0; i < 4; ++i) {
+        //     std::cout << adfMaxBound[i] << " ";
+        // }
+        // std::cout << std::endl;
+
         PrecisionModel precisionModel(100., 0, 0);
         GeometryFactory geomFactory(&precisionModel);
         const CoordinateSequenceFactory* seqFactory =
@@ -166,21 +175,56 @@ private:
         }
 
         // compute neighbour
-        int buffer = 10;
+        // int buffer = 10;
+        // std::map < int, Polygon* >::const_iterator it = polygons.begin();
+
+        // while (it != polygons.end()) {
+        //     Geometry* bufferedPolygon = it->second->buffer(buffer);
+        //     std::map < int, Polygon* >::const_iterator it2 = polygons.begin();
+
+        //     while (it2 != polygons.end()) {
+        //         if (it->first != it2->first) {
+        //             if (bufferedPolygon->intersects(it2->second)) {
+        //                 boost::add_edge(vertices[it->first],
+        //                                 vertices[it2->first], 1., g);
+
+        //                 g[vertices[it2->first]]._neighbour_centroids.push_back(
+        //                     paradevs::tests::boost_graph::Point(
+        //                         g[vertices[it->first]]._centroid));
+        //             }
+        //         }
+        //         ++it2;
+        //     }
+        //     delete bufferedPolygon;
+        //     ++it;
+        // }
+
+        // compute neighbour
         std::map < int, Polygon* >::const_iterator it = polygons.begin();
 
         while (it != polygons.end()) {
-            Geometry* bufferedPolygon = it->second->buffer(buffer);
             std::map < int, Polygon* >::const_iterator it2 = polygons.begin();
 
             while (it2 != polygons.end()) {
-                if (bufferedPolygon->intersects(it2->second)) {
-                    boost::add_edge(vertices[it->first],
-                                    vertices[it2->first], 1., g);
+                if (it->first != it2->first) {
+                    // geos::algorithm::CentroidArea centroid;
+
+                    // centroid.add(dynamic_cast < Geometry* >(it->second));
+
+                    // std::cout << it->first << " " << it2->first << " " << it->second->distance(it2->second)
+                    //           << " " << centroid.getCentroid()->x << " " << centroid.getCentroid()->y << std::endl;
+
+                    if (it->second->distance(it2->second) < 10) {
+                        boost::add_edge(vertices[it->first],
+                                        vertices[it2->first], 1., g);
+
+                        g[vertices[it2->first]]._neighbour_centroids.push_back(
+                            paradevs::tests::boost_graph::Point(
+                                g[vertices[it->first]]._centroid));
+                    }
                 }
                 ++it2;
             }
-            delete bufferedPolygon;
             ++it;
         }
 
