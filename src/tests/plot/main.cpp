@@ -45,7 +45,7 @@ double plot_monothreading()
             paradevs::common::NoParameters,
             GraphManagerParameters >
         > rc(0, 60, "root", paradevs::common::NoParameters(),
-             GraphManagerParameters("/home/eric/tmp/parcelle/oye_plage.shp",
+             GraphManagerParameters("/home/herbez/Documents/Thèse/parcelle/oye_plage.shp",
                                     4));
 
     steady_clock::time_point t1 = steady_clock::now();
@@ -69,7 +69,7 @@ double plot_multithreading(int cluster_number)
             paradevs::common::NoParameters,
             GraphManagerParameters >
         > rc(0, 10, "root", paradevs::common::NoParameters(),
-             GraphManagerParameters("/home/eric/tmp/parcelle/oye_plage.shp",
+             GraphManagerParameters("/home/herbez/Documents/Thèse/parcelle/oye_plage.shp",
                                     cluster_number));
 
     steady_clock::time_point t1 = steady_clock::now();

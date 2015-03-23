@@ -30,6 +30,7 @@
 namespace paradevs { namespace tests { namespace plot {
 
 #define SCALE 4
+#define M_PI 3.14159265358979323846 
 
 class KleinDispersionFunction
 {
@@ -68,6 +69,100 @@ public:
 
         }
         return rt;
+    }
+};
+
+class Plume2dDispersionFunction
+{
+public:
+    Plume2dDispersionFunction()
+    {
+    }
+
+    virtual double operator()(
+        typename common::DoubleTime::type t,
+        const paradevs::tests::boost_graph::Point& source,
+        const paradevs::tests::boost_graph::Point& destination,
+        double wind_speed,
+        double wind_direction) const
+    {
+		paradevs::tests::boost_graph::Point destination1,destination2;
+		
+		//Modification à apporter pour prendre en compte la vitesse du vent
+		//Valeurs arbitraire à modifier en fonction du parcellaire étudié
+		double d = 400; //distance entre la source et le point d'infection maximum
+		double sigma_x = 500; //dispertion sur l'axe x
+		double moy_x   = d/std::cos(wind_direction);
+		
+		destination1  = destination;
+		
+		//Changement de repère centré en (source._x, source._y)
+        destination1._x -= source._x;
+        destination1._y -= source._y;
+        
+        //Rotation des axes d'angle wind_direction
+        destination2._x = destination1._x*std::cos(wind_direction) + 
+						  destination1._y*std::sin(wind_direction);
+		destination2._y = -destination1._x*std::sin(wind_direction) + 
+						  destination1._y*std::cos(wind_direction);
+        
+        double distance = std::sqrt(
+            (destination2._x) * (destination2._x) +
+            (destination2._y) * (destination2._y));
+        
+        std::pair<double,double> param_y;
+        int caseSwitch = 1;
+		switch (caseSwitch)
+		{
+		    case 1:
+		        param_y.first  = 0.495;
+		        param_y.second = 0.873;
+		        break;
+		    case 2:
+		        param_y.first  = 0.310;
+		        param_y.second = 0.897;
+		        break;
+		    case 3:
+		        param_y.first  = 0.197;
+		        param_y.second = 0.908;
+		        break;
+		    case 4:
+		        param_y.first  = 0.122;
+		        param_y.second = 0.916;
+		        break;
+		    case 5:
+		        param_y.first  = 0.0934;
+		        param_y.second = 0.912;
+		        break;
+		    case 6:
+		        param_y.first  = 0.0625;
+		        param_y.second = 0.911;
+		        break;
+		    default:
+		        std::cout << "Problem ! Choose a good case !" << std::endl;
+		        break;
+		}
+         
+        double sigma_y = param_y.first * std::pow(distance, param_y.second);
+        //Problème si calcul de dispertion intra parcelle -> voir modification
+        
+        double disp = 1/(M_PI*sigma_x*sigma_y) * 
+					  std::exp(-0.5*std::pow((destination2._x-moy_x)/sigma_x,2)) *
+					  std::exp(-0.5*std::pow(destination2._y/sigma_y,2));
+					  
+		/* Formule extraite du papier sur plume / par la vitesse du vent 
+		 * (mais je ne vois pas ce que ça apporte)
+		 * double disp = std::pow(10,3)/(M_PI*sigma_x*sigma_y*wind_speed) * 
+					  std::exp(-0.5*std::pow((destination2._x-moy_x)/sigma_x,2)) *
+					  std::exp(-0.5*std::pow(destination2._y/sigma_y,2));
+		 */
+		
+		//Problème avec la normalisation de disp, manque d'information sur les voisins ...
+		
+		/** ATTENTION **/ 
+		//Algorithme non validé et non testé, juste compilé.
+       
+        return disp;
     }
 };
 
