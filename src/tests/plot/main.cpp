@@ -36,7 +36,7 @@ using namespace paradevs::common;
 using namespace std::chrono;
 using namespace paradevs::tests::plot;
 
-double plot_monothreading()
+double plot_monothreading(const std::string& shapefile)
 {
     paradevs::common::RootCoordinator <
         DoubleTime, paradevs::pdevs::Coordinator <
@@ -44,9 +44,8 @@ double plot_monothreading()
             HierarchicalGraphManager,
             paradevs::common::NoParameters,
             GraphManagerParameters >
-        > rc(0, 60, "root", paradevs::common::NoParameters(),
-             GraphManagerParameters("/home/herbez/Documents/Thèse/parcelle/oye_plage.shp",
-                                    4));
+        > rc(0, 200, "root", paradevs::common::NoParameters(),
+             GraphManagerParameters(shapefile, 4));
 
     steady_clock::time_point t1 = steady_clock::now();
 
@@ -60,7 +59,7 @@ double plot_monothreading()
     return time_span.count();
 }
 
-double plot_multithreading(int cluster_number)
+double plot_multithreading(int cluster_number, const std::string& shapefile)
 {
     paradevs::common::RootCoordinator <
         DoubleTime, paradevs::pdevs::multithreading::Coordinator <
@@ -69,8 +68,7 @@ double plot_multithreading(int cluster_number)
             paradevs::common::NoParameters,
             GraphManagerParameters >
         > rc(0, 10, "root", paradevs::common::NoParameters(),
-             GraphManagerParameters("/home/herbez/Documents/Thèse/parcelle/oye_plage.shp",
-                                    cluster_number));
+             GraphManagerParameters(shapefile, cluster_number));
 
     steady_clock::time_point t1 = steady_clock::now();
 
@@ -84,19 +82,19 @@ double plot_multithreading(int cluster_number)
     return time_span.count();
 }
 
-void plot(int n)
+void plot(int n, const std::string& shapefile)
 {
     if (n == 1) {
-        std::cout << plot_monothreading() << std::endl;
+        std::cout << plot_monothreading(shapefile) << std::endl;
     } else {
-        std::cout << plot_multithreading(n) << std::endl;
+        std::cout << plot_multithreading(n, shapefile) << std::endl;
     }
 }
 
 int main(int argc, char** argv)
 {
-    if (argc > 1) {
-        plot(atoi(argv[1]));
+    if (argc > 2) {
+        plot(atoi(argv[1]), argv[2]);
     }
     return 0;
 }

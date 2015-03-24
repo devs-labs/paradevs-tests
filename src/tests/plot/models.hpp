@@ -36,6 +36,8 @@
 
 #include <shapefil.h>
 
+#include <cmath>
+
 namespace paradevs { namespace tests { namespace plot {
 
 struct PlotParameters
@@ -137,30 +139,32 @@ public:
                     sum += _dispersion_function(
                         t,
                         paradevs::tests::boost_graph::Point(it->x, it->y),
-                        _centroid, 0., 0.) * it->ready_spore_number;
+                        _centroid, 6., 0.) * it->ready_spore_number;
 
                     // std::cout << (_index + 1) << " " << (it->index + 1) << " " << it->concentration << std::endl;
 
                 }
             }
-            sum += _dispersion_function(t, _centroid, _centroid, 0., 0.) *
+            sum += _dispersion_function(
+                t, _centroid,
+                paradevs::tests::boost_graph::Point(_centroid._x + 10,
+                                                    _centroid._y), 6., 0.) *
                 _data.ready_spore_number;
             _milsol.add_zoospore_number(sum);
 
             double p = 0;
 
             if (_milsol.get_zoospore_number() > 0) {
-                p =  std::log10(_milsol.get_zoospore_number());
+                p = std::log10(_milsol.get_zoospore_number());
             }
 
-            // std::cout << t << "\t" << get_name() << "\t"
+            // std::cout << t << "\t" << _index << "\t"
             //           << _data.ready_spore_number << "\t"
             //           << _milsol.get_zoospore_number() << "\t"
+            //           << sum << "\t"
             //           << p << std::endl;
 
             DBFWriteDoubleAttribute(_handle, _index, 0, p);
-
-            // std::cout << (_index + 1) << " " << _data.concentration << std::endl;
 
             _phase  = SEND;
             _sigma = 1;
@@ -211,7 +215,7 @@ public:
         typename common::DoubleTime::type /* t */)
     {
         if (_index == 210) {
-            _milsol.set_inoculum_primaire_number(10);
+            _milsol.set_inoculum_primaire_number(1e6);
         } else {
             _milsol.set_inoculum_primaire_number(0);
         }
@@ -263,7 +267,8 @@ private:
     std::vector < PlotData > _neighbour_data;
 
     // submodels
-    KleinDispersionFunction _dispersion_function;
+    Plume2dDispersionFunction _dispersion_function;
+    // KleinDispersionFunction _dispersion_function;
     Milsol                  _milsol;
     Climate                 _climate;
 
