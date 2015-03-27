@@ -38,36 +38,39 @@
 
 #include <cmath>
 
+#define WIND_SPEED 6
+#define WIND_DIRECTION 0
+#define PLOT_ID 297
+
 namespace paradevs { namespace tests { namespace plot {
 
 struct PlotParameters
 {
     PlotParameters(int index,
-                   const paradevs::tests::boost_graph::Point& centroid,
-                   const paradevs::tests::boost_graph::Points&
-                   neighbour_centroids)
-        : _index(index), _centroid(centroid),
-          _neighbour_centroids(neighbour_centroids)
+                   const paradevs::tests::boost_graph::Points& points,
+                   int neighbour_number)
+        : _index(index), _points(points), _neighbour_number(neighbour_number)
     { }
 
     int _index;
-    paradevs::tests::boost_graph::Point _centroid;
-    paradevs::tests::boost_graph::Points _neighbour_centroids;
+    paradevs::tests::boost_graph::Points _points;
+    int _neighbour_number;
 };
+
+typedef std::vector < double > Doubles;
 
 struct PlotData
 {
-    PlotData() : index(-1), x(-1), y(-1), ready_spore_number(0)
+    PlotData() : index(-1)
     { }
 
-    PlotData(int index, double x, double y, double ready_spore_number) :
-        index(index), x(x), y(y), ready_spore_number(ready_spore_number)
+    PlotData(int index, const Points& points, Doubles ready_spore_numbers) :
+        index(index), points(points), ready_spore_numbers(ready_spore_numbers)
     { }
 
     int index;
-    double x;
-    double y;
-    double ready_spore_number;
+    Points points;
+    Doubles ready_spore_numbers;
 };
 
 class Plot : public paradevs::pdevs::Dynamics < common::DoubleTime,
@@ -78,12 +81,17 @@ public:
         paradevs::pdevs::Dynamics < common::DoubleTime, PlotParameters >(
             name, parameters),
         _index(parameters._index),
-        _centroid(parameters._centroid),
-        _neighbour_centroids(parameters._neighbour_centroids)
+        _points(parameters._points),
+        _neighbour_number(parameters._neighbour_number)
     {
         _data.index = _index;
-        _data.x = parameters._centroid._x;
-        _data.y = parameters._centroid._y;
+        _data.points = parameters._points;
+
+        for (Points::const_iterator it = parameters._points.begin();
+             it != parameters._points.end(); ++it) {
+            _milsol.push_back(Milsol());
+            _data.ready_spore_numbers.push_back(0.);
+        }
 
         // std::cout << "(" << _centroid._x << "," << _centroid._y << "): ";
         // for (Points::const_iterator it = _neighbour_centroids.begin();
@@ -117,7 +125,7 @@ public:
         //           << _phase << std::endl;
 
         if (_phase == SEND) {
-            if (_neighbour_centroids.size() > 0) {
+            if (_neighbour_number > 0) {
                 _phase = WAIT;
                 _sigma = common::DoubleTime::infinity;
             } else {
@@ -126,37 +134,77 @@ public:
             }
         } else if (_phase == NEWSTATE) {
             // cohorte update
-            _milsol(t);
-            _data.ready_spore_number = _milsol.get_ready_spore_number();
+            int i = 0;
+
+            for (std::vector < Milsol >::iterator it = _milsol.begin();
+                 it != _milsol.end(); ++it) {
+                (*it)(t);
+                _data.ready_spore_numbers[i] = it->get_ready_spore_number();
+                ++i;
+            }
 
             // compute
-            double sum = 0;
+            // neighbour -> local
+            {
+                for (int k = 0; k < _data.points.size(); ++k) {
+                    double sum = 0;
 
-            for (std::vector < PlotData >::const_iterator it =
-                     _neighbour_data.begin(); it != _neighbour_data.end();
-                 ++it) {
-                if (it->ready_spore_number > 0) {
-                    sum += _dispersion_function(
-                        t,
-                        paradevs::tests::boost_graph::Point(it->x, it->y),
-                        _centroid, 6., 0.) * it->ready_spore_number;
-
-                    // std::cout << (_index + 1) << " " << (it->index + 1) << " " << it->concentration << std::endl;
-
+                    for (std::vector < PlotData >::iterator it =
+                             _neighbour_data.begin();
+                         it != _neighbour_data.end(); ++it) {
+                        for (int i = 0; i < it->points.size(); ++i) {
+                            if (it->ready_spore_numbers[i] > 0) {
+                                sum += _dispersion_function(
+                                    t,
+                                    paradevs::tests::boost_graph::Point(
+                                        it->points[i]._x, it->points[i]._y),
+                                    _data.points[k],
+                                    WIND_SPEED, WIND_DIRECTION) *
+                                    it->ready_spore_numbers[i];
+                            }
+                        }
+                    }
+                    _milsol[k].add_zoospore_number(sum);
                 }
             }
-            sum += _dispersion_function(
-                t, _centroid,
-                paradevs::tests::boost_graph::Point(_centroid._x + 10,
-                                                    _centroid._y), 6., 0.) *
-                _data.ready_spore_number;
-            _milsol.add_zoospore_number(sum);
 
-            double p = 0;
+            // local -> local
+            {
+                for (int k = 0; k < _data.points.size(); ++k) {
+                    double sum = 0;
 
-            if (_milsol.get_zoospore_number() > 0) {
-                p = std::log10(_milsol.get_zoospore_number());
+                    for (int i = 0; i < _data.points.size(); ++i) {
+                        if (i != k and _data.ready_spore_numbers[i] > 0) {
+                            sum += _dispersion_function(
+                                t, _data.points[i], _data.points[k],
+                                WIND_SPEED, WIND_DIRECTION) *
+                                _data.ready_spore_numbers[i];
+                        }
+                    }
+                    _milsol[k].add_zoospore_number(sum);
+                }
             }
+
+            // sum += _dispersion_function(
+            //     t, _centroid,
+            //     paradevs::tests::boost_graph::Point(_centroid._x + 10,
+            //                                         _centroid._y), 6., 0.) *
+            //     _data.ready_spore_number;
+
+            {
+                double sum = 0;
+                double p = 0;
+
+                for (int k = 0; k < _data.points.size(); ++k) {
+                    sum += _milsol[k].get_zoospore_number();
+                }
+                sum /= _data.points.size();
+                if (sum > 0) {
+                    p = std::log10(sum);
+                    if (p < 0) {
+                        p = 0;
+                    }
+                }
 
             // std::cout << t << "\t" << _index << "\t"
             //           << _data.ready_spore_number << "\t"
@@ -164,7 +212,8 @@ public:
             //           << sum << "\t"
             //           << p << std::endl;
 
-            DBFWriteDoubleAttribute(_handle, _index, 0, p);
+                DBFWriteDoubleAttribute(_handle, _index, 0, p);
+            }
 
             _phase  = SEND;
             _sigma = 1;
@@ -187,7 +236,7 @@ public:
             ++_received;
         }
 
-        if (_received == _neighbour_centroids.size()) {
+        if (_received == _neighbour_number) {
             _phase = NEWSTATE;
             _sigma = 0;
         } else {
@@ -214,13 +263,17 @@ public:
     typename common::DoubleTime::type start(
         typename common::DoubleTime::type /* t */)
     {
-        if (_index == 210) {
-            _milsol.set_inoculum_primaire_number(1e6);
-        } else {
-            _milsol.set_inoculum_primaire_number(0);
+        for (std::vector < Milsol >::iterator it = _milsol.begin();
+             it != _milsol.end(); ++it) {
+            it->set_inoculum_primaire_number(0);
         }
+
+        if (_index == PLOT_ID) {
+            _milsol[0].set_inoculum_primaire_number(1e6);
+        }
+
         _phase = SEND;
-        if (_neighbour_centroids.size() > 0) {
+        if (_neighbour_number > 0) {
             _sigma = 0;
         } else {
             _sigma = 1;
@@ -241,10 +294,6 @@ public:
         if (_phase == SEND) {
             bag.push_back(common::ExternalEvent < common::DoubleTime >(
                               "out", (void*)(&_data)));
-
-            // std::cout << t << "[" << get_name() << "]: lambda - "
-            //           << _phase << std::endl;
-
         }
         return bag;
     }
@@ -257,19 +306,19 @@ private:
 
     // parameters
     int _index;
-    paradevs::tests::boost_graph::Point _centroid;
-    std::vector < paradevs::tests::boost_graph::Point > _neighbour_centroids;
+    paradevs::tests::boost_graph::Points _points;
+    int _neighbour_number;
 
     DBFHandle _handle;
 
     // data
-    PlotData _data;
+    PlotData                 _data;
     std::vector < PlotData > _neighbour_data;
 
     // submodels
     Plume2dDispersionFunction _dispersion_function;
     // KleinDispersionFunction _dispersion_function;
-    Milsol                  _milsol;
+    std::vector < Milsol >  _milsol;
     Climate                 _climate;
 
     // state

@@ -80,8 +80,8 @@ public:
         for (; vertexIt != vertexEnd; ++vertexIt) {
             std::ostringstream ss;
             PlotParameters parameters(g[*vertexIt]._index,
-                                      g[*vertexIt]._centroid,
-                                      g[*vertexIt]._neighbour_centroids);
+                                      g[*vertexIt]._points,
+                                      g[*vertexIt]._neighbour_number);
 
             ss << "" << g[*vertexIt]._index;
             _simulators[g[*vertexIt]._index] = new Simulator(ss.str(),

@@ -44,7 +44,7 @@ double plot_monothreading(const std::string& shapefile)
             HierarchicalGraphManager,
             paradevs::common::NoParameters,
             GraphManagerParameters >
-        > rc(0, 200, "root", paradevs::common::NoParameters(),
+        > rc(0, 100, "root", paradevs::common::NoParameters(),
              GraphManagerParameters(shapefile, 4));
 
     steady_clock::time_point t1 = steady_clock::now();

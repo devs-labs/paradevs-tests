@@ -91,6 +91,7 @@ public:
 
         double delta_x = destination._x - source._x;
 
+        // TODO:
         if (delta_x > 0) {
             double delta_y = destination._y - source._y;
             double distance = std::sqrt(delta_x * delta_x + delta_y * delta_y) *

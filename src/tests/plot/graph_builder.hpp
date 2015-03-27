@@ -37,9 +37,12 @@
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/LinearRing.h>
 #include <geos/geom/Polygon.h>
+#include <geos/geom/Point.h>
 #include <geos/geom/PrecisionModel.h>
 #include <geos/simplify/DouglasPeuckerSimplifier.h>
 #include <geos/algorithm/CentroidArea.h>
+#include <geos/triangulate/DelaunayTriangulationBuilder.h>
+#include <geos/triangulate/quadedge/QuadEdgeSubdivision.h>
 
 #include <map>
 
@@ -47,6 +50,8 @@ using namespace geos;
 using namespace geos::geom;
 using namespace geos::simplify;
 using namespace paradevs::tests::boost_graph;
+
+#define DELTA 10.
 
 namespace paradevs { namespace tests { namespace plot {
 
@@ -110,15 +115,6 @@ private:
 
         SHPGetInfo(hSHP, &nEntities, &nShapeType, adfMinBound, adfMaxBound);
 
-        // for (int i = 0; i < 4; ++i) {
-        //     std::cout << adfMinBound[i] << " ";
-        // }
-        // std::cout << std::endl;
-        // for (int i = 0; i < 4; ++i) {
-        //     std::cout << adfMaxBound[i] << " ";
-        // }
-        // std::cout << std::endl;
-
         PrecisionModel precisionModel(100., 0, 0);
         GeometryFactory geomFactory(&precisionModel);
         const CoordinateSequenceFactory* seqFactory =
@@ -158,6 +154,32 @@ private:
 
             std::auto_ptr < Geometry > object =
                 DouglasPeuckerSimplifier::simplify(polygon, 1);
+            Points list;
+
+            {
+                GeometryFactory factory;
+
+                for (double x = (*object->getEnvelope()
+                                 ->getCoordinates())[0].x + DELTA / 2;
+                     x < (*object->getEnvelope()->getCoordinates())[1].x;
+                     x += DELTA) {
+                    for (double y = (*object->getEnvelope()
+                                     ->getCoordinates())[0].y + DELTA / 2;
+                         y < (*object->getEnvelope()->getCoordinates())[2].y;
+                         y += DELTA) {
+                        Coordinate c;
+                        c.x = x;
+                        c.y = y;
+
+                        geos::geom::Point* pt = factory.createPoint(c);
+
+                        if (object->contains(pt->clone())) {
+                            list.push_back(
+                                paradevs::tests::boost_graph::Point(x, y));
+                        }
+                    }
+                }
+            }
 
             polygons[i] = dynamic_cast < Polygon* >(object->clone());
 
@@ -166,9 +188,7 @@ private:
             centroid.add(object.get());
 
             vertices.push_back(boost::add_vertex(g));
-            g[vertices.back()] = VertexProperties(i, 1.,
-                                                  centroid.getCentroid()->x,
-                                                  centroid.getCentroid()->y);
+            g[vertices.back()] = VertexProperties(i, 1., list, 0);
 
             delete ring;
             SHPDestroyObject(psShape);
@@ -207,20 +227,10 @@ private:
 
             while (it2 != polygons.end()) {
                 if (it->first != it2->first) {
-                    // geos::algorithm::CentroidArea centroid;
-
-                    // centroid.add(dynamic_cast < Geometry* >(it->second));
-
-                    // std::cout << it->first << " " << it2->first << " " << it->second->distance(it2->second)
-                    //           << " " << centroid.getCentroid()->x << " " << centroid.getCentroid()->y << std::endl;
-
                     if (it->second->distance(it2->second) < 10) {
                         boost::add_edge(vertices[it->first],
                                         vertices[it2->first], 1., g);
-
-                        g[vertices[it2->first]]._neighbour_centroids.push_back(
-                            paradevs::tests::boost_graph::Point(
-                                g[vertices[it->first]]._centroid));
+                        g[vertices[it2->first]]._neighbour_number++;
                     }
                 }
                 ++it2;

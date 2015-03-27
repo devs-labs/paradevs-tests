@@ -53,19 +53,21 @@ struct VertexProperties
 {
     int    _index;
     double _weight;
-    Point  _centroid;
-    Points _neighbour_centroids;
+    Points _points;
+    int    _neighbour_number;
 
-    VertexProperties() : _index(0), _weight(0)
+    VertexProperties() : _index(0), _weight(0), _neighbour_number(0)
     { }
 
-    VertexProperties(int index, double weight, double x, double y) :
-        _index(index), _weight(weight), _centroid(x, y)
+    VertexProperties(int index, double weight, const Points& points,
+                     int neighbour_number) :
+        _index(index), _weight(weight), _points(points),
+        _neighbour_number(neighbour_number)
     { }
 
     VertexProperties(const VertexProperties& vp) :
-        _index(vp._index), _weight(vp._weight), _centroid(vp._centroid),
-        _neighbour_centroids(vp._neighbour_centroids)
+        _index(vp._index), _weight(vp._weight), _points(vp._points),
+        _neighbour_number(vp._neighbour_number)
     { }
 };
 
