@@ -38,7 +38,7 @@ int main()
         DoubleTime, paradevs::pdevs::Coordinator <
             DoubleTime,
             OnlyOneGraphManager < ThreeStateModel > >
-        > rc(0, 500, "root", paradevs::common::NoParameters(),
+        > rc(0, 10000, "root", paradevs::common::NoParameters(),
              paradevs::common::NoParameters());
 
     rc.run();

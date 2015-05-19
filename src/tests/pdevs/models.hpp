@@ -420,93 +420,99 @@ public:
     virtual ~ThreeStateModel()
     { }
 
-    bool full()
+    void compute()
+    {
+        for (unsigned int i = 0; i < heights.size(); ++i) {
+            if (heights[i] != -1 and heights[i] < 10) {
+                heights[i] += speeds[i] * scales[i];
+            }
+        }
+    }
+
+    void display() const
+    {
+        for (std::vector < double >::const_iterator it = heights.begin();
+             it != heights.end(); ++it) {
+            std::cout << *it << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    void display_full() const
+    {
+        unsigned int i = 1;
+
+        for (std::vector < double >::const_iterator it = heights.begin();
+             it != heights.end(); ++it, ++i) {
+            if (*it > 10) {
+                std::cout << "S" << i;
+            }
+        }
+        std::cout << std::endl;
+    }
+
+    bool full() const
     {
         unsigned int n = 0;
 
-        if (S1 == -1) ++n;
-        if (S2 == -1) ++n;
-        if (S3 == -1) ++n;
-        if (S4 == -1) ++n;
-        if (S5 == -1) ++n;
-        return n >= 4;
+        for (std::vector < double >::const_iterator it = heights.begin();
+             it != heights.end(); ++it) {
+            if (*it > 10) {
+                ++n;
+            }
+        }
+        return n > 0;
+    }
+
+    bool full_N() const
+    {
+        unsigned int n = 0;
+
+        for (std::vector < double >::const_iterator it = heights.begin();
+             it != heights.end(); ++it) {
+            if (*it == -1) {
+                ++n;
+            }
+        }
+        return n >= 3;
+    }
+
+    void mark_full(typename common::DoubleTime::type t)
+    {
+        for (std::vector < double >::iterator it = heights.begin();
+             it != heights.end(); ++it) {
+            if (*it > 10) {
+                *it = -1;
+                _last_time = t;
+            }
+        }
+    }
+
+    void raz()
+    {
+        for (std::vector < double >::iterator it = heights.begin();
+             it != heights.end(); ++it) {
+            if (*it == -1) {
+                *it = 0;
+            }
+        }
     }
 
     void dint(typename common::DoubleTime::type t)
     {
-        if (S1 > 10 or S2 > 10 or S3 > 10 or S4 > 10 or S5 > 10) {
-            if (S1 > 10) {
-                S1 = -1;
-            }
-            if (S2 > 10) {
-                S2 = -1;
-            }
-            if (S3 > 10) {
-                S3 = -1;
-            }
-            if (S4 > 10) {
-                S4 = -1;
-            }
-            if (S5 > 10) {
-                S5 = -1;
-            }
-            _last_time = t;
+        mark_full(t);
+        if (full_N()) {
+            raz();
         }
-        if (full()) {
-            if (S1 == -1) {
-                S1 = 0;
-                // speed1 = speed1 == 1 ? 5 : 1;
-            }
-            if (S2 == -1) {
-                S2 = 0;
-                // speed2 = speed2 == 3 ? 1 : 3;
-            }
-            if (S3 == -1) {
-                S3 = 0;
-                // speed3 = speed3 == 2 ? 1 : 2;
-            }
-            if (S4 == -1) {
-                S4 = 0;
-                // speed4 = speed4 == 1 ? 3 : 1;
-            }
-            if (S5 == -1) {
-                S5 = 0;
-                // speed5 = speed5 == 2 ? 1 : 2;
-            }
-        }
-        if (S1 != -1 and S1 <= 10) {
-            S1 += 0.21 * speed1;
-        }
-        if (S2 != -1 and S2 <= 10) {
-            S2 += 0.3 * speed2;
-        }
-        if (S3 != -1 and S3 <= 10) {
-            S3 += 0.7 * speed3;
-        }
-        if (S4 != -1 and S4 <= 10) {
-            S4 += 0.56 * speed4;
-        }
-        if (S5 != -1 and S5 <= 10) {
-            S5 += 0.14 * speed5;
-        }
-
-        // std::cout << S1 << " " << S2 << " "
-        //           << S3 << " " << S4 << " "
-        //           << S5 << " " << std::endl;
-
+        compute();
     }
 
     typename common::DoubleTime::type start(
         typename common::DoubleTime::type t)
     {
-        S1 = S2 = S3 = S4 = S5 = 0;
-        speed1 = speed2 = speed3 = speed4 = speed5 = 1;
-
-        // speed1 = 1;
-        // speed2 = 3;
-        // speed3 = 2;
-        // speed4 = 1;
-        // speed5 = 2;
+        heights = { 0, 0, 0, 0, 0 };
+        speeds = { 0.21, 0.3, 0.7, 0.56, 0.14 };
+        scales = { 1, 1, 1, 1, 1 };
         _last_time = t;
         return 0;
     }
@@ -518,33 +524,17 @@ public:
     common::Bag < common::DoubleTime > lambda(
         typename common::DoubleTime::type t) const
     {
-
-        if (S1 > 10 or S2 > 10 or S3 > 10 or S4 > 10 or S5 > 10) {
+        if (full()) {
             std::cout << (t - _last_time) << " ";
-            if (S1 > 10) {
-                std::cout << "S1";
-            }
-            if (S2 > 10) {
-                std::cout << "S2";
-            }
-            if (S3 > 10) {
-                std::cout << "S3";
-            }
-            if (S4 > 10) {
-                std::cout << "S4";
-            }
-            if (S5 > 10) {
-                std::cout << "S5";
-            }
-            std::cout << std::endl;
+            display_full();
         }
-
         return common::Bag < common::DoubleTime >();
     }
 
 private:
-    double S1, S2, S3, S4, S5;
-    double speed1, speed2, speed3, speed4, speed5;
+    std::vector < double > heights;
+    std::vector < double > speeds;
+    std::vector < double > scales;
 
     typename common::DoubleTime::type _last_time;
 };
