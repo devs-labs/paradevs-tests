@@ -39,8 +39,8 @@
 #include <cmath>
 
 #define WIND_SPEED 6
-#define WIND_DIRECTION 0
-#define PLOT_ID 297
+#define WIND_DIRECTION 1.57 // 0 (ouest) 3.1415 (est)
+#define PLOT_ID 153 // 240 // (est) 50 (sud) 159 (centre) 126 (ouest)
 
 namespace paradevs { namespace tests { namespace plot {
 
@@ -57,7 +57,7 @@ struct PlotParameters
     int _neighbour_number;
 };
 
-typedef std::vector < double > Doubles;
+typedef std::vector < long double > Doubles;
 
 struct PlotData
 {
@@ -93,18 +93,6 @@ public:
             _data.ready_spore_numbers.push_back(0.);
         }
 
-        // std::cout << "(" << _centroid._x << "," << _centroid._y << "): ";
-        // for (Points::const_iterator it = _neighbour_centroids.begin();
-        //      it != _neighbour_centroids.end(); ++it) {
-        //     double distance = std::sqrt(
-        //         (_centroid._x - it->_x) * (_centroid._x - it->_x) +
-        //         (_centroid._y - it->_y) * (_centroid._y - it->_y));
-
-        //     std::cout << "(" << it->_x << "," << it->_y << ") -> " << distance
-        //               << " ";
-        // }
-        // std::cout << std::endl;
-
         _handle = DBFOpen("/home/eric/tmp/parcelle/test/parcellaire.dbf",
                           "rb+");
 
@@ -115,15 +103,10 @@ public:
     }
 
     virtual ~Plot()
-    {
-        DBFClose(_handle);
-    }
+    { DBFClose(_handle); }
 
     void dint(typename common::DoubleTime::type t)
     {
-        // std::cout << _index << " " << t << ": dint - BEFORE - "
-        //           << _phase << std::endl;
-
         if (_phase == SEND) {
             if (_neighbour_number > 0) {
                 _phase = WAIT;
@@ -185,12 +168,8 @@ public:
                 }
             }
 
-            // sum += _dispersion_function(
-            //     t, _centroid,
-            //     paradevs::tests::boost_graph::Point(_centroid._x + 10,
-            //                                         _centroid._y), 6., 0.) *
-            //     _data.ready_spore_number;
-
+            // affect new spores to milsol model
+            // and compute mean
             {
                 double sum = 0;
                 double p = 0;
@@ -206,13 +185,7 @@ public:
                     }
                 }
 
-            // std::cout << t << "\t" << _index << "\t"
-            //           << _data.ready_spore_number << "\t"
-            //           << _milsol.get_zoospore_number() << "\t"
-            //           << sum << "\t"
-            //           << p << std::endl;
-
-                DBFWriteDoubleAttribute(_handle, _index, 0, p);
+                DBFWriteDoubleAttribute(_handle, _index, (int)t, p);
             }
 
             _phase  = SEND;
@@ -220,10 +193,6 @@ public:
             _received = 0;
             _neighbour_data.clear();
         }
-
-        // std::cout << _index << " " << t << ": dint - AFTER - "
-        //           << _phase << std::endl;
-
     }
 
     void dext(typename common::DoubleTime::type t,
@@ -232,7 +201,19 @@ public:
     {
         for (common::Bag < common::DoubleTime >::const_iterator it =
                  bag.begin(); it != bag.end(); ++it) {
-            _neighbour_data.push_back(*(PlotData*)(it->get_content()));
+            PlotData data = *(PlotData*)(it->get_content());
+
+            _neighbour_data.push_back(data);
+
+            std::cout << _index << " " << t << ": dext - "
+                      << data.index << " [ ";
+
+            for (int k = 0; k < data.ready_spore_numbers.size(); ++k) {
+                std::cout << data.ready_spore_numbers[k] << " ";
+            }
+
+            std::cout << "]" << std::endl;
+
             ++_received;
         }
 
@@ -243,11 +224,6 @@ public:
             _phase = WAIT;
             _sigma = common::DoubleTime::infinity;
         }
-
-        // std::cout << _index << " " << t << ": dext - "
-        //           << _received << "/"
-        //           << _neighbour_centroids.size()
-        //           << " " << _phase << std::endl;
     }
 
     void dconf(typename common::DoubleTime::type t,
@@ -263,13 +239,16 @@ public:
     typename common::DoubleTime::type start(
         typename common::DoubleTime::type /* t */)
     {
-        for (std::vector < Milsol >::iterator it = _milsol.begin();
-             it != _milsol.end(); ++it) {
-            it->set_inoculum_primaire_number(0);
-        }
-
         if (_index == PLOT_ID) {
-            _milsol[0].set_inoculum_primaire_number(1e6);
+            for (std::vector < Milsol >::iterator it = _milsol.begin();
+                 it != _milsol.end(); ++it) {
+                it->set_inoculum_primaire_number(1e6);
+            }
+        } else {
+            for (std::vector < Milsol >::iterator it = _milsol.begin();
+                 it != _milsol.end(); ++it) {
+                it->set_inoculum_primaire_number(0);
+            }
         }
 
         _phase = SEND;

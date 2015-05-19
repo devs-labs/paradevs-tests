@@ -127,6 +127,7 @@ private:
         S2GraphManager > S2;
 };
 
+template < typename M >
 class OnlyOneGraphManager :
         public paradevs::pdevs::GraphManager < common::DoubleTime >
 {
@@ -135,16 +136,16 @@ public:
                         const paradevs::common::NoParameters& parameters) :
         paradevs::pdevs::GraphManager < common::DoubleTime >(coordinator,
                                                           parameters),
-        a("a", common::NoParameters())
+        model("m", common::NoParameters())
     {
-        add_child(&a);
+        add_child(&model);
     }
 
     virtual ~OnlyOneGraphManager()
     { }
 
 private:
-    paradevs::pdevs::Simulator < common::DoubleTime, A > a;
+    paradevs::pdevs::Simulator < common::DoubleTime, M > model;
 };
 
 class FlatGraphManager :

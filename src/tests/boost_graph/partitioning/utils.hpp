@@ -2346,6 +2346,7 @@ OrientedGraphs Graph_Partition(const EntiersEntiers& Partition,
             vertex_to v = add_vertex(graph);
 
             tab_vertex_to.push_back(v);
+
             graph[v] = VertexProperties((*go)[Partition.at(i)->at(j)]);
         }
         neigh_community.push_back(community);

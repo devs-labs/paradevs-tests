@@ -29,9 +29,9 @@
 
 #include <cmath>
 
-namespace paradevs { namespace tests { namespace plot {
-
 #define SCALE 4
+
+namespace paradevs { namespace tests { namespace plot {
 
 class KleinDispersionFunction
 {
@@ -87,28 +87,21 @@ public:
         double wind_speed,
         double wind_direction) const
     {
-        paradevs::tests::boost_graph::Point destination1, destination2;
+        paradevs::tests::boost_graph::Point destination1(destination);
+        paradevs::tests::boost_graph::Point destination2;
 
-        double delta_x = destination._x - source._x;
+        //Changement de repère centré en (source._x, source._y)
+        destination1._x -= source._x;
+        destination1._y -= source._y;
 
-        // TODO:
-        if (delta_x > 0) {
-            double delta_y = destination._y - source._y;
-            double distance = std::sqrt(delta_x * delta_x + delta_y * delta_y) *
-                SCALE;
+        //Rotation des axes d'angle wind_direction
+        destination2._x = destination1._x * std::cos(wind_direction) +
+            destination1._y * std::sin(wind_direction);
+        destination2._y = -destination1._x * std::sin(wind_direction) +
+            destination1._y * std::cos(wind_direction);
 
-            destination1  = destination;
 
-            //Changement de repère centré en (source._x, source._y)
-            destination1._x -= source._x;
-            destination1._y -= source._y;
-
-            //Rotation des axes d'angle wind_direction
-            destination2._x = destination1._x * std::cos(wind_direction) +
-                destination1._y * std::sin(wind_direction);
-            destination2._y = -destination1._x * std::sin(wind_direction) +
-                destination1._y * std::cos(wind_direction);
-
+        if (destination2._x > 0) {
             // double sigma_y = 0.0787*x/(std::pow(1+x/707,0.135));
             // double sigma_z = 0.0475*x/(std::pow(1+x/707, 0.465));
 
@@ -121,10 +114,6 @@ public:
             double disp = 1. / (2 * M_PI * wind_speed * sigma_y * sigma_z) *
                 std::exp(-0.5 * std::pow(h / sigma_z, 2)) *
                 std::exp(-0.5 * std::pow(destination2._y * SCALE / sigma_y, 2));
-
-            // std::cout << (destination2._x * SCALE) << " "
-            //           << (destination2._y * SCALE) << " "
-            //           << (disp * 3600 * 24) << std::endl;
 
             return disp * 3600 * 24 * 1e4;
         } else {

@@ -84,6 +84,10 @@ public:
                                       g[*vertexIt]._neighbour_number);
 
             ss << "" << g[*vertexIt]._index;
+
+            // std::cout << "CREATE SIMULATOR: " << g[*vertexIt]._index
+            //           << std::endl;
+
             _simulators[g[*vertexIt]._index] = new Simulator(ss.str(),
                                                              parameters);
             _simulators[g[*vertexIt]._index]->add_out_port("out");
@@ -142,9 +146,15 @@ public:
             if (not coordinator->exist_in_port(ss_in.str())) {
                 coordinator->add_in_port(ss_in.str());
             }
+
+            // std::cout << "CREATE LINK TO => " << it->second << " "
+            //           << std::endl;
+
             BuiltFlatGraphManager::add_link(
                 coordinator, ss_in.str(),
                 BuiltFlatGraphManager::_simulators[it->second], "in");
+                // BuiltFlatGraphManager::_simulators[
+                //     parameters._graph[it->second]._index], "in");
         }
 
         // output

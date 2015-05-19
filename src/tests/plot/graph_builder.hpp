@@ -51,7 +51,9 @@ using namespace geos::geom;
 using namespace geos::simplify;
 using namespace paradevs::tests::boost_graph;
 
-#define DELTA 10.
+#define DISTANCE 1000.
+#define SCALE 4.
+#define DELTA 20 // 2.5
 
 namespace paradevs { namespace tests { namespace plot {
 
@@ -104,6 +106,81 @@ public:
     }
 
 private:
+    void build_neighbourhood(
+        OrientedGraph& g,
+        std::map < int, OrientedGraph::vertex_descriptor >& vertices,
+        const std::map < int, std::pair < Polygon*, Points > >& polygons,
+        const std::map < int, bool >& select)
+    {
+        // build vertices
+        std::map < int, std::pair < Polygon*, Points > >::const_iterator it =
+            polygons.begin();
+
+        while (it != polygons.end()) {
+            vertices[it->first] = boost::add_vertex(g);
+            if (select.find(it->first)->second) {
+                g[vertices[it->first]] = VertexProperties(it->first, 1.,
+                                                      it->second.second, 0);
+            } else {
+                g[vertices[it->first]] = VertexProperties(it->first, 1.,
+                                                          Points(), 0);
+            }
+            ++it;
+        }
+
+        // build edges
+        it = polygons.begin();
+        while (it != polygons.end()) {
+            if (select.find(it->first)->second) {
+                std::map < int,
+                           std::pair < Polygon*,
+                                       Points > >::const_iterator it2 =
+                    polygons.begin();
+
+                while (it2 != polygons.end()) {
+                    if (select.find(it2->first)->second) {
+                        if (it->first != it2->first) {
+                            if (it->second.first->distance(
+                                    it2->second.first) < DISTANCE) {
+                                boost::add_edge(vertices[it->first],
+                                                vertices[it2->first], 1., g);
+                                g[vertices[it2->first]]._neighbour_number++;
+                            }
+                        }
+                    }
+                    ++it2;
+                }
+            }
+            ++it;
+        }
+
+            // compute neighbour
+        // int buffer = 10;
+        // std::map < int, Polygon* >::const_iterator it = polygons.begin();
+
+        // while (it != polygons.end()) {
+        //     Geometry* bufferedPolygon = it->second->buffer(buffer);
+        //     std::map < int, Polygon* >::const_iterator it2 = polygons.begin();
+
+        //     while (it2 != polygons.end()) {
+        //         if (it->first != it2->first) {
+        //             if (bufferedPolygon->intersects(it2->second)) {
+        //                 boost::add_edge(vertices[it->first],
+        //                                 vertices[it2->first], 1., g);
+
+        //                 g[vertices[it2->first]]._neighbour_centroids.push_back(
+        //                     paradevs::tests::boost_graph::Point(
+        //                         g[vertices[it->first]]._centroid));
+        //             }
+        //         }
+        //         ++it2;
+        //     }
+        //     delete bufferedPolygon;
+        //     ++it;
+        // }
+
+    }
+
     void generate(OrientedGraph& g)
     {
         SHPHandle hSHP;
@@ -120,8 +197,8 @@ private:
         const CoordinateSequenceFactory* seqFactory =
             CoordinateArraySequenceFactory::instance();
         std::vector < Geometry* > holes;
-        std::map < int, Polygon* > polygons;
-        std::vector < OrientedGraph::vertex_descriptor > vertices;
+        std::map < int, std::pair < Polygon*, Points > > polygons;
+        std::map < int, OrientedGraph::vertex_descriptor > vertices;
 
         // read shapefile file and build polygons
         for (int i = 0; i < nEntities; i++) {
@@ -168,6 +245,7 @@ private:
                          y < (*object->getEnvelope()->getCoordinates())[2].y;
                          y += DELTA) {
                         Coordinate c;
+
                         c.x = x;
                         c.y = y;
 
@@ -181,66 +259,23 @@ private:
                 }
             }
 
-            polygons[i] = dynamic_cast < Polygon* >(object->clone());
-
-            geos::algorithm::CentroidArea centroid;
-
-            centroid.add(object.get());
-
-            vertices.push_back(boost::add_vertex(g));
-            g[vertices.back()] = VertexProperties(i, 1., list, 0);
+            polygons[i] = std::make_pair(
+                dynamic_cast < Polygon* >(object->clone()), list);
 
             delete ring;
             SHPDestroyObject(psShape);
         }
 
-        // compute neighbour
-        // int buffer = 10;
-        // std::map < int, Polygon* >::const_iterator it = polygons.begin();
+        std::map < int, bool > select;
 
-        // while (it != polygons.end()) {
-        //     Geometry* bufferedPolygon = it->second->buffer(buffer);
-        //     std::map < int, Polygon* >::const_iterator it2 = polygons.begin();
+        select_polygons(polygons, select);
+        build_neighbourhood(g, vertices, polygons, select);
 
-        //     while (it2 != polygons.end()) {
-        //         if (it->first != it2->first) {
-        //             if (bufferedPolygon->intersects(it2->second)) {
-        //                 boost::add_edge(vertices[it->first],
-        //                                 vertices[it2->first], 1., g);
-
-        //                 g[vertices[it2->first]]._neighbour_centroids.push_back(
-        //                     paradevs::tests::boost_graph::Point(
-        //                         g[vertices[it->first]]._centroid));
-        //             }
-        //         }
-        //         ++it2;
-        //     }
-        //     delete bufferedPolygon;
-        //     ++it;
-        // }
-
-        // compute neighbour
-        std::map < int, Polygon* >::const_iterator it = polygons.begin();
+        std::map < int, std::pair < Polygon*, Points > >::const_iterator it =
+            polygons.begin();
 
         while (it != polygons.end()) {
-            std::map < int, Polygon* >::const_iterator it2 = polygons.begin();
-
-            while (it2 != polygons.end()) {
-                if (it->first != it2->first) {
-                    if (it->second->distance(it2->second) < 10) {
-                        boost::add_edge(vertices[it->first],
-                                        vertices[it2->first], 1., g);
-                        g[vertices[it2->first]]._neighbour_number++;
-                    }
-                }
-                ++it2;
-            }
-            ++it;
-        }
-
-        it = polygons.begin();
-        while (it != polygons.end()) {
-            delete it->second;
+            delete it->second.first;
             ++it;
         }
 
@@ -260,6 +295,42 @@ private:
         //     }
         //     std::cout << "}" << std::endl;
         // }
+
+    }
+
+    void select_polygons(const std::map < int, std::pair < Polygon*, Points > >&
+                         polygons, std::map < int, bool >& select)
+    {
+        double sum = 0;
+
+        std::map < int, std::pair < Polygon*, Points > >::const_iterator it =
+            polygons.begin();
+
+        while (it != polygons.end()) {
+            sum += it->second.first->getArea() * SCALE * SCALE / 1e4;
+            select[it->first] = false;
+            ++it;
+        }
+
+        std::cout << "Total area = " << sum << " Ha" << std::endl;
+
+        int n = 0;
+
+        sum = 0;
+        while (sum < 150) {
+            int index = rand() % polygons.size();
+
+            if (not select[index] and
+                polygons.find(index)->second.first->getArea() *
+                SCALE * SCALE  > 10 * 1e4) {
+                select[index] = true;
+                sum += polygons.find(index)->second.first->getArea() *
+                    SCALE * SCALE / 1e4;
+                ++n;
+            }
+        }
+
+        std::cout << "Select number = " << n << " for " << sum << std::endl;
 
     }
 

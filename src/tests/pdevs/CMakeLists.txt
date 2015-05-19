@@ -14,3 +14,9 @@ ADD_EXECUTABLE(pdevs-tests graph_manager.hpp models.hpp tests.cpp)
 TARGET_LINK_LIBRARIES(pdevs-tests
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_TIMER_LIBRARY})
+
+ADD_EXECUTABLE(pdevs-main graph_manager.hpp models.hpp main.cpp)
+
+TARGET_LINK_LIBRARIES(pdevs-main
+  ${Boost_SYSTEM_LIBRARY}
+  ${Boost_TIMER_LIBRARY})

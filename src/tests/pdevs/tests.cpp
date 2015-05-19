@@ -40,7 +40,7 @@ TEST_CASE("pdevs/only_one", "run")
     paradevs::common::RootCoordinator <
         DoubleTime, paradevs::pdevs::Coordinator <
             DoubleTime,
-            OnlyOneGraphManager >
+            OnlyOneGraphManager < A > >
         > rc(0, 10, "root", paradevs::common::NoParameters(),
              paradevs::common::NoParameters());
 
