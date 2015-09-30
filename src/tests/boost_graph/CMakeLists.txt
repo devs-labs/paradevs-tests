@@ -15,9 +15,9 @@ ADD_EXECUTABLE(graph-tests graph_builder.hpp graph_generator.hpp
   partitioning/utils.hpp partitioning/gggp.hpp partitioning/graph_build.hpp)
 
 # file generator
-ADD_EXECUTABLE(file-generator graph_generator.hpp graph_defs.hpp
-  graph_partitioning.hpp file_generator.cpp
-  partitioning/utils.hpp partitioning/gggp.hpp partitioning/graph_build.hpp)
+#ADD_EXECUTABLE(file-generator graph_generator.hpp graph_defs.hpp
+#  graph_partitioning.hpp file_generator.cpp
+#  partitioning/utils.hpp partitioning/gggp.hpp partitioning/graph_build.hpp)
 
 TARGET_LINK_LIBRARIES(graph-tests
   ${Boost_LIBRARIES}
@@ -25,10 +25,10 @@ TARGET_LINK_LIBRARIES(graph-tests
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES})
 
-TARGET_LINK_LIBRARIES(file-generator
-  ${Boost_LIBRARIES}
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES})
+#TARGET_LINK_LIBRARIES(file-generator
+#  ${Boost_LIBRARIES}
+#  ${GLIBMM_LIBRARIES}
+#  ${LIBXML_LIBRARIES}
+#  ${GTHREAD_LIBRARIES})
 
 ADD_SUBDIRECTORY(partitioning)

@@ -474,7 +474,7 @@ public:
                 ++n;
             }
         }
-        return n >= 3;
+        return n >= 2;
     }
 
     void mark_full(typename common::DoubleTime::type t)
@@ -526,7 +526,7 @@ public:
     {
         if (full()) {
             std::cout << (t - _last_time) << " ";
-            display_full();
+            // display_full();
         }
         return common::Bag < common::DoubleTime >();
     }

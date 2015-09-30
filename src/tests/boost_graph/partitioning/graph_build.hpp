@@ -799,13 +799,13 @@ void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source,
     std::vector <vertex_to> dg_vertex_list;
     OrientedGraph::vertex_iterator it_dg, end_dg;
 
-    tie(it_dg, end_dg) = vertices(*go);
+    boost::tie(it_dg, end_dg) = vertices(*go);
     for (uint i = 0; it_dg != end_dg; ++it_dg, ++i) {
         dg_in_vertex_list.push_back(0);
         dg_vertex_list.push_back(*it_dg);
     }
 
-    tie(it_dg, end_dg) = vertices(*go);
+    boost::tie(it_dg, end_dg) = vertices(*go);
     for (uint i = 0; it_dg != end_dg; ++it_dg, ++i) {
         OrientedGraph::adjacency_iterator neighbour_it, neighbour_end;
 
@@ -823,7 +823,7 @@ void build_generator_graph(OrientedGraph *go, int nbr_vertex, int nbr_source,
     int compteur = 0;
     for(uint i = 0; i<num_vertices(*go); i++){
         bool indic = false;
-        for(tie(ei,edge_end) = in_edges(i,*go); ei != edge_end; ++ei){
+        for(boost::tie(ei,edge_end) = in_edges(i,*go); ei != edge_end; ++ei){
             indic = true;
             break;
         }
@@ -998,13 +998,13 @@ void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex,
     std::vector <vertex_to> dg_vertex_list;
     OrientedGraph::vertex_iterator it_dg, end_dg;
 
-    tie(it_dg, end_dg) = vertices(*go);
+    boost::tie(it_dg, end_dg) = vertices(*go);
     for (uint i = 0; it_dg != end_dg; ++it_dg, ++i) {
         dg_in_vertex_list.push_back(0);
         dg_vertex_list.push_back(*it_dg);
     }
 
-    tie(it_dg, end_dg) = vertices(*go);
+    boost::tie(it_dg, end_dg) = vertices(*go);
     for (uint i = 0; it_dg != end_dg; ++it_dg, ++i) {
         OrientedGraph::adjacency_iterator neighbour_it, neighbour_end;
 
@@ -1021,7 +1021,7 @@ void build_generator_graph_linked(OrientedGraph *go, int nbr_vertex,
 
     for(uint i = 0; i<num_vertices(*go); i++){
         bool indic = false;
-        for(tie(ei,edge_end) = in_edges(i,*go); ei != edge_end; ++ei){
+        for(boost::tie(ei,edge_end) = in_edges(i,*go); ei != edge_end; ++ei){
             indic = true;
             break;
         }
@@ -1455,7 +1455,7 @@ void build_parcellaire_graph(OrientedGraph *go, uint size_max, std::string name)
 
     for(uint i = 0; i< point.size(); i++){
         bool indic = false;
-        for(tie(ei,edge_end) = in_edges(i,*go); ei != edge_end; ++ei){
+        for(boost::tie(ei,edge_end) = in_edges(i,*go); ei != edge_end; ++ei){
             indic = true;
             break;
         }

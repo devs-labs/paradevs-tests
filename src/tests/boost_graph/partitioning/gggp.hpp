@@ -446,10 +446,10 @@ UnorientedGraph::adjacency_iterator neighbourIt, neighbourEnd;
 
 	    		std::ofstream GRAPH2 (nom.at(cpt), std::ios::out);
 				GRAPH2<<"graph G {"<<std::endl;
-				tie(vertexIt, vertexEnd) = vertices(copy_graph);
+                                boost::tie(vertexIt, vertexEnd) = vertices(copy_graph);
 				for (; vertexIt != vertexEnd; ++vertexIt) {
 					GRAPH2<<(copy_graph)[*vertexIt]._index<<" -- {";
-					tie(neighbourIt, neighbourEnd) = adjacent_vertices(*vertexIt,
+					boost::tie(neighbourIt, neighbourEnd) = adjacent_vertices(*vertexIt,
 	    			copy_graph);
 					for (; neighbourIt != neighbourEnd; ++neighbourIt){
 						if((copy_graph)[*neighbourIt]._index>(copy_graph)[*vertexIt]._index)
@@ -592,7 +592,7 @@ void Pseudo_random_partitioning(UnorientedGraph *g, EntiersEntiers &Partition,
              */
 UnorientedGraph::adjacency_iterator neighbourIt, neighbourEnd;
 
-tie(neighbourIt, neighbourEnd) = adjacent_vertices(part->at(j),*g);
+boost::tie(neighbourIt, neighbourEnd) = adjacent_vertices(part->at(j),*g);
             for (; neighbourIt != neighbourEnd; ++neighbourIt){
                 if(In_tab(*Partition.at(0),*neighbourIt)==1){
                     // std::cout<<"le voisin déplacé est : "<<*neighbourIt<<std::endl;
@@ -919,7 +919,7 @@ UnorientedGraph::adjacency_iterator neighbourIt, neighbourEnd;
 	    if(rec){
 			std::ofstream GRAPHp ("../../sortie_graphe/Tests/Graphes/Bissection/poids_graphe.txt", std::ios::out);
 			GRAPHp<<"Poids du graphe contracté : "<<std::endl;
-			tie(vertexIt, vertexEnd) = vertices(*baseg.at(baseg.size()-1));
+			boost::tie(vertexIt, vertexEnd) = vertices(*baseg.at(baseg.size()-1));
 			for (; vertexIt != vertexEnd; ++vertexIt) {
 				GRAPHp<<(*baseg.at(baseg.size()-1))[*vertexIt]._index<<" --> "<<(*baseg.at(baseg.size()-1))[*vertexIt]._weight<<std::endl;;
 			}
@@ -1280,43 +1280,44 @@ void Optimisation_method_neighbour_minweight(UnorientedGraph *g,
 }
 
 void tirage_distance(UnorientedGraph *g, int tirage,
-						std::list<int> &vertex_list, int distance){
-	std::vector<std::list<int> > vertex_delete;
-	std::list<int> liste1;
-	std::list<int> vd;
+                     std::list<int> &vertex_list, int distance)
+{
+    std::vector<std::list<int> > vertex_delete;
+    std::list<int> liste1;
+    std::list<int> vd;
 
-	liste1.push_back(tirage);
-	vertex_delete.push_back(liste1);
+    liste1.push_back(tirage);
+    vertex_delete.push_back(liste1);
 
-	for(int i=0; i<distance; i++){
-		std::list<int> liste_tmp;
-		std::list<int>::iterator Ite_tmp;
-		for(Ite_tmp = vertex_delete.at(i).begin();
-								Ite_tmp != vertex_delete.at(i).end();
-								Ite_tmp ++){
-UnorientedGraph::adjacency_iterator neighbourIt, neighbourEnd;
+    for(int i=0; i<distance; i++){
+        std::list<int> liste_tmp;
+        std::list<int>::iterator Ite_tmp;
+        for(Ite_tmp = vertex_delete.at(i).begin();
+            Ite_tmp != vertex_delete.at(i).end();
+            Ite_tmp ++){
+            UnorientedGraph::adjacency_iterator neighbourIt, neighbourEnd;
 
 
-                    tie(neighbourIt, neighbourEnd) =
-								adjacent_vertices(*Ite_tmp,*g);
-			for (; neighbourIt != neighbourEnd; ++neighbourIt){
-				liste_tmp.push_back(*neighbourIt);
-			}
-		}
-		liste_tmp.sort();
-		liste_tmp.unique();
-		vertex_delete.push_back(liste_tmp);
-	}
+            boost::tie(neighbourIt, neighbourEnd) =
+                adjacent_vertices(*Ite_tmp,*g);
+            for (; neighbourIt != neighbourEnd; ++neighbourIt){
+                liste_tmp.push_back(*neighbourIt);
+            }
+        }
+        liste_tmp.sort();
+        liste_tmp.unique();
+        vertex_delete.push_back(liste_tmp);
+    }
 
-	for(int index = 0; index < vertex_delete.size(); index ++){
-		vd.merge(vertex_delete.at(index));
-	}
-	vd.unique();
+    for(int index = 0; index < vertex_delete.size(); index ++){
+        vd.merge(vertex_delete.at(index));
+    }
+    vd.unique();
 
-	std::list<int>::iterator Ite;
-	for(Ite = vd.begin(); Ite != vd.end(); Ite ++){
-		vertex_list.remove(*Ite);
-	}
+    std::list<int>::iterator Ite;
+    for(Ite = vd.begin(); Ite != vd.end(); Ite ++){
+        vertex_list.remove(*Ite);
+    }
 }
 
 } } } // namespace paradevs tests boost_graph
