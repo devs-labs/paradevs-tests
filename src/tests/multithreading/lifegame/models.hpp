@@ -90,7 +90,7 @@ public:
 
         for (common::Bag < common::DoubleTime >::const_iterator it =
                  bag.begin(); it != bag.end(); ++it) {
-            if (*(bool*)(it->get_content())) {
+            if (it->get_content().get_content < bool >()) {
                 ++_true_neighbour_number;
             }
             ++_received;
@@ -147,7 +147,7 @@ public:
             //           << std::endl;
 
             bag.push_back(common::ExternalEvent < common::DoubleTime >(
-                              "out", (void*)(&_state)));
+                              "out", common::Value(_state)));
         }
         return bag;
     }

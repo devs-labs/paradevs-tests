@@ -76,7 +76,10 @@ public:
         common::Trace < common::DoubleTime >::trace().flush();
 #endif
 
+        std::cout << t << ": " << get_name() << " => dint" << std::endl;
+
         delay();
+        ++_value;
 
         if (_phase == SEND) {
             _phase = WAIT;
@@ -92,6 +95,13 @@ public:
         (void)t;
         (void)msgs;
 #endif
+
+        for (common::Bag < common::DoubleTime >::const_iterator it =
+                 msgs.begin(); it != msgs.end(); ++it) {
+            std::cout << t << ": " << get_name()
+                      << " => " << it->get_content().get_content < double >()
+                      << std::endl;
+        }
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -114,6 +124,9 @@ public:
         (void)t;
         (void)msgs;
 #endif
+
+        std::cout << t << ": " << get_name() << " => " << msgs.to_string()
+                  << std::endl;
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -178,7 +191,9 @@ public:
 
         msgs.push_back(
             common::ExternalEvent < common::DoubleTime >(
-                "out", (void*)&_value));
+                "out", common::Value(_value)));
+
+        std::cout << t << ": " << get_name() << " => lambda" << std::endl;
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -228,7 +243,10 @@ public:
         common::Trace < common::DoubleTime >::trace().flush();
 #endif
 
+        std::cout << t << ": " << get_name() << " => dint" << std::endl;
+
         delay();
+        ++_value;
 
         if (_phase == SEND) {
             _phase = WAIT;
@@ -244,6 +262,9 @@ public:
         (void)t;
         (void)msgs;
 #endif
+
+        std::cout << t << ": " << get_name() << " => " << msgs.to_string()
+                  << std::endl;
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -328,9 +349,11 @@ public:
 #endif
         common::Bag < common::DoubleTime > msgs;
 
+        std::cout << t << ": " << get_name() << " => lambda" << std::endl;
+
         msgs.push_back(common::ExternalEvent <
                            common::DoubleTime >(
-                               "out", (void*)&_value));
+                               "out", common::Value(_value)));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()

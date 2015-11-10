@@ -158,7 +158,7 @@ public:
 
         msgs.push_back(common::ExternalEvent <
                            common::DoubleTime >(
-                               "out", (void*)&_value));
+                               "out", common::Value(_value)));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -303,7 +303,7 @@ public:
 
         msgs.push_back(common::ExternalEvent <
                            common::DoubleTime >(
-                               "out", (void*)&t));
+                               "out", common::Value(_phase)));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -382,7 +382,8 @@ public:
         common::Bag < common::DoubleTime > msgs;
 
         msgs.push_back(
-            common::ExternalEvent < common::DoubleTime >( "out", (void*)&_value));
+            common::ExternalEvent < common::DoubleTime >(
+                "out", common::Value(_value)));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -459,7 +460,8 @@ public:
         common::Bag < common::DoubleTime > msgs;
 
         msgs.push_back(
-            common::ExternalEvent < common::DoubleTime >("out", (void*)&_value));
+            common::ExternalEvent < common::DoubleTime >(
+                "out", common::Value(_value)));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -601,7 +603,7 @@ public:
 
         msgs.push_back(common::ExternalEvent <
                            common::DoubleTime >(
-                               "out", (void*)&_value));
+                               "out", common::Value(_value)));
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()

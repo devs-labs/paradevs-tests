@@ -35,7 +35,7 @@
 #include <paradevs/kernel/pdevs/mpi/GraphManager.hpp>
 #include <paradevs/kernel/pdevs/Simulator.hpp>
 
-#include <tests/boost_graph/graph_defs.hpp>
+// #include <tests/boost_graph/graph_defs.hpp>
 
 namespace paradevs { namespace tests { namespace mpi {
 
@@ -146,6 +146,8 @@ public:
         add_child(&S1);
         add_child(&S2);
 
+        S1.add_out_port("out");
+        S2.add_in_port("in");
         add_link(&S1, "out", &S2, "in");
     }
 
@@ -157,79 +159,79 @@ private:
     paradevs::pdevs::mpi::ModelProxy < common::DoubleTime > S2;
 };
 
-struct MPIHierarchicalGraphManagerParameters
-{
-    paradevs::tests::boost_graph::OrientedGraphs graphs;
-    paradevs::tests::boost_graph::InputEdgeList input_edges;
-    paradevs::tests::boost_graph::OutputEdgeList output_edges;
-    paradevs::tests::boost_graph::Connections parent_connections;
-    std::vector < int > ranks;
-};
+// struct MPIHierarchicalGraphManagerParameters
+// {
+//     paradevs::tests::boost_graph::OrientedGraphs graphs;
+//     paradevs::tests::boost_graph::InputEdgeList input_edges;
+//     paradevs::tests::boost_graph::OutputEdgeList output_edges;
+//     paradevs::tests::boost_graph::Connections parent_connections;
+//     std::vector < int > ranks;
+// };
 
-class MPIHierarchicalGraphManager :
-        public paradevs::pdevs::GraphManager <
-    common::DoubleTime, MPIHierarchicalGraphManagerParameters >
-{
-public:
-    MPIHierarchicalGraphManager(
-        common::Coordinator < common::DoubleTime >* coordinator,
-        const MPIHierarchicalGraphManagerParameters& parameters) :
-        paradevs::pdevs::GraphManager <
-            common::DoubleTime,
-            MPIHierarchicalGraphManagerParameters >
-        (coordinator, parameters)
-    {
-        // build model proxies (graphs)
-        for (unsigned int i = 0; i < parameters.graphs.size(); ++i) {
-            ModelProxy* model = 0;
-            std::ostringstream ss;
+// class MPIHierarchicalGraphManager :
+//         public paradevs::pdevs::GraphManager <
+//     common::DoubleTime, MPIHierarchicalGraphManagerParameters >
+// {
+// public:
+//     MPIHierarchicalGraphManager(
+//         common::Coordinator < common::DoubleTime >* coordinator,
+//         const MPIHierarchicalGraphManagerParameters& parameters) :
+//         paradevs::pdevs::GraphManager <
+//             common::DoubleTime,
+//             MPIHierarchicalGraphManagerParameters >
+//         (coordinator, parameters)
+//     {
+//         // build model proxies (graphs)
+//         for (unsigned int i = 0; i < parameters.graphs.size(); ++i) {
+//             ModelProxy* model = 0;
+//             std::ostringstream ss;
 
-            ss << "S" << i;
-            model = new ModelProxy(ss.str(), parameters.ranks[i], false);
-            _models.push_back(model);
-            add_child(model);
-        }
+//             ss << "S" << i;
+//             model = new ModelProxy(ss.str(), parameters.ranks[i], false);
+//             _models.push_back(model);
+//             add_child(model);
+//         }
 
-        // // builds internal connections (edges)
-        // for (Connections::const_iterator it = parent_connections.begin();
-        //      it != parent_connections.end(); ++it) {
-        //     const Connection& connection = *it;
-        //     std::ostringstream ss_out;
-        //     std::ostringstream ss_in;
+//         // // builds internal connections (edges)
+//         // for (Connections::const_iterator it = parent_connections.begin();
+//         //      it != parent_connections.end(); ++it) {
+//         //     const Connection& connection = *it;
+//         //     std::ostringstream ss_out;
+//         //     std::ostringstream ss_in;
 
-        //     ss_out << "out_" << connection.first.second;
-        //     ss_in << "in_" << connection.first.second;
+//         //     ss_out << "out_" << connection.first.second;
+//         //     ss_in << "in_" << connection.first.second;
 
-        //     if (not ParallelHeapHierarchicalGraphManager <
-        //             GraphBuilder >::exist_link(
-        //                 _coordinators[connection.first.first - 1],
-        //                 ss_out.str(),
-        //                 _coordinators[connection.second.first - 1],
-        //                 ss_in.str())) {
-        //         ParallelHeapHierarchicalGraphManager <
-        //             GraphBuilder >::add_link(
-        //                 _coordinators[connection.first.first - 1],
-        //                 ss_out.str(),
-        //                 _coordinators[connection.second.first - 1],
-        //                 ss_in.str());
-        //     }
-        // }
-    }
+//         //     if (not ParallelHeapHierarchicalGraphManager <
+//         //             GraphBuilder >::exist_link(
+//         //                 _coordinators[connection.first.first - 1],
+//         //                 ss_out.str(),
+//         //                 _coordinators[connection.second.first - 1],
+//         //                 ss_in.str())) {
+//         //         ParallelHeapHierarchicalGraphManager <
+//         //             GraphBuilder >::add_link(
+//         //                 _coordinators[connection.first.first - 1],
+//         //                 ss_out.str(),
+//         //                 _coordinators[connection.second.first - 1],
+//         //                 ss_in.str());
+//         //     }
+//         // }
+//     }
 
-    virtual ~MPIHierarchicalGraphManager()
-    {
-        for (typename ModelProxies::const_iterator it = _models.begin();
-             it != _models.end(); ++it) {
-            delete *it;
-        }
-    }
+//     virtual ~MPIHierarchicalGraphManager()
+//     {
+//         for (typename ModelProxies::const_iterator it = _models.begin();
+//              it != _models.end(); ++it) {
+//             delete *it;
+//         }
+//     }
 
-private:
-    typedef paradevs::pdevs::mpi::ModelProxy < common::DoubleTime > ModelProxy;
-    typedef std::vector < ModelProxy* > ModelProxies;
+// private:
+//     typedef paradevs::pdevs::mpi::ModelProxy < common::DoubleTime > ModelProxy;
+//     typedef std::vector < ModelProxy* > ModelProxies;
 
-    ModelProxies _models;
-};
+//     ModelProxies _models;
+// };
 
 } } } // namespace paradevs tests mpi
 

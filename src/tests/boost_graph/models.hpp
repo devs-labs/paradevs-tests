@@ -92,7 +92,7 @@ public:
         common::Bag < common::DoubleTime > bag;
 
         bag.push_back(common::ExternalEvent < common::DoubleTime >(
-                          "out", (void*)&_value));
+                          "out", common::Value(_value)));
         return bag;
     }
 
@@ -202,7 +202,7 @@ public:
 
         if (_phase == SEND) {
             bag.push_back(common::ExternalEvent < common::DoubleTime >(
-                              "out", (void*)&_value));
+                              "out", common::Value(_value)));
         }
         return bag;
     }

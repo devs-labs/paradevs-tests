@@ -201,7 +201,7 @@ public:
     {
         for (common::Bag < common::DoubleTime >::const_iterator it =
                  bag.begin(); it != bag.end(); ++it) {
-            PlotData data = *(PlotData*)(it->get_content());
+            PlotData data; // = *(PlotData*)(it->get_content());
 
             _neighbour_data.push_back(data);
 
@@ -271,8 +271,8 @@ public:
         common::Bag < common::DoubleTime > bag;
 
         if (_phase == SEND) {
-            bag.push_back(common::ExternalEvent < common::DoubleTime >(
-                              "out", (void*)(&_data)));
+            // bag.push_back(common::ExternalEvent < common::DoubleTime >(
+            //                   "out", _data));
         }
         return bag;
     }

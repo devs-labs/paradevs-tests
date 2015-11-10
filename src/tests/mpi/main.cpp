@@ -29,10 +29,10 @@
 #include <boost/mpi/environment.hpp>
 #include <boost/mpi/communicator.hpp>
 
-#include <tests/boost_graph/graph_defs.hpp>
-#include <tests/boost_graph/graph_builder.hpp>
-#include <tests/boost_graph/graph_generator.hpp>
-#include <tests/boost_graph/graph_partitioning.hpp>
+// #include <tests/boost_graph/graph_defs.hpp>
+// #include <tests/boost_graph/graph_builder.hpp>
+// #include <tests/boost_graph/graph_generator.hpp>
+// #include <tests/boost_graph/graph_partitioning.hpp>
 
 #include <paradevs/common/time/DoubleTime.hpp>
 #include <paradevs/kernel/pdevs/mpi/LogicalProcessor.hpp>
@@ -93,56 +93,57 @@ void example_simple(int argc, char *argv[])
     }
 }
 
-void example_grid(int argc, char *argv[])
-{
-    environment env(argc, argv);
-    communicator world;
+// void example_grid(int argc, char *argv[])
+// {
+//     environment env(argc, argv);
+//     communicator world;
 
-    unsigned int side = 100;
-    std::vector<std::pair<int,int>> vertex_selection;
-    std::pair<int,int> tmp;
-    tmp.first = 0;
-    tmp.second = 3;
-    vertex_selection.push_back(tmp);
-    paradevs::tests::boost_graph::Entiers weight_vertex;
-    weight_vertex.push_back(1);
-    const char *edge_weight;
-    edge_weight = "../../sortie_graphe/tests_grid.txt";
-    bool rec = false;
+//     unsigned int side = 100;
+//     std::vector<std::pair<int,int>> vertex_selection;
+//     std::pair<int,int> tmp;
+//     tmp.first = 0;
+//     tmp.second = 3;
+//     vertex_selection.push_back(tmp);
+//     paradevs::tests::boost_graph::Entiers weight_vertex;
+//     weight_vertex.push_back(1);
+//     const char *edge_weight;
+//     edge_weight = "../../sortie_graphe/tests_grid.txt";
+//     bool rec = false;
 
-    paradevs::tests::boost_graph::RandomGridGraphGenerator generator(
-        side, vertex_selection,  weight_vertex, edge_weight, rec);
-    paradevs::tests::boost_graph::PartitioningGraphBuilder builder(
-        4, "gggp", 20, false, generator);
-    paradevs::tests::mpi::MPIHierarchicalGraphManagerParameters parameters;
+//     paradevs::tests::boost_graph::RandomGridGraphGenerator generator(
+//         side, vertex_selection,  weight_vertex, edge_weight, rec);
+//     paradevs::tests::boost_graph::PartitioningGraphBuilder builder(
+//         4, "gggp", 20, false, generator);
+//     paradevs::tests::mpi::MPIHierarchicalGraphManagerParameters parameters;
 
-    builder.build(parameters.graphs, parameters.input_edges,
-                  parameters.output_edges, parameters.parent_connections);
-    if (world.rank() == 0) {
-        paradevs::common::RootCoordinator <
-            DoubleTime, paradevs::pdevs::mpi::Coordinator <
-                DoubleTime,
-                paradevs::tests::mpi::MPIHierarchicalGraphManager,
-                paradevs::common::NoParameters,
-                paradevs::tests::mpi::MPIHierarchicalGraphManagerParameters >
-            > rc(0, 10, "root", paradevs::common::NoParameters(), parameters);
+//     builder.build(parameters.graphs, parameters.input_edges,
+//                   parameters.output_edges, parameters.parent_connections);
+//     if (world.rank() == 0) {
+//         paradevs::common::RootCoordinator <
+//             DoubleTime, paradevs::pdevs::mpi::Coordinator <
+//                 DoubleTime,
+//                 paradevs::tests::mpi::MPIHierarchicalGraphManager,
+//                 paradevs::common::NoParameters,
+//                 paradevs::tests::mpi::MPIHierarchicalGraphManagerParameters >
+//             > rc(0, 10, "root", paradevs::common::NoParameters(), parameters);
 
-        steady_clock::time_point t1 = steady_clock::now();
+//         steady_clock::time_point t1 = steady_clock::now();
 
-        rc.run();
+//         rc.run();
 
-        steady_clock::time_point t2 = steady_clock::now();
+//         steady_clock::time_point t2 = steady_clock::now();
 
-        duration < double > time_span = duration_cast <
-            duration < double > >(t2 - t1);
+//         duration < double > time_span = duration_cast <
+//             duration < double > >(t2 - t1);
 
-        std::cout << "MULTI = " << time_span.count() << std::endl;
-    } else {
-    }
-}
+//         std::cout << "MULTI = " << time_span.count() << std::endl;
+//     } else {
+//     }
+// }
 
 int main(int argc, char *argv[])
 {
     example_simple(argc, argv);
+    // example_grid(argc, argv);
     return 0;
 }
