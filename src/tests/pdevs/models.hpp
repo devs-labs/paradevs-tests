@@ -50,13 +50,24 @@ void delay()
     }
 }
 
+struct data
+{
+    double x;
+    double y;
+
+    data() : x(0), y(0)
+    { }
+
+    data(double _x, double _y) : x(_x), y(_y)
+    { }
+};
+
 class A :
         public paradevs::pdevs::Dynamics < common::DoubleTime >
 {
 public:
     A(const std::string& name, const common::NoParameters& parameters) :
-        paradevs::pdevs::Dynamics < common::DoubleTime >(name, parameters),
-        _value(0)
+        paradevs::pdevs::Dynamics < common::DoubleTime >(name, parameters)
     { }
     virtual ~A()
     { }
@@ -76,10 +87,12 @@ public:
         common::Trace < common::DoubleTime >::trace().flush();
 #endif
 
-        std::cout << t << ": " << get_name() << " => dint" << std::endl;
-
         delay();
-        ++_value;
+        ++_value.x;
+        --_value.y;
+
+        std::cout << t << ": " << get_name() << " => dint -> "
+                  << _value.x << " " << _value.y << std::endl;
 
         if (_phase == SEND) {
             _phase = WAIT;
@@ -214,7 +227,7 @@ private:
     enum Phase { WAIT, SEND };
 
     Phase _phase;
-    double _value;
+    data _value;
 };
 
 class B :
@@ -243,10 +256,11 @@ public:
         common::Trace < common::DoubleTime >::trace().flush();
 #endif
 
-        std::cout << t << ": " << get_name() << " => dint" << std::endl;
-
         delay();
         ++_value;
+
+        std::cout << t << ": " << get_name() << " => dint -> "
+                  << _value << std::endl;
 
         if (_phase == SEND) {
             _phase = WAIT;
@@ -263,8 +277,13 @@ public:
         (void)msgs;
 #endif
 
-        std::cout << t << ": " << get_name() << " => " << msgs.to_string()
-                  << std::endl;
+        for (common::Bag < common::DoubleTime >::const_iterator it =
+                 msgs.begin(); it != msgs.end(); ++it) {
+            std::cout << t << ": " << get_name()
+                      << " => " << it->get_content().get_content < data >().x
+                      << " " << it->get_content().get_content < data >().y
+                      << std::endl;
+        }
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
