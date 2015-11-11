@@ -91,8 +91,8 @@ public:
         ++_value.x;
         --_value.y;
 
-        std::cout << t << ": " << get_name() << " => dint -> "
-                  << _value.x << " " << _value.y << std::endl;
+        // std::cout << t << ": " << get_name() << " => dint -> "
+        //           << _value.x << " " << _value.y << std::endl;
 
         if (_phase == SEND) {
             _phase = WAIT;
@@ -109,12 +109,12 @@ public:
         (void)msgs;
 #endif
 
-        for (common::Bag < common::DoubleTime >::const_iterator it =
-                 msgs.begin(); it != msgs.end(); ++it) {
-            std::cout << t << ": " << get_name()
-                      << " => " << it->get_content().get_content < double >()
-                      << std::endl;
-        }
+        // for (common::Bag < common::DoubleTime >::const_iterator it =
+        //          msgs.begin(); it != msgs.end(); ++it) {
+        //     std::cout << t << ": " << get_name()
+        //               << " => " << it->get_content().get_content < double >()
+        //               << std::endl;
+        // }
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -138,8 +138,8 @@ public:
         (void)msgs;
 #endif
 
-        std::cout << t << ": " << get_name() << " => " << msgs.to_string()
-                  << std::endl;
+        // std::cout << t << ": " << get_name() << " => " << msgs.to_string()
+        //           << std::endl;
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -206,7 +206,7 @@ public:
             common::ExternalEvent < common::DoubleTime >(
                 "out", common::Value(_value)));
 
-        std::cout << t << ": " << get_name() << " => lambda" << std::endl;
+        // std::cout << t << ": " << get_name() << " => lambda" << std::endl;
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -259,8 +259,8 @@ public:
         delay();
         ++_value;
 
-        std::cout << t << ": " << get_name() << " => dint -> "
-                  << _value << std::endl;
+        // std::cout << t << ": " << get_name() << " => dint -> "
+        //           << _value << std::endl;
 
         if (_phase == SEND) {
             _phase = WAIT;
@@ -277,13 +277,13 @@ public:
         (void)msgs;
 #endif
 
-        for (common::Bag < common::DoubleTime >::const_iterator it =
-                 msgs.begin(); it != msgs.end(); ++it) {
-            std::cout << t << ": " << get_name()
-                      << " => " << it->get_content().get_content < data >().x
-                      << " " << it->get_content().get_content < data >().y
-                      << std::endl;
-        }
+        // for (common::Bag < common::DoubleTime >::const_iterator it =
+        //          msgs.begin(); it != msgs.end(); ++it) {
+        //     std::cout << t << ": " << get_name()
+        //               << " => " << it->get_content().get_content < data >().x
+        //               << " " << it->get_content().get_content < data >().y
+        //               << std::endl;
+        // }
 
 #ifdef WITH_TRACE
         common::Trace < common::DoubleTime >::trace()
@@ -368,7 +368,7 @@ public:
 #endif
         common::Bag < common::DoubleTime > msgs;
 
-        std::cout << t << ": " << get_name() << " => lambda" << std::endl;
+        // std::cout << t << ": " << get_name() << " => lambda" << std::endl;
 
         msgs.push_back(common::ExternalEvent <
                            common::DoubleTime >(

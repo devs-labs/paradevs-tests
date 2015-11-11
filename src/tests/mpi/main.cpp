@@ -53,8 +53,16 @@ void example_simple(int argc, char *argv[])
     if (world.rank() == 0) {
         paradevs::tests::mpi::RootGraphManagerParameters parameters;
 
-        parameters.S1_rank = 1;
-        parameters.S2_rank = 2;
+        parameters.ranks.push_back(1);
+        parameters.ranks.push_back(2);
+        parameters.ranks.push_back(3);
+        parameters.ranks.push_back(4);
+        parameters.ranks.push_back(5);
+        parameters.ranks.push_back(6);
+        parameters.ranks.push_back(7);
+        parameters.ranks.push_back(8);
+        parameters.ranks.push_back(9);
+        parameters.ranks.push_back(10);
 
         paradevs::common::RootCoordinator <
             DoubleTime,
@@ -63,26 +71,29 @@ void example_simple(int argc, char *argv[])
                 paradevs::tests::mpi::RootGraphManager,
                 paradevs::common::NoParameters,
                 paradevs::tests::mpi::RootGraphManagerParameters >
-            > rc(0, 10, "root", paradevs::common::NoParameters(), parameters);
+            > rc(0, 20, "root", paradevs::common::NoParameters(), parameters);
 
         rc.run();
     } else {
+        std::stringstream ss;
+
+        ss << "S" << world.rank();
         if (world.rank() == 1) {
             paradevs::pdevs::mpi::Coordinator <
                 DoubleTime,
                 paradevs::tests::mpi::S1GraphManager > model(
-                    "S1", paradevs::common::NoParameters(),
+                    ss.str(), paradevs::common::NoParameters(),
                     paradevs::common::NoParameters());
             paradevs::pdevs::mpi::LogicalProcessor <
                 DoubleTime > LP(&model, world.rank(), 0);
 
             model.set_logical_processor(&LP);
             LP.loop();
-        } else if (world.rank() == 2) {
+        } else {
             paradevs::pdevs::mpi::Coordinator <
                 DoubleTime,
                 paradevs::tests::mpi::S2GraphManager > model(
-                    "S2", paradevs::common::NoParameters(),
+                    ss.str(), paradevs::common::NoParameters(),
                     paradevs::common::NoParameters());
             paradevs::pdevs::mpi::LogicalProcessor <
                 DoubleTime > LP(&model, world.rank(), 0);

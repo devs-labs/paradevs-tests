@@ -35,6 +35,8 @@
 #include <paradevs/kernel/pdevs/mpi/GraphManager.hpp>
 #include <paradevs/kernel/pdevs/Simulator.hpp>
 
+#include <sstream>
+
 // #include <tests/boost_graph/graph_defs.hpp>
 
 namespace paradevs { namespace tests { namespace mpi {
@@ -125,9 +127,11 @@ private:
 
 struct RootGraphManagerParameters
 {
-    int S1_rank;
-    int S2_rank;
+    std::vector < int > ranks;
 };
+
+typedef paradevs::pdevs::mpi::ModelProxy < common::DoubleTime > ModelProxy;
+typedef std::vector < ModelProxy* > ModelProxies;
 
 class RootGraphManager :
         public paradevs::pdevs::GraphManager < common::DoubleTime,
@@ -139,24 +143,36 @@ public:
         const RootGraphManagerParameters& parameters) :
         paradevs::pdevs::GraphManager < common::DoubleTime,
                                         RootGraphManagerParameters >(
-                                            coordinator, parameters),
-        S1("a", parameters.S1_rank, false),
-        S2("b", parameters.S2_rank, false)
+                                            coordinator, parameters)
     {
-        add_child(&S1);
-        add_child(&S2);
+        ModelProxy* previous = 0;
 
-        S1.add_out_port("out");
-        S2.add_in_port("in");
-        add_link(&S1, "out", &S2, "in");
+        for (std::vector < int >::const_iterator it = parameters.ranks.begin();
+             it != parameters.ranks.end(); ++it) {
+            std::stringstream ss;
+            ModelProxy* model = 0;
+
+            ss << "S" << *it;
+            model = new ModelProxy(ss.str(), *it, false);
+            models.push_back(model);
+            add_child(model);
+            model->add_out_port("out");
+            model->add_in_port("in");
+            if (it != parameters.ranks.begin()) {
+                add_link(previous, "out", model, "in");
+            }
+            previous = model;
+        }
     }
 
     virtual ~RootGraphManager()
-    { }
+    {
+        std::for_each(models.begin(), models.end(),
+                      std::default_delete < ModelProxy >());
+    }
 
 private:
-    paradevs::pdevs::mpi::ModelProxy < common::DoubleTime > S1;
-    paradevs::pdevs::mpi::ModelProxy < common::DoubleTime > S2;
+    ModelProxies models;
 };
 
 // struct MPIHierarchicalGraphManagerParameters
