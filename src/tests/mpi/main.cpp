@@ -105,6 +105,7 @@ void example_simple(int argc, char *argv[])
 }
 
 #define SUB_GRID_SIZE 10
+#define SUB_GRID_NUMBER 3
 
 void example_grid(int argc, char *argv[])
 {
@@ -114,7 +115,7 @@ void example_grid(int argc, char *argv[])
     if (world.rank() == 0) {
         paradevs::tests::mpi::GridGraphManagerParameters parameters;
 
-        parameters.global_size = SUB_GRID_SIZE * 3;
+        parameters.global_size = SUB_GRID_SIZE * SUB_GRID_NUMBER;
         parameters.sub_grid_size = SUB_GRID_SIZE;
 
         paradevs::common::RootCoordinator <
@@ -129,13 +130,13 @@ void example_grid(int argc, char *argv[])
         rc.run();
     } else {
         std::stringstream ss;
-        unsigned int x = (world.rank() - 1) % 3;
-        unsigned int y = (world.rank() - 1) / 3;
+        unsigned int x = (world.rank() - 1) % SUB_GRID_NUMBER;
+        unsigned int y = (world.rank() - 1) / SUB_GRID_NUMBER;
         paradevs::tests::mpi::SubGridGraphManagerParameters parameters;
 
-        ss << "S_" << x << "_" << y;
+        ss << "GC_" << x << "_" << y;
 
-        parameters.global_size = SUB_GRID_SIZE * 3;
+        parameters.global_size = SUB_GRID_SIZE * SUB_GRID_NUMBER;
         parameters.begin_column = x * SUB_GRID_SIZE;
         parameters.end_column = (x + 1) * SUB_GRID_SIZE - 1;
         parameters.begin_line = y * SUB_GRID_SIZE;
