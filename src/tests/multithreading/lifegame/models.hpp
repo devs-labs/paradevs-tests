@@ -51,11 +51,13 @@ public:
             name, parameters),
         _neighbour_number(parameters.neighbour_number)
     { }
+
     virtual ~Cell()
     { }
 
     void dint(typename common::DoubleTime::type t)
     {
+        (void)t;
 
         // std::cout << t << " [" << get_name() << "] -> dint: "
         //           << _phase << " => ";
@@ -84,6 +86,7 @@ public:
               typename common::DoubleTime::type /* e */,
               const common::Bag < common::DoubleTime >& bag)
     {
+        (void)t;
 
         // std::cout << t << " [" << get_name() << "] -> dext => "
         //           << _received << " " << _phase << std::endl;
@@ -121,8 +124,10 @@ public:
 
     typename common::DoubleTime::type start(typename common::DoubleTime::type t)
     {
+        (void)t;
 
-        // std::cout << t << " [" << get_name() << "] -> START" << std::endl;
+        // std::cout << t << " [" << get_name() << "] -> START - "
+        //           << _neighbour_number << std::endl;
 
         _phase = SEND;
         _sigma = 0;
@@ -134,11 +139,15 @@ public:
 
     typename common::DoubleTime::type ta(
         typename common::DoubleTime::type t) const
-    { return _sigma; }
+    {
+        (void)t;
+        return _sigma;
+    }
 
     common::Bag < common::DoubleTime > lambda(
         typename common::DoubleTime::type t) const
     {
+        (void)t;
         common::Bag < common::DoubleTime > bag;
 
         if (_phase == SEND) {

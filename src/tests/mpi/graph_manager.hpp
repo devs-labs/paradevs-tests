@@ -27,8 +27,9 @@
 #ifndef TESTS_PDEVS_MPI_GRAPH_MANAGER_HPP
 #define TESTS_PDEVS_MPI_GRAPH_MANAGER_HPP 1
 
-#include <tests/pdevs/models.hpp>
+#include <tests/multithreading/lifegame/models.hpp>
 #include <tests/pdevs/graph_manager.hpp>
+#include <tests/pdevs/models.hpp>
 
 #include <paradevs/kernel/pdevs/mpi/Coordinator.hpp>
 #include <paradevs/kernel/pdevs/mpi/ModelProxy.hpp>
@@ -173,6 +174,550 @@ public:
 
 private:
     ModelProxies models;
+};
+
+struct GridGraphManagerParameters
+{
+    unsigned int global_size;
+    unsigned int sub_grid_size;
+};
+
+class GridGraphManager :
+        public paradevs::pdevs::GraphManager < common::DoubleTime,
+                                               GridGraphManagerParameters >
+{
+public:
+    GridGraphManager(
+        common::Coordinator < common::DoubleTime >* coordinator,
+        const GridGraphManagerParameters& parameters) :
+        paradevs::pdevs::GraphManager < common::DoubleTime,
+                                        GridGraphManagerParameters >(
+                                            coordinator, parameters)
+    {
+        int index = 1;
+        unsigned int size = parameters.global_size / parameters.sub_grid_size;
+
+        // models
+        for (unsigned int j = 0; j < size; ++j) {
+            for (unsigned int i = 0; i < size; ++i) {
+                std::stringstream ss;
+                ModelProxy* model = 0;
+
+                ss << "S_" << i << "_" << j;
+                model = new ModelProxy(ss.str(), index++, false);
+                models.push_back(model);
+                add_child(model);
+            }
+        }
+
+        // input ports
+        for (unsigned int i = 0; i < size; ++i) {
+            for (unsigned int j = 0; j < size; ++j) {
+                ModelProxy* model = models[i + j * size];
+
+                // top and bottom
+                for (unsigned int x = i * parameters.sub_grid_size;
+                     x < (i + 1) * parameters.sub_grid_size; ++x) {
+                    // top
+                    if (j != 0) {
+                        std::stringstream ss;
+
+                        ss << "in_" << x << "_"
+                           << (j * parameters.sub_grid_size - 1);
+
+                        // std::cout << "ADD INPUT PORT "
+                        //           << model->get_name() << " "
+                        //           << ss.str() << std::endl;
+
+                        model->add_in_port(ss.str());
+                    }
+                    // bottom
+                    if (j != size - 1) {
+                        std::stringstream ss;
+
+                        ss << "in_" << x << "_"
+                           << ((j + 1) * parameters.sub_grid_size);
+
+                        // std::cout << "ADD INPUT PORT "
+                        //           << model->get_name() << " "
+                        //           << ss.str() << std::endl;
+
+                        model->add_in_port(ss.str());
+                    }
+                }
+                // left and right
+                for (unsigned int y = j * parameters.sub_grid_size;
+                     y < (j + 1) * parameters.sub_grid_size; ++y) {
+
+                    // left
+                    if (i != 0) {
+                        std::stringstream ss;
+
+                        ss << "in_" << (i * parameters.sub_grid_size - 1)
+                           << "_" << y;
+
+                        // std::cout << "ADD INPUT PORT "
+                        //           << model->get_name() << " "
+                        //           << ss.str() << std::endl;
+
+                        model->add_in_port(ss.str());
+                    }
+                    // right
+                    if (i != size - 1) {
+                        std::stringstream ss;
+
+                        ss << "in_" << ((i + 1) * parameters.sub_grid_size)
+                           << "_" << y;
+
+                        // std::cout << "ADD INPUT PORT "
+                        //           << model->get_name() << " "
+                        //           << ss.str() << std::endl;
+
+                        model->add_in_port(ss.str());
+                    }
+                }
+            }
+        }
+
+        // output ports
+        for (unsigned int i = 0; i < size; ++i) {
+            for (unsigned int j = 0; j < size; ++j) {
+                ModelProxy* model = models[i + j * size];
+
+                // top and bottom
+                for (unsigned int x = i * parameters.sub_grid_size;
+                     x < (i + 1) * parameters.sub_grid_size; ++x) {
+                    // top
+                    if (j != 0) {
+                        std::stringstream ss;
+
+                        ss << "out_" << x << "_"
+                           << (j * parameters.sub_grid_size);
+
+                        // std::cout << "ADD OUTPUT PORT "
+                        //           << model->get_name() << " "
+                        //           << ss.str() << std::endl;
+
+                        model->add_out_port(ss.str());
+                    }
+                    // bottom
+                    if (j != size - 1) {
+                        std::stringstream ss;
+
+                        ss << "out_" << x << "_"
+                           << ((j + 1) * parameters.sub_grid_size - 1);
+
+                        // std::cout << "ADD OUTPUT PORT "
+                        //           << model->get_name() << " "
+                        //           << ss.str() << std::endl;
+
+                        model->add_out_port(ss.str());
+                    }
+                }
+                // left and right
+                for (unsigned int y = j * parameters.sub_grid_size;
+                     y < (j + 1) * parameters.sub_grid_size; ++y) {
+                    // left
+                    if (i != 0) {
+                        std::stringstream ss;
+
+                        ss << "out_" << (i * parameters.sub_grid_size)
+                           << "_" << y;
+                        if (not model->exist_out_port(ss.str())) {
+
+                            // std::cout << "ADD OUTPUT PORT "
+                            //           << model->get_name() << " "
+                            //           << ss.str() << std::endl;
+
+                            model->add_out_port(ss.str());
+                        }
+                    }
+                    // right
+                    if (i != size - 1) {
+                        std::stringstream ss;
+
+                        ss << "out_" << ((i + 1) * parameters.sub_grid_size - 1)
+                           << "_" << y;
+                        if (not model->exist_out_port(ss.str())) {
+
+                            // std::cout << "ADD OUTPUT PORT "
+                            //           << model->get_name() << " "
+                            //           << ss.str() << std::endl;
+
+                            model->add_out_port(ss.str());
+                        }
+                    }
+                }
+            }
+        }
+
+        // connections
+        for (unsigned int i = 0; i < size; ++i) {
+            for (unsigned int j = 0; j < size; ++j) {
+                ModelProxy* model = models[i + j * size];
+
+                // top
+                if (j != 0) {
+                    for (unsigned int x = i * parameters.sub_grid_size;
+                         x < (i + 1) * parameters.sub_grid_size; ++x) {
+                        std::stringstream out_ss;
+                        std::stringstream in_ss;
+
+                        out_ss << "out_" << x << "_"
+                               << (j * parameters.sub_grid_size - 1);
+                        in_ss << "in_" << x << "_"
+                              << (j * parameters.sub_grid_size - 1);
+
+                        // std::cout << "LINK " << model->get_name()
+                        //           << "::" << in_ss.str()
+                        //           << " <= "
+                        //           << models[i + (j - 1) * size]->get_name()
+                        //           << "::"
+                        //           << out_ss.str()
+                        //           << std::endl;
+
+                        add_link(models[i + (j - 1) * size], out_ss.str(),
+                                 model, in_ss.str());
+                    }
+                }
+                // bottom
+                if (j != size - 1) {
+                    for (unsigned int x = i * parameters.sub_grid_size;
+                         x < (i + 1) * parameters.sub_grid_size; ++x) {
+                        std::stringstream out_ss;
+                        std::stringstream in_ss;
+
+                        out_ss << "out_" << x << "_"
+                               << ((j + 1) * parameters.sub_grid_size);
+                        in_ss << "in_" << x << "_"
+                              << ((j + 1) * parameters.sub_grid_size);
+
+                        // std::cout << "LINK " << model->get_name()
+                        //           << "::" << in_ss.str()
+                        //           << " <= "
+                        //           << models[i + (j + 1) * size]->get_name()
+                        //           << "::"
+                        //           << out_ss.str()
+                        //           << std::endl;
+
+                        add_link(models[i + (j + 1) * size], out_ss.str(),
+                                 model, in_ss.str());
+                    }
+                }
+                // left
+                if (i != 0) {
+                    for (unsigned int y = j * parameters.sub_grid_size;
+                         y < (j + 1) * parameters.sub_grid_size; ++y) {
+                        std::stringstream out_ss;
+                        std::stringstream in_ss;
+
+                        out_ss << "out_" << (i * parameters.sub_grid_size - 1)
+                               << "_" << y;
+                        in_ss << "in_" << (i * parameters.sub_grid_size - 1)
+                              << "_" << y;
+
+                        // std::cout << "LINK " << model->get_name()
+                        //           << "::" << in_ss.str()
+                        //           << " <= "
+                        //           << models[i - 1 + j * size]->get_name()
+                        //           << "::"
+                        //           << out_ss.str()
+                        //           << std::endl;
+
+                        add_link(models[i - 1 + j * size], out_ss.str(),
+                                 model, in_ss.str());
+                    }
+                }
+                // right
+                if (i != size - 1) {
+                    for (unsigned int y = j * parameters.sub_grid_size;
+                         y < (j + 1) * parameters.sub_grid_size; ++y) {
+                        std::stringstream out_ss;
+                        std::stringstream in_ss;
+
+                        out_ss << "out_"
+                               << ((i + 1) * parameters.sub_grid_size)
+                               << "_" << y;
+                        in_ss << "in_"
+                              << ((i + 1) * parameters.sub_grid_size)
+                              << "_" << y;
+
+                        // std::cout << "LINK " << model->get_name()
+                        //           << "::" << in_ss.str()
+                        //           << " <= "
+                        //           << models[i + 1 + j * size]->get_name()
+                        //           << "::"
+                        //           << out_ss.str()
+                        //           << std::endl;
+
+                        add_link(models[i + 1 + j * size], out_ss.str(),
+                                 model, in_ss.str());
+                    }
+                }
+            }
+        }
+    }
+
+    virtual ~GridGraphManager()
+    {
+        std::for_each(models.begin(), models.end(),
+                      std::default_delete < ModelProxy >());
+    }
+
+private:
+    ModelProxies models;
+};
+
+struct SubGridGraphManagerParameters
+{
+    unsigned int global_size;
+    unsigned int begin_line;
+    unsigned int end_line;
+    unsigned int begin_column;
+    unsigned int end_column;
+};
+
+class SubGridGraphManager :
+        public paradevs::pdevs::mpi::GraphManager <
+    common::DoubleTime, SubGridGraphManagerParameters >
+{
+public:
+    SubGridGraphManager(
+        common::Coordinator < common::DoubleTime >* coordinator,
+        const SubGridGraphManagerParameters& parameters) :
+        paradevs::pdevs::mpi::GraphManager <
+    common::DoubleTime, SubGridGraphManagerParameters >(coordinator,
+                                                        parameters)
+    {
+        unsigned int size = parameters.end_column - parameters.begin_column + 1;
+
+        for (unsigned int y = parameters.begin_line;
+             y <= parameters.end_line; ++y) {
+            for (unsigned int x = parameters.begin_column;
+                 x <= parameters.end_column; ++x) {
+                std::stringstream ss;
+                Simulator* simulator = 0;
+                paradevs::tests::multithreading::lifegame::CellParameters
+                    cell_parameters(
+                        ((x != 0) ? 1 : 0) +
+                        ((x != parameters.global_size - 1) ? 1 : 0) +
+                        ((y != 0) ? 1 : 0) +
+                        ((y != parameters.global_size - 1) ? 1 : 0));
+
+                ss << "C_" << x << "_" << y;
+                simulator = new Simulator(ss.str(), cell_parameters);
+                simulators.push_back(simulator);
+                add_child(simulator);
+                simulator->add_out_port("out");
+                simulator->add_in_port("in");
+            }
+        }
+        // internal connections
+        for (unsigned int x = parameters.begin_column;
+             x <= parameters.end_column; ++x) {
+            for (unsigned int y = parameters.begin_line;
+                 y <= parameters.end_line; ++y) {
+                unsigned int i = x - parameters.begin_column;
+                unsigned int j = y - parameters.begin_line;
+                Simulator* simulator = simulators[i + j * size];
+
+                if (i != 0) {
+                    add_link(simulators[(i - 1) + j * size], "out",
+                             simulator, "in");
+
+                    // std::cout << "subgrid [ " << parameters.begin_column
+                    //           << " " << parameters.begin_line << " ] => "
+                    //           << ((i - 1) + j * size) << " -> "
+                    //           << (i + j * size) << std::endl;
+
+                }
+                if (i != size - 1) {
+                    add_link(simulators[(i + 1) + j * size], "out",
+                             simulator, "in");
+
+                    // std::cout << "subgrid [ " << parameters.begin_column
+                    //           << " " << parameters.begin_line << " ] => "
+                    //           << ((i + 1) + j * size) << " -> "
+                    //           << (i + j * size) << std::endl;
+
+                }
+                if (j != 0) {
+                    add_link(simulators[i + (j - 1) * size], "out",
+                             simulator, "in");
+
+                    // std::cout << "subgrid [ " << parameters.begin_column
+                    //           << " " << parameters.begin_line << " ] => "
+                    //           << (i + (j - 1) * size) << " -> "
+                    //           << (i + j * size) << std::endl;
+
+                }
+                if (j != size - 1) {
+                    add_link(simulators[i + (j + 1 ) * size], "out",
+                             simulator, "in");
+
+                    // std::cout << "subgrid [ " << parameters.begin_column
+                    //           << " " << parameters.begin_line << " ] => "
+                    //           << (i + (j + 1) * size) << " -> "
+                    //           << (i + j * size) << std::endl;
+
+                }
+            }
+        }
+        // input ports
+        {
+            // top and bottom
+            for (unsigned int x = parameters.begin_column;
+                 x <= parameters.end_column; ++x) {
+                unsigned int i = x - parameters.begin_column;
+
+                // top
+                if (parameters.begin_line != 0) {
+                    std::stringstream ss;
+
+                    ss << "in_" << x << "_" << (parameters.begin_line - 1);
+                    coordinator->add_in_port(ss.str());
+                    add_link(coordinator, ss.str(), simulators[i], "in");
+                }
+                // bottom
+                if (parameters.end_line != parameters.global_size - 1) {
+                    std::stringstream ss;
+
+                    ss << "in_" << x << "_" << (parameters.end_line + 1);
+                    coordinator->add_in_port(ss.str());
+                    add_link(coordinator, ss.str(),
+                             simulators[i + size * (size - 1)], "in");
+                }
+            }
+            // left and right
+            for (unsigned int y = parameters.begin_line;
+                 y <= parameters.end_line; ++y) {
+                unsigned int j = y - parameters.begin_line;
+
+                // left
+                if (parameters.begin_column != 0) {
+                    std::stringstream ss;
+
+                    ss << "in_" << (parameters.begin_column - 1) << "_" << y;
+                    coordinator->add_in_port(ss.str());
+                    add_link(coordinator, ss.str(), simulators[j * size], "in");
+                }
+                // right
+                if (parameters.end_column != parameters.global_size - 1) {
+                    std::stringstream ss;
+
+                    ss << "in_" << (parameters.end_column + 1) << "_" << y;
+                    coordinator->add_in_port(ss.str());
+                    add_link(coordinator, ss.str(),
+                             simulators[size - 1 + j * size], "in");
+
+                    // std::cout << "subgrid [ " << parameters.begin_column
+                    //           << " " << parameters.begin_line << " ] => "
+                    //           << ss.str() << " -> "
+                    //           << (size - 1 + j * size) << std::endl;
+
+                }
+            }
+        }
+        // output ports
+        {
+            // top and bottom
+            for (unsigned int x = parameters.begin_column;
+                 x <= parameters.end_column; ++x) {
+                unsigned int i = x - parameters.begin_column;
+
+                // top
+                {
+                    std::stringstream ss;
+
+                    ss << "out_" << x << "_" << parameters.begin_line;
+                    coordinator->add_out_port(ss.str());
+                    add_link(simulators[i], "out", coordinator, ss.str());
+
+                    // std::cout << "subgrid [ " << parameters.begin_column
+                    //           << " " << parameters.begin_line << " ] => "
+                    //           << simulators[i]->get_name()
+                    //           << "::out => " << ss.str() << std::endl;
+
+                }
+                // bottom
+                {
+                    std::stringstream ss;
+
+                    ss << "out_" << x << "_" << parameters.end_line;
+                    coordinator->add_out_port(ss.str());
+                    add_link(simulators[i + size * (size - 1)], "out",
+                             coordinator, ss.str());
+
+                    // std::cout << "subgrid [ " << parameters.begin_column
+                    //           << " " << parameters.begin_line << " ] => "
+                    //           << simulators[i + size * (size - 1)]->get_name()
+                    //           << "::out => " << ss.str() << std::endl;
+
+                }
+            }
+            // left and right
+            for (unsigned int y = parameters.begin_line;
+                 y <= parameters.end_line; ++y) {
+                unsigned int j = y - parameters.begin_line;
+
+                // left
+                {
+                    std::stringstream ss;
+
+                    ss << "out_" << parameters.begin_column << "_" << y;
+                    if (not coordinator->exist_out_port(ss.str())) {
+                        coordinator->add_out_port(ss.str());
+                        add_link(simulators[j * size], "out",
+                                 coordinator, ss.str());
+
+                        // std::cout << "subgrid [ " << parameters.begin_column
+                        //       << " " << parameters.begin_line << " ] => "
+                        //       << simulators[j * size]->get_name()
+                        //       << "::out => " << ss.str() << std::endl;
+
+                    }
+                }
+                // right
+                {
+                    std::stringstream ss;
+
+                    ss << "out_" << parameters.end_column << "_" << y;
+                    if (not coordinator->exist_out_port(ss.str())) {
+                        coordinator->add_out_port(ss.str());
+                        add_link(simulators[size - 1 + j * size], "out",
+                                 coordinator, ss.str());
+                    }
+                }
+            }
+        }
+    }
+
+    void init()
+    { }
+
+    void start(common::DoubleTime::type /* t */)
+    { }
+
+    void transition(
+        const common::Models < common::DoubleTime >& /* receivers */,
+        common::DoubleTime::type /* t */)
+    { }
+
+    virtual ~SubGridGraphManager()
+    {
+        std::for_each(simulators.begin(), simulators.end(),
+                      std::default_delete < Simulator >());
+    }
+
+private:
+    typedef paradevs::pdevs::Simulator <
+    common::DoubleTime,
+    multithreading::lifegame::Cell,
+    multithreading::lifegame::CellParameters > Simulator;
+
+    typedef std::vector < Simulator* > Simulators;
+
+    Simulators simulators;
 };
 
 // struct MPIHierarchicalGraphManagerParameters
