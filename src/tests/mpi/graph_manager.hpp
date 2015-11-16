@@ -80,8 +80,8 @@ public:
     { }
 
 private:
-    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::A  > a;
-    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::B  > b;
+    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::A > a;
+    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::B > b;
 };
 
 class S2GraphManager :
@@ -101,10 +101,13 @@ public:
         a.add_in_port("in");
         a.add_out_port("out");
         b.add_in_port("in");
+        b.add_out_port("out");
         coordinator->add_in_port("in");
+        coordinator->add_out_port("out");
 
         add_link(&a, "out", &b, "in");
         add_link(coordinator, "in", &a, "in");
+        add_link(&b, "out", coordinator, "out");
     }
 
     void init()
@@ -122,17 +125,14 @@ public:
     { }
 
 private:
-    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::A  > a;
-    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::B  > b;
+    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::A > a;
+    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::B > b;
 };
 
 struct RootGraphManagerParameters
 {
     std::vector < int > ranks;
 };
-
-typedef paradevs::pdevs::mpi::ModelProxy < common::DoubleTime > ModelProxy;
-typedef std::vector < ModelProxy* > ModelProxies;
 
 class RootGraphManager :
         public paradevs::pdevs::GraphManager < common::DoubleTime,
@@ -173,8 +173,158 @@ public:
     }
 
 private:
+    typedef paradevs::pdevs::mpi::ModelProxy < common::DoubleTime > ModelProxy;
+    typedef std::vector < ModelProxy* > ModelProxies;
+
     ModelProxies models;
 };
+
+/******************************************************************************/
+
+class S1LocalGraphManager :
+        public paradevs::pdevs::GraphManager < common::DoubleTime >
+{
+public:
+    S1LocalGraphManager(common::Coordinator < common::DoubleTime >* coordinator,
+                        const paradevs::common::NoParameters& parameters) :
+        paradevs::pdevs::GraphManager < common::DoubleTime >(coordinator,
+                                                             parameters),
+        a("a1", common::NoParameters()),
+        b("b1", common::NoParameters())
+    {
+        add_child(&a);
+        add_child(&b);
+
+        a.add_out_port("out");
+        b.add_in_port("in");
+        b.add_out_port("out");
+        coordinator->add_out_port("out");
+
+        add_link(&a, "out", &b, "in");
+        add_link(&b, "out", coordinator, "out");
+    }
+
+    void init()
+    { }
+
+    void start(common::DoubleTime::type /* t */)
+    { }
+
+    void transition(
+        const common::Models < common::DoubleTime >& /* receivers */,
+        common::DoubleTime::type /* t */)
+    { }
+
+    virtual ~S1LocalGraphManager()
+    { }
+
+private:
+    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::A > a;
+    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::B > b;
+};
+
+class S2LocalGraphManager :
+        public paradevs::pdevs::GraphManager < common::DoubleTime >
+{
+public:
+    S2LocalGraphManager(common::Coordinator < common::DoubleTime >* coordinator,
+                        const paradevs::common::NoParameters& parameters) :
+        paradevs::pdevs::GraphManager < common::DoubleTime >(coordinator,
+                                                             parameters),
+        a("a2", common::NoParameters()),
+        b("b2", common::NoParameters())
+    {
+        add_child(&a);
+        add_child(&b);
+
+        a.add_in_port("in");
+        a.add_out_port("out");
+        b.add_in_port("in");
+        b.add_out_port("out");
+        coordinator->add_in_port("in");
+        coordinator->add_out_port("out");
+
+        add_link(&a, "out", &b, "in");
+        add_link(coordinator, "in", &a, "in");
+        add_link(&b, "out", coordinator, "out");
+    }
+
+    void init()
+    { }
+
+    void start(common::DoubleTime::type /* t */)
+    { }
+
+    void transition(
+        const common::Models < common::DoubleTime >& /* receivers */,
+        common::DoubleTime::type /* t */)
+    { }
+
+    virtual ~S2LocalGraphManager()
+    { }
+
+private:
+    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::A > a;
+    paradevs::pdevs::Simulator < common::DoubleTime, pdevs::B > b;
+};
+
+struct RootLocalGraphManagerParameters
+{
+    std::vector < int > ranks;
+};
+
+class RootLocalGraphManager :
+        public paradevs::pdevs::GraphManager < common::DoubleTime,
+                                               RootLocalGraphManagerParameters >
+{
+public:
+    RootLocalGraphManager(
+        common::Coordinator < common::DoubleTime >* coordinator,
+        const RootLocalGraphManagerParameters& parameters) :
+        paradevs::pdevs::GraphManager < common::DoubleTime,
+                                        RootLocalGraphManagerParameters >(
+                                            coordinator, parameters),
+        first("S0", paradevs::common::NoParameters(),
+              paradevs::common::NoParameters())
+    {
+        Next* previous = 0;
+
+        for (std::vector < int >::const_iterator it = parameters.ranks.begin();
+             it != parameters.ranks.end(); ++it) {
+            std::stringstream ss;
+            Next* model = 0;
+
+            ss << "S" << *it;
+            model = new Next(ss.str(), paradevs::common::NoParameters(),
+                             paradevs::common::NoParameters());
+            nexts.push_back(model);
+            add_child(model);
+            if (it != parameters.ranks.begin()) {
+                add_link(previous, "out", model, "in");
+            }
+            previous = model;
+        }
+        add_link(&first, "out", nexts[0], "in");
+    }
+
+    virtual ~RootLocalGraphManager()
+    {
+        std::for_each(nexts.begin(), nexts.end(),
+                      std::default_delete < Next >());
+    }
+
+private:
+    typedef paradevs::pdevs::Coordinator < common::DoubleTime,
+                                           S1LocalGraphManager > First;
+    typedef paradevs::pdevs::Coordinator < common::DoubleTime,
+                                           S2LocalGraphManager > Next;
+    typedef std::vector < Next* > Nexts;
+
+    First first;
+    Nexts nexts;
+};
+
+/******************************************************************************/
 
 struct GridGraphManagerParameters
 {
@@ -465,6 +615,9 @@ public:
     }
 
 private:
+    typedef paradevs::pdevs::mpi::ModelProxy < common::DoubleTime > ModelProxy;
+    typedef std::vector < ModelProxy* > ModelProxies;
+
     ModelProxies models;
 };
 

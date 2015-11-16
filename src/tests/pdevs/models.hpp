@@ -87,7 +87,7 @@ public:
         common::Trace < common::DoubleTime >::trace().flush();
 #endif
 
-        delay();
+        // delay();
         ++_value.x;
         --_value.y;
 
@@ -256,7 +256,7 @@ public:
         common::Trace < common::DoubleTime >::trace().flush();
 #endif
 
-        delay();
+        // delay();
 
         // std::cout << t << ": " << get_name() << " => dint -> "
         //           << _value << std::endl;
