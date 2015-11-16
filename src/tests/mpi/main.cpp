@@ -248,8 +248,8 @@ void example_grid(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    // example_simple(argc, argv);
-    example_simple_local();
+    example_simple(argc, argv);
+//    example_simple_local();
 //    example_grid(argc, argv);
     return 0;
 }
