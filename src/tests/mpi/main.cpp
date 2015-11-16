@@ -61,7 +61,6 @@ void example_simple(int argc, char *argv[])
         parameters.ranks.push_back(6);
         parameters.ranks.push_back(7);
         parameters.ranks.push_back(8);
-        parameters.ranks.push_back(9);
 
         paradevs::common::RootCoordinator <
             DoubleTime,
