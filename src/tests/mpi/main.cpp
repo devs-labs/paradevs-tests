@@ -62,7 +62,6 @@ void example_simple(int argc, char *argv[])
         parameters.ranks.push_back(7);
         parameters.ranks.push_back(8);
         parameters.ranks.push_back(9);
-        parameters.ranks.push_back(10);
 
         paradevs::common::RootCoordinator <
             DoubleTime,
@@ -205,7 +204,7 @@ void example_grid(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-//    example_simple(argc, argv);
-    example_grid(argc, argv);
+    example_simple(argc, argv);
+//    example_grid(argc, argv);
     return 0;
 }
