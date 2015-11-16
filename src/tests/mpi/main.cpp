@@ -104,8 +104,8 @@ void example_simple(int argc, char *argv[])
     }
 }
 
-#define SUB_GRID_SIZE 10
-#define SUB_GRID_NUMBER 3
+#define SUB_GRID_SIZE 32
+#define SUB_GRID_NUMBER 8
 
 void example_grid(int argc, char *argv[])
 {
