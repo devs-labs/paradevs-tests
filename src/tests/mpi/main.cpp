@@ -69,7 +69,7 @@ void example_simple(int argc, char *argv[])
                 paradevs::tests::mpi::RootGraphManager,
                 paradevs::common::NoParameters,
                 paradevs::tests::mpi::RootGraphManagerParameters >
-            > rc(0, 20, "root", paradevs::common::NoParameters(), parameters);
+            > rc(0, 1000, "root", paradevs::common::NoParameters(), parameters);
 
 
         steady_clock::time_point t1 = steady_clock::now();
@@ -133,7 +133,7 @@ void example_simple_local()
             paradevs::tests::mpi::RootLocalGraphManager,
             paradevs::common::NoParameters,
             paradevs::tests::mpi::RootLocalGraphManagerParameters >
-        > rc(0, 20, "root", paradevs::common::NoParameters(), parameters);
+        > rc(0, 1000, "root", paradevs::common::NoParameters(), parameters);
 
     steady_clock::time_point t1 = steady_clock::now();
 
