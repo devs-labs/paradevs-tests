@@ -324,6 +324,119 @@ private:
     Nexts nexts;
 };
 
+class RootMultithreadingGraphManager :
+        public paradevs::pdevs::GraphManager < common::DoubleTime,
+                                               RootLocalGraphManagerParameters >
+{
+public:
+    RootMultithreadingGraphManager(
+        common::Coordinator < common::DoubleTime >* coordinator,
+        const RootLocalGraphManagerParameters& parameters) :
+        paradevs::pdevs::GraphManager < common::DoubleTime,
+                                        RootLocalGraphManagerParameters >(
+                                            coordinator, parameters),
+        first("S0", paradevs::common::NoParameters(),
+              paradevs::common::NoParameters())
+    {
+        Next* previous = 0;
+
+        add_child(&first);
+        for (std::vector < int >::const_iterator it = parameters.ranks.begin();
+             it != parameters.ranks.end(); ++it) {
+            std::stringstream ss;
+            Next* model = 0;
+
+            ss << "S" << *it;
+            model = new Next(ss.str(), paradevs::common::NoParameters(),
+                             paradevs::common::NoParameters());
+            nexts.push_back(model);
+            add_child(model);
+            if (it != parameters.ranks.begin()) {
+                add_link(previous, "out", model, "in");
+            }
+            previous = model;
+        }
+        add_link(&first, "out", nexts[0], "in");
+    }
+
+    virtual ~RootMultithreadingGraphManager()
+    {
+        std::for_each(nexts.begin(), nexts.end(),
+                      std::default_delete < Next >());
+    }
+
+    void init()
+    {
+        first.set_sender(
+            dynamic_cast < paradevs::pdevs::multithreading::Coordinator <
+            common::DoubleTime,
+            RootMultithreadingGraphManager,
+            paradevs::common::NoParameters,
+            RootLocalGraphManagerParameters >*
+            >(get_coordinator())->get_sender());
+        for (Nexts::const_iterator it = nexts.begin(); it != nexts.end();
+             ++it) {
+            (*it)->set_sender(
+                dynamic_cast < paradevs::pdevs::multithreading::Coordinator <
+                    common::DoubleTime,
+                    RootMultithreadingGraphManager,
+                    paradevs::common::NoParameters,
+                    RootLocalGraphManagerParameters >*
+                >(get_coordinator())->get_sender());
+        }
+    }
+
+    void start(common::DoubleTime::type t)
+    {
+        first.get_sender().send(
+            paradevs::pdevs::multithreading::start_message <
+            paradevs::common::DoubleTime >(t));
+        for (Nexts::const_iterator it = nexts.begin(); it != nexts.end();
+             ++it) {
+            (*it)->get_sender().send(
+                paradevs::pdevs::multithreading::start_message <
+                    paradevs::common::DoubleTime >(t));
+        }
+    }
+
+    void transition(const common::Models < common::DoubleTime >& receivers,
+                    paradevs::common::DoubleTime::type t)
+    {
+        common::Models < common::DoubleTime >::const_iterator it =
+            receivers.begin();
+
+        while (it != receivers.end()) {
+            if (not (*it)->is_atomic()) {
+                Nexts::const_iterator itc =
+                    std::find(nexts.begin(), nexts.end(), *it);
+
+                if (itc != nexts.end()) {
+                    (*itc)->get_sender().send(
+                        paradevs::pdevs::multithreading::transition_message <
+                        paradevs::common::DoubleTime >(t));
+                } else {
+                    first.get_sender().send(
+                        paradevs::pdevs::multithreading::transition_message <
+                        paradevs::common::DoubleTime >(t));
+                }
+            }
+            ++it;
+        }
+    }
+
+private:
+    typedef paradevs::pdevs::multithreading::Coordinator <
+    common::DoubleTime,
+    S1LocalGraphManager > First;
+    typedef paradevs::pdevs::multithreading::Coordinator <
+        common::DoubleTime,
+        S2LocalGraphManager > Next;
+    typedef std::vector < Next* > Nexts;
+
+    First first;
+    Nexts nexts;
+};
+
 /******************************************************************************/
 
 struct GridGraphManagerParameters

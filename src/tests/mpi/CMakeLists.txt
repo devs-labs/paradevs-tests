@@ -23,6 +23,7 @@ ADD_EXECUTABLE(pdevs-mpi-main graph_manager.hpp main.cpp
   ../boost_graph/partitioning/graph_build.hpp)
 
 TARGET_LINK_LIBRARIES(pdevs-mpi-main
+  ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_SERIALIZATION_LIBRARY}
   ${Boost_MPI_LIBRARY}
   ${MPI_CXX_LIBRARIES})

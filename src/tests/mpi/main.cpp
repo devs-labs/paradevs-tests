@@ -36,6 +36,7 @@
 
 #include <paradevs/common/time/DoubleTime.hpp>
 #include <paradevs/kernel/pdevs/mpi/LogicalProcessor.hpp>
+#include <paradevs/kernel/pdevs/multithreading/Coordinator.hpp>
 #include <tests/mpi/graph_manager.hpp>
 
 #include <chrono>
@@ -131,6 +132,40 @@ void example_simple_local()
         paradevs::pdevs::Coordinator <
             DoubleTime,
             paradevs::tests::mpi::RootLocalGraphManager,
+            paradevs::common::NoParameters,
+            paradevs::tests::mpi::RootLocalGraphManagerParameters >
+        > rc(0, 1000, "root", paradevs::common::NoParameters(), parameters);
+
+    steady_clock::time_point t1 = steady_clock::now();
+
+    rc.run();
+
+    steady_clock::time_point t2 = steady_clock::now();
+
+    duration < double > time_span = duration_cast <
+        duration < double > >(t2 - t1);
+
+    std::cout << "CHAIN = " << time_span.count() << std::endl;
+}
+
+void example_simple_multithreading()
+{
+    paradevs::tests::mpi::RootLocalGraphManagerParameters parameters;
+
+    parameters.ranks.push_back(1);
+    parameters.ranks.push_back(2);
+    parameters.ranks.push_back(3);
+    parameters.ranks.push_back(4);
+    parameters.ranks.push_back(5);
+    parameters.ranks.push_back(6);
+    parameters.ranks.push_back(7);
+    parameters.ranks.push_back(8);
+
+    paradevs::common::RootCoordinator <
+        DoubleTime,
+        paradevs::pdevs::multithreading::Coordinator <
+            DoubleTime,
+            paradevs::tests::mpi::RootMultithreadingGraphManager,
             paradevs::common::NoParameters,
             paradevs::tests::mpi::RootLocalGraphManagerParameters >
         > rc(0, 1000, "root", paradevs::common::NoParameters(), parameters);
@@ -248,7 +283,8 @@ void example_grid(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    example_simple(argc, argv);
+    example_simple_multithreading();
+    // example_simple(argc, argv);
 //    example_simple_local();
 //    example_grid(argc, argv);
     return 0;
