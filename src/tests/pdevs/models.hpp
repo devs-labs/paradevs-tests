@@ -237,9 +237,9 @@ public:
     B(const std::string& name, const common::NoParameters& parameters) :
         paradevs::pdevs::Dynamics < common::DoubleTime >(name, parameters),
         _value(0)
-    { _value = new char[1024]; }
+    { }
     virtual ~B()
-    { delete[] _value; }
+    { }
 
     void dint(typename common::DoubleTime::type t)
     {
@@ -392,7 +392,7 @@ private:
     enum Phase { WAIT, SEND };
 
     Phase _phase;
-    char* _value;
+    double _value;
 };
 
 class TwoStateModel :
